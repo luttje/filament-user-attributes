@@ -3,14 +3,8 @@
 > **Warning**
 > This package is still in development. It is not yet ready for production use.
 
-<!--
-
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/luttje/filament-user-attributes.svg?style=flat-square)](https://packagist.org/packages/luttje/filament-user-attributes)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/luttje/filament-user-attributes/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/luttje/filament-user-attributes/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/luttje/filament-user-attributes/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/luttje/filament-user-attributes/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/luttje/filament-user-attributes.svg?style=flat-square)](https://packagist.org/packages/luttje/filament-user-attributes)
-
--->
+[![Tests](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml)
+[![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
 
 Let your users specify custom attributes for models.
 
