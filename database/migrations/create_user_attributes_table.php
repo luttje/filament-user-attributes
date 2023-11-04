@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('user_attributes', function (Blueprint $table) {
             $table->id();
 
-            $table->morphs('model');
+            // Large enough morph for any type of id.
+            $table->string('model_id');
+            $table->string('model_type');
             $table->json('values');
 
             // Ensure that each model can only have one set of attributes.

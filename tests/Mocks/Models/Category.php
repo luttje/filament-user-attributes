@@ -2,17 +2,15 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\ProductFactory;
+use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\CategoryFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
-class Product extends Model
+class Category extends Model
 {
     use HasFactory;
     use HasUserAttributes;
-    use HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +27,6 @@ class Product extends Model
      */
     protected static function newFactory()
     {
-        return ProductFactory::new();
+        return CategoryFactory::new();
     }
 }

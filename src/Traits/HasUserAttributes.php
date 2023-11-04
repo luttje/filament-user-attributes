@@ -5,12 +5,63 @@ namespace Luttje\FilamentUserAttributes\Traits;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
-
 /**
  * @property object $user_attributes
  */
 trait HasUserAttributes
 {
+    /**
+     * All user attributes that have been set on the model but not yet saved.
+     */
+    protected $dirtyUserAttributes = [];
+
+    /**
+     * Whether the user attributes should be destroyed when the model is saved.
+     */
+    protected $shouldDestroyUserAttributes = false;
+
+    /**
+     * Stores an instance of the anonymous class that is created when the user_attributes
+     */
+    private $__userAttributesInstance;
+
+    /**
+     * Boots the trait and adds a saving hook to save the user attributes
+     * when the model is saved.
+     *
+     * @return void
+     */
+    protected static function bootHasUserAttributes()
+    {
+        static::saved(function ($model) {
+            if ($model->shouldDestroyUserAttributes) {
+                $model->userAttributes()->delete();
+                $model->shouldDestroyUserAttributes = false;
+                return;
+            }
+
+            if (!empty($model->dirtyUserAttributes)) {
+                // If the model already has user attributes, merge them, otherwise create a new record
+                $attributes = $model->userAttributes()->first();
+                if ($attributes) {
+                    $newValues = array_merge($attributes->values->toArray(), $model->dirtyUserAttributes);
+                    $attributes->values = $newValues;
+                    $attributes->save();
+                } else {
+                    $model->userAttributes()->create(['values' => $model->dirtyUserAttributes]);
+                }
+
+                // Clear the delayed attributes as they are now saved
+                $model->dirtyUserAttributes = [];
+            }
+        });
+    }
+
+    /**
+     * Relationship to the user attributes model.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     */
     public function userAttributes(): MorphOne
     {
         return $this->morphOne(UserAttribute::class, 'model');
@@ -21,29 +72,32 @@ trait HasUserAttributes
         return $this->userAttributes()->where('values->' . $key, '!=', null)->exists();
     }
 
+    public function setUserAttributeValue(string $key, $value)
+    {
+        if ($this->shouldDestroyUserAttributes) {
+            throw new \Exception('Cannot set user attribute on a model that has been marked for deletion.');
+        }
+
+        $this->dirtyUserAttributes[$key] = $value;
+    }
+
     public function setUserAttributeValues(object $values)
     {
-        return $this->userAttributes()->updateOrCreate([], ['values' => $values]);
+        if ($this->shouldDestroyUserAttributes) {
+            throw new \Exception('Cannot set user attributes on a model that has been marked for deletion.');
+        }
+
+        $this->dirtyUserAttributes = array_merge($this->dirtyUserAttributes, (array)$values);
     }
 
     public function destroyUserAttributes()
     {
-        return $this->userAttributes?->delete();
+        $this->shouldDestroyUserAttributes = true;
     }
 
     public function getUserAttributeValue(string $key)
     {
         return $this->userAttributes()->first()->values[$key] ?? null;
-    }
-
-    public function setUserAttributeValue(string $key, $value)
-    {
-        if ($this->userAttributes !== null) {
-            $this->userAttributes()->update(['values->' . $key => $value]);
-            return;
-        }
-
-        $this->userAttributes()->create(['values' => [$key => $value]]);
     }
 
     /**
