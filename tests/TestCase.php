@@ -67,13 +67,13 @@ class TestCase extends Orchestra
 
         $this->loadMigrationsFrom([
             '--database' => 'testing',
-            '--path' => realpath(__DIR__ . '/../database/migrations')
+            '--path' => realpath(__DIR__ . '/../database/migrations'),
         ]);
 
         // Test only migrations
         $this->loadMigrationsFrom([
             '--database' => 'testing',
-            '--path' => realpath(__DIR__ . '/database/migrations')
+            '--path' => realpath(__DIR__ . '/database/migrations'),
         ]);
 
         $this->artisan('migrate', ['--database' => 'testing'])->run();

@@ -7,7 +7,6 @@ use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
-use Luttje\FilamentUserAttributes\Commands\FilamentUserAttributesCommand;
 use Luttje\FilamentUserAttributes\Testing\TestsFilamentUserAttributes;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
