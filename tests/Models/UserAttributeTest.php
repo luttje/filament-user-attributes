@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Models;
 
-use Luttje\FilamentUserAttributes\Models\UserAttribute;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Models\User;
 
 it('can add a custom attribute to a model', function () {
