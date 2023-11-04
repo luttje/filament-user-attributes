@@ -96,17 +96,9 @@ $product->getUserAttribute('color');
 
 ## Testing
 
-Make sure you have enabled `pdo_sqlite` in your `php` installation.
+1. Copy `phpunit.xml.example` to `phpunit.xml`
 
-1. Find your `php.ini` file
-```bash
-php --ini
-```
-
-2. Open the `php.ini` file and ensure there is no comment (semicolon) before the following line:
-```ini
-extension=pdo_sqlite
-```
+2. Start and create a database that supports JSON columns and add the credentials to the `phpunit.xml` file.
 
 3. Run the tests
 ```bash
