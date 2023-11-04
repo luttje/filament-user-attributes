@@ -53,3 +53,24 @@ If the project maintainer has any additional requirements, you will find them li
 - **Send coherent history** - Make sure each individual commit in your pull request is meaningful. If you had to make multiple intermediate commits while developing, please [squash them](https://www.git-scm.com/book/en/v2/Git-Tools-Rewriting-History#Changing-Multiple-Commit-Messages) before submitting.
 
 **Happy coding**!
+
+## Getting Started
+
+1. Clone this repository to your device
+2. Inside the root of this repository run composer install
+3. Create a test project in which you will use this package (Follow Usage instructions above)
+4. Add the package locally using the following additions to your composer.
+```json
+	"repositories": [
+		{
+			"type": "path",
+			"url": "../filament-user-attributes"
+		}
+	],
+```
+
+In place of `../filament-user-attributes` you should specify the path to where you cloned this package.
+
+Run composer require "luttje/filament-user-attributes @dev" inside the test project
+
+You can now test and modify this package. Changes will immediately be reflected in the test project.

@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class FilamentUserAttributesCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'filament-user-attributes';
 
     public $description = 'My command';
 

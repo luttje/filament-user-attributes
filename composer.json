@@ -1,21 +1,20 @@
 {
-    "name": ":vendor_slug/:package_slug",
-    "description": ":package_description",
+    "name": "luttje/filament-user-attributes",
+    "description": " Let your users specify custom attributes for models. ",
     "keywords": [
-        ":vendor_name",
+        "luttje",
         "laravel",
-        ":package_slug"
+        "filament-user-attributes"
     ],
-    "homepage": "https://github.com/:vendor_slug/:package_slug",
+    "homepage": "https://github.com/luttje/filament-user-attributes",
     "support": {
-        "issues": "https://github.com/:vendor_slug/:package_slug/issues",
-        "source": "https://github.com/:vendor_slug/:package_slug"
+        "issues": "https://github.com/luttje/filament-user-attributes/issues",
+        "source": "https://github.com/luttje/filament-user-attributes"
     },
     "license": "MIT",
     "authors": [
         {
-            "name": ":author_name",
-            "email": "author@domain.com",
+            "name": "luttje",
             "role": "Developer"
         }
     ],
@@ -42,13 +41,13 @@
     },
     "autoload": {
         "psr-4": {
-            "VendorName\\Skeleton\\": "src/",
-            "VendorName\\Skeleton\\Database\\Factories\\": "database/factories/"
+            "Luttje\\FilamentUserAttributes\\": "src/",
+            "Luttje\\FilamentUserAttributes\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "VendorName\\Skeleton\\Tests\\": "tests/"
+            "Luttje\\FilamentUserAttributes\\Tests\\": "tests/"
         }
     },
     "scripts": {
@@ -68,10 +67,10 @@
     "extra": {
         "laravel": {
             "providers": [
-                "VendorName\\Skeleton\\SkeletonServiceProvider"
+                "Luttje\\FilamentUserAttributes\\FilamentUserAttributesServiceProvider"
             ],
             "aliases": {
-                "Skeleton": "VendorName\\Skeleton\\Facades\\Skeleton"
+                "FilamentUserAttributes": "Luttje\\FilamentUserAttributes\\Facades\\FilamentUserAttributes"
             }
         }
     },
