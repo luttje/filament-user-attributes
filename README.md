@@ -41,7 +41,7 @@ Let your users specify custom attributes for models in Filament. This package us
         - [ ] Preview
     - [ ] Color
 
-## Requirements
+## 📦 Requirements
 
 - PHP 8.x or higher
 - Filament 3.x or higher
@@ -50,7 +50,7 @@ Let your users specify custom attributes for models in Filament. This package us
     - PostgreSQL 9.2 or higher
     - SQLite 3.38 or higher
 
-## Getting started
+## 🚀 Getting started
 
 1. <s>Install the package via composer:
     
@@ -72,7 +72,13 @@ Let your users specify custom attributes for models in Filament. This package us
     > 
     > Then run `composer require luttje/filament-user-attributes @dev`
 
-2. Add the `HasUserAttributes` trait to the model you want to have custom user attributes on.
+2. Run the following command to fully install the package:
+
+    ```bash
+    php artisan filament-user-attributes:install
+    ```
+
+3. Add the `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
 
     ```php
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
@@ -83,7 +89,7 @@ Let your users specify custom attributes for models in Filament. This package us
     }
     ```
 
-3. Now you can easily set custom attributes to your model like this:
+4. Now you can easily set custom attributes to your model like this:
 
     ```php
     $product = new Product();
@@ -95,7 +101,7 @@ Let your users specify custom attributes for models in Filament. This package us
     $product->save();
     ```
 
-4. Getting the attribute is just as easy:
+5. Getting the attribute is just as easy:
 
     ```php
     $product = Product::find(1);
@@ -103,7 +109,7 @@ Let your users specify custom attributes for models in Filament. This package us
     echo $product->user_attributes->customizations['material']; // 'synthetic'
     ```
 
-5. Destroying all user attributes is as easy as:
+6. Destroying all user attributes is as easy as:
 
     ```php
     $product = Product::find(1);
@@ -111,15 +117,9 @@ Let your users specify custom attributes for models in Filament. This package us
     $product->save();
     ```
 
-## Manual configuration
+You'll find all the attributes in the `user_attributes` table, but you don't have to worry about that. The `HasUserAttributes` trait handles all the database interactions for you.
 
-After requiring the package with composer simply run the following command to fully install the package:
-
-```bash
-php artisan filament-user-attributes:install
-```
-
-### Manual configuration
+### 🧨 Manual configuration
 
 If you want to make changes to the migrations or config. You can publish the following assets.
 
@@ -136,35 +136,6 @@ php artisan migrate
 php artisan vendor:publish --tag="filament-user-attributes-views"
 ```
 
-## Testing
+## ❤ Contributing
 
-1. Copy `phpunit.xml.example` to `phpunit.xml`
-
-2. Start and create a database that supports JSON columns and add the credentials to the `phpunit.xml` file.
-
-3. Run the tests
-```bash
-composer test
-```
-
-To enable code coverage install [Xdebug](https://xdebug.org/wizard) and configure it in your `php.ini` file:
-```ini
-[xdebug]
-; enables the extension:
-zend_extension=xdebug
-; required for code coverage:
-xdebug.mode=develop,debug,coverage
-xdebug.start_with_request = yes
-```
-Finally run the following command:
-```bash
-composer test-coverage
-```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details.
+Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for details on how to contribute to this project. You'll also find instructions on [how to run the tests](.github/CONTRIBUTING.md#🧪-testing).

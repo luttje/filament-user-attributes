@@ -54,7 +54,7 @@ If the project maintainer has any additional requirements, you will find them li
 
 **Happy coding**!
 
-## Getting Started
+## 🚀 Getting Started
 
 1. Clone this repository to your device
 2. Inside the root of this repository run composer install
@@ -74,3 +74,32 @@ In place of `../filament-user-attributes` you should specify the path to where y
 Run composer require "luttje/filament-user-attributes @dev" inside the test project
 
 You can now test and modify this package. Changes will immediately be reflected in the test project.
+
+## 🧪 Testing
+
+1. Copy `phpunit.xml.example` to `phpunit.xml`
+
+2. Start and create a database that supports JSON columns.
+
+3. Add the credentials to the `phpunit.xml` file.
+
+4. Run the tests
+```bash
+composer test
+```
+
+### Code coverage
+
+To enable code coverage install [Xdebug](https://xdebug.org/wizard) and configure it in your `php.ini` file:
+```ini
+[xdebug]
+; enables the extension:
+zend_extension=xdebug
+; required for code coverage:
+xdebug.mode=develop,debug,coverage
+xdebug.start_with_request = yes
+```
+Finally run the following command:
+```bash
+composer test-coverage
+```
