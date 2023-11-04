@@ -28,6 +28,15 @@ trait HasUserAttributes
      */
     private $__userAttributesInstance;
 
+    // TODO: This should be a config option
+    // /**
+    //  * Always eager load the user attributes.
+    //  */
+    // protected function initializeHasUserAttributes()
+    // {
+    //     $this->with[] = 'userAttributes';
+    // }
+
     /**
      * Boots the trait and adds a saving hook to save the user attributes
      * when the model is saved.
@@ -46,13 +55,15 @@ trait HasUserAttributes
 
             if (! empty($model->dirtyUserAttributes)) {
                 // If the model already has user attributes, merge them, otherwise create a new record
-                $attributes = $model->userAttributes()->first();
-                if ($attributes) {
-                    $newValues = array_merge($attributes->values->toArray(), $model->dirtyUserAttributes);
-                    $attributes->values = $newValues;
-                    $attributes->save();
+                if ($model->userAttributes()->exists()) {
+                    $newValues = array_merge($model->userAttributes->values->toArray(), $model->dirtyUserAttributes);
+                    $model->userAttributes->values = $newValues;
+                    $model->userAttributes->save();
                 } else {
                     $model->userAttributes()->create(['values' => $model->dirtyUserAttributes]);
+
+                    // Ensure that the user attributes are dirty for the next time the model is used.
+                    //$model->unsetRelation('userAttributes'); ?/ This was here because I accidentally fetched the relationship, just before creating it. Causing it to be set as null (and then not updated after save)
                 }
 
                 // Clear the delayed attributes as they are now saved
@@ -99,7 +110,7 @@ trait HasUserAttributes
 
     public function getUserAttributeValue(string $keyOrPath)
     {
-        $array = $this->userAttributes()->first()->values;
+        $array = $this->userAttributes->values;
 
         if (! $array) {
             return null;
@@ -110,7 +121,7 @@ trait HasUserAttributes
 
     public function getUserAttributeValues(): ArrayObject
     {
-        return $this->userAttributes()->first()->values;
+        return $this->userAttributes->values;
     }
 
     /**
