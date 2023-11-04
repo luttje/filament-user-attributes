@@ -101,7 +101,7 @@ trait HasUserAttributes
     {
         $array = $this->userAttributes()->first()->values;
 
-        if (!$array) {
+        if (! $array) {
             return null;
         }
 
