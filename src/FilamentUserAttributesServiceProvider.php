@@ -2,10 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes;
 
-use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Assets\Asset;
-use Filament\Support\Assets\Css;
-use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Facades\FilamentIcon;
 use Illuminate\Filesystem\Filesystem;
@@ -30,7 +27,6 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
          * More info: https://github.com/spatie/laravel-package-tools
          */
         $package->name(static::$name)
-            ->hasCommands($this->getCommands())
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile()
@@ -101,21 +97,7 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
      */
     protected function getAssets(): array
     {
-        return [
-            // AlpineComponent::make('filament-user-attributes', __DIR__ . '/../resources/dist/components/filament-user-attributes.js'),
-            Css::make('filament-user-attributes-styles', __DIR__ . '/../resources/dist/filament-user-attributes.css'),
-            Js::make('filament-user-attributes-scripts', __DIR__ . '/../resources/dist/filament-user-attributes.js'),
-        ];
-    }
-
-    /**
-     * @return array<class-string>
-     */
-    protected function getCommands(): array
-    {
-        return [
-            FilamentUserAttributesCommand::class,
-        ];
+        return [];
     }
 
     /**
@@ -148,7 +130,7 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
     protected function getMigrations(): array
     {
         return [
-            'create_filament-user-attributes_table',
+            'create_user_attributes_table',
         ];
     }
 }

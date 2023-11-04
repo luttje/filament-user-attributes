@@ -8,12 +8,18 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create('filament_user_attributes_table', function (Blueprint $table) {
+        Schema::create('user_attributes', function (Blueprint $table) {
             $table->id();
 
-            // add fields
+            $table->morphs('model');
+            $table->json('values');
 
             $table->timestamps();
         });
+    }
+
+    public function down()
+    {
+        Schema::dropIfExists('user_attributes');
     }
 };

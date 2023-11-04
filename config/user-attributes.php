@@ -1,6 +1,7 @@
 <?php
 
-// config for Luttje/FilamentUserAttributes
 return [
-
+    'models' => [
+        'UserAttribute' => \Luttje\FilamentUserAttributes\Models\UserAttribute::class,
+    ],
 ];

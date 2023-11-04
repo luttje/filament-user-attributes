@@ -9,8 +9,6 @@ use Filament\FilamentServiceProvider;
 use Filament\Forms\FormsServiceProvider;
 use Filament\Infolists\InfolistsServiceProvider;
 use Filament\Notifications\NotificationsServiceProvider;
-use Filament\SpatieLaravelSettingsPluginServiceProvider;
-use Filament\SpatieLaravelTranslatablePluginServiceProvider;
 use Filament\Support\SupportServiceProvider;
 use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
@@ -27,7 +25,7 @@ class TestCase extends Orchestra
         parent::setUp();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory'
+            fn (string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
     }
 
@@ -43,8 +41,6 @@ class TestCase extends Orchestra
             InfolistsServiceProvider::class,
             LivewireServiceProvider::class,
             NotificationsServiceProvider::class,
-            SpatieLaravelSettingsPluginServiceProvider::class,
-            SpatieLaravelTranslatablePluginServiceProvider::class,
             SupportServiceProvider::class,
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
@@ -55,10 +51,32 @@ class TestCase extends Orchestra
     public function getEnvironmentSetUp($app)
     {
         config()->set('database.default', 'testing');
+        // Setup MySQL
+        config()->set('database.connections.testing', [
+            'driver' => 'mysql',
+            'host' => env('DB_HOST', 'localhost'),
+            'port' => env('DB_PORT', '3306'),
+            'database' => 'filament_user_attributes',
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', ''),
+        ]);
+    }
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_filament-user-attributes_table.php.stub';
-        $migration->up();
-        */
+    protected function defineDatabaseMigrations()
+    {
+        $this->loadLaravelMigrations(['--database' => 'testing']);
+
+        $this->loadMigrationsFrom([
+            '--database' => 'testing',
+            '--path' => realpath(__DIR__ . '/../database/migrations')
+        ]);
+
+        // Test only migrations
+        $this->loadMigrationsFrom([
+            '--database' => 'testing',
+            '--path' => realpath(__DIR__ . '/database/migrations')
+        ]);
+
+        $this->artisan('migrate', ['--database' => 'testing'])->run();
     }
 }
