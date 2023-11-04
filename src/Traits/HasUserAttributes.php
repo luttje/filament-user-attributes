@@ -3,8 +3,11 @@
 namespace Luttje\FilamentUserAttributes\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Arr;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
+
 /**
  * @property object $user_attributes
  */
@@ -37,10 +40,11 @@ trait HasUserAttributes
             if ($model->shouldDestroyUserAttributes) {
                 $model->userAttributes()->delete();
                 $model->shouldDestroyUserAttributes = false;
+
                 return;
             }
 
-            if (!empty($model->dirtyUserAttributes)) {
+            if (! empty($model->dirtyUserAttributes)) {
                 // If the model already has user attributes, merge them, otherwise create a new record
                 $attributes = $model->userAttributes()->first();
                 if ($attributes) {
@@ -59,8 +63,6 @@ trait HasUserAttributes
 
     /**
      * Relationship to the user attributes model.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
      */
     public function userAttributes(): MorphOne
     {
@@ -87,7 +89,7 @@ trait HasUserAttributes
             throw new \Exception('Cannot set user attributes on a model that has been marked for deletion.');
         }
 
-        $this->dirtyUserAttributes = array_merge($this->dirtyUserAttributes, (array)$values);
+        $this->dirtyUserAttributes = array_merge($this->dirtyUserAttributes, (array) $values);
     }
 
     public function destroyUserAttributes()
@@ -95,17 +97,25 @@ trait HasUserAttributes
         $this->shouldDestroyUserAttributes = true;
     }
 
-    public function getUserAttributeValue(string $key)
+    public function getUserAttributeValue(string $keyOrPath)
     {
-        return $this->userAttributes()->first()->values[$key] ?? null;
+        $array = $this->userAttributes()->first()->values;
+
+        if (!$array) {
+            return null;
+        }
+
+        return Arr::get($array, $keyOrPath);
+    }
+
+    public function getUserAttributeValues(): ArrayObject
+    {
+        return $this->userAttributes()->first()->values;
     }
 
     /**
-     *
      * Static Getters
-     *
      */
-
     public static function getUserAttributeQuery(): Builder
     {
         return UserAttribute::query()
@@ -120,11 +130,8 @@ trait HasUserAttributes
     }
 
     /**
-     *
      * Aggregates
-     *
      */
-
     public static function userAttributeSum(string $path): int
     {
         return UserAttribute::query()
@@ -133,11 +140,8 @@ trait HasUserAttributes
     }
 
     /**
-     *
      * Where filters
-     *
      */
-
     public static function whereUserAttribute(string $key, $value)
     {
         return static::whereHas('userAttributes', function ($query) use ($key, $value) {
@@ -165,9 +169,7 @@ trait HasUserAttributes
     }
 
     /**
-     *
      * Magic Methods
-     *
      */
 
     /**
@@ -183,7 +185,7 @@ trait HasUserAttributes
     public function __get($key)
     {
         if ($key === 'user_attributes') {
-            if (!$this->__userAttributesInstance) {
+            if (! $this->__userAttributesInstance) {
                 $this->__userAttributesInstance = new class($this)
                 {
                     private $owner;
@@ -215,17 +217,20 @@ trait HasUserAttributes
      * When the user attempts to directly set the user_attributes property, we intercept it
      * and call setUserAttributeValues instead.
      *
-     * @param mixed $key
-     * @param mixed $value
+     * @param  mixed  $key
+     * @param  mixed  $value
      */
     public function __set($key, $value)
     {
         if ($key === 'user_attributes') {
-            if (!is_object($value)) {
+            if (! is_object($value)) {
+                // We throw, because if a developer would set `$model->user_attributes = ['key' => 'value']`, it would
+                // mess with the IDE's ability to recognize `user_attributes` as an object (thanks to the PHPdoc and __get)
                 throw new \Exception('The user_attributes property must be an object. Be sure to wrap arrays with UserAttribute::make($yourArray) or cast them to an object.');
             }
 
             $this->setUserAttributeValues($value);
+
             return;
         }
 
@@ -236,12 +241,13 @@ trait HasUserAttributes
      * When the user attempts to unset the user_attributes property, we intercept it
      * and call destroyUserAttributes instead.
      *
-     * @param mixed $key
+     * @param  mixed  $key
      */
     public function __unset($key)
     {
         if ($key === 'user_attributes') {
             $this->destroyUserAttributes();
+
             return;
         }
 

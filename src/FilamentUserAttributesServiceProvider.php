@@ -4,8 +4,6 @@ namespace Luttje\FilamentUserAttributes;
 
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
-use Filament\Support\Facades\FilamentIcon;
-use Illuminate\Filesystem\Filesystem;
 use Livewire\Features\SupportTesting\Testable;
 use Luttje\FilamentUserAttributes\Testing\TestsFilamentUserAttributes;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
@@ -28,17 +26,10 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
         $package->name(static::$name)
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
-                    ->publishConfigFile()
                     ->publishMigrations()
                     ->askToRunMigrations()
                     ->askToStarRepoOnGitHub('luttje/filament-user-attributes');
             });
-
-        $configFileName = $package->shortName();
-
-        if (file_exists($package->basePath("/../config/{$configFileName}.php"))) {
-            $package->hasConfigFile();
-        }
 
         if (file_exists($package->basePath('/../database/migrations'))) {
             $package->hasMigrations($this->getMigrations());
@@ -70,18 +61,6 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
             $this->getAssetPackageName()
         );
 
-        // Icon Registration
-        FilamentIcon::register($this->getIcons());
-
-        // Handle Stubs
-        if (app()->runningInConsole()) {
-            foreach (app(Filesystem::class)->files(__DIR__ . '/../stubs/') as $file) {
-                $this->publishes([
-                    $file->getRealPath() => base_path("stubs/filament-user-attributes/{$file->getFilename()}"),
-                ], 'filament-user-attributes-stubs');
-            }
-        }
-
         // Testing
         Testable::mixin(new TestsFilamentUserAttributes());
     }
@@ -95,14 +74,6 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
      * @return array<Asset>
      */
     protected function getAssets(): array
-    {
-        return [];
-    }
-
-    /**
-     * @return array<string>
-     */
-    protected function getIcons(): array
     {
         return [];
     }

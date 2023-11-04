@@ -17,11 +17,11 @@ class UserAttribute extends Model
 
     public function model()
     {
-        return $this->morphTo();
+        return $this->morphTo(__FUNCTION__, 'model_type', 'model_id');
     }
 
     public static function make(array $values): object
     {
-        return (object)$values;
+        return (object) $values;
     }
 }
