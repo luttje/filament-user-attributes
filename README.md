@@ -6,7 +6,7 @@
 [![Tests](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml)
 [![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
 
-Let your users specify custom attributes for models.
+Let your users specify custom attributes for models in Filament. This package uses a polymorphic relationship to store the attributes in a JSON column.
 
 ## Requirements
 
@@ -17,18 +17,52 @@ Let your users specify custom attributes for models.
     - PostgreSQL 9.2 or higher
     - SQLite 3.38 or higher
 
-## Installation
+## Getting started
 
-You can install the package via composer:
+1. Install the package via composer:
 
-```bash
-composer require luttje/filament-user-attributes
-```
+    ```bash
+    composer require luttje/filament-user-attributes
+    ```
 
-> **Note** 
-> This package is not yet available on Packagist. You can install it by adding the repository to your `composer.json` file.
+    > **Note** 
+    > This package is not yet available on Packagist. You can install it by adding the repository to your `composer.json` file.
 
-### Recommended configuration
+2. Add the `HasUserAttributes` trait to the model you want to have custom user attributes on.
+
+    ```php
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+
+    class Product extends Model
+    {
+        use HasUserAttributes;
+    }
+    ```
+
+3. Now you can easily set custom attributes to your model like this:
+
+    ```php
+    $product = new Product();
+    $product->user_attributes->color = 'red';
+    $product->save();
+    ```
+
+4. Getting the attribute is just as easy:
+
+    ```php
+    $product = Product::find(1);
+    echo $product->user_attributes->color; // 'red'
+    ```
+
+5. Destroying all user attributes is as easy as:
+
+    ```php
+    $product = Product::find(1);
+    unset($product->user_attributes);
+    $product->save();
+    ```
+
+## Manual configuration
 
 After requiring the package with composer simply run the following command to fully install the package:
 
@@ -57,35 +91,6 @@ php artisan vendor:publish --tag="filament-user-attributes-config"
 
 ```bash
 php artisan vendor:publish --tag="filament-user-attributes-views"
-```
-
-## Usage
-
-After installation you must add the `HasUserAttributes` trait to the model you want to add user attributes to.
-
-```php
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
-
-class Product extends Model
-{
-    use HasUserAttributes;
-}
-```
-
-### Setting attributes
-
-When a user wants to add an attribute to a model, you can use the `setUserAttribute` method.
-
-```php
-$product->setUserAttribute('color', 'red');
-```
-
-### Retrieving a single attribute
-
-When you want to retrieve a single attribute of a model, you can use the `getUserAttribute` method.
-
-```php
-$product->getUserAttribute('color');
 ```
 
 ## Testing

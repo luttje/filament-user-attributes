@@ -14,6 +14,9 @@ return new class extends Migration
             $table->morphs('model');
             $table->json('values');
 
+            // Ensure that each model can only have one set of attributes.
+            $table->unique(['model_id', 'model_type']);
+
             $table->timestamps();
         });
     }
