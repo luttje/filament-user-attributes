@@ -18,7 +18,7 @@ it('can add a custom attribute to a new model', function () {
     $model->save();
 
     expect($model->userAttributes()->count())->toBe(1);
-    expect($model->userAttributes()->first()->values)->toMatchArray((array)$attributes);
+    expect($model->userAttributes()->first()->values)->toMatchArray((array) $attributes);
     expect($model->userAttributes()->first()->model->id)->toBe($model->id);
 });
 
@@ -30,7 +30,7 @@ it('can add a custom attribute to an existing model', function () {
     $model->save();
 
     expect($model->userAttributes()->count())->toBe(1);
-    expect($model->userAttributes()->first()->values)->toMatchArray((array)$attributes);
+    expect($model->userAttributes()->first()->values)->toMatchArray((array) $attributes);
     expect($model->userAttributes()->first()->model->id)->toBe($model->id);
 });
 
@@ -43,7 +43,7 @@ it('can update a custom attribute on an existing model', function () {
     $model->save();
 
     expect($model->userAttributes()->count())->toBe(1);
-    expect($model->userAttributes()->first()->values)->toMatchArray((array)$newValues);
+    expect($model->userAttributes()->first()->values)->toMatchArray((array) $newValues);
     expect($model->userAttributes()->first()->model->id)->toBe($model->id);
 });
 

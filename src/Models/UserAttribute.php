@@ -22,6 +22,6 @@ class UserAttribute extends Model
 
     public static function make(array $values): object
     {
-        return (object)$values;
+        return (object) $values;
     }
 }
