@@ -13,10 +13,10 @@ Let your users specify custom attributes for models in Filament. This package us
 - [x] Add custom attributes to any model
 - [x] Support for UUIDs
 - [x] Support for ULIDs
-- [ ] Easily display the attributes in a Filament form
-- [ ] Easily display the attributes in a Filament table
+- [x] Easily display the attributes in a Filament form
+- [x] Easily display the attributes in a Filament table
 - [ ] Supported Input types
-    - [ ] Text
+    - [x] Text
     - [ ] Textarea
     - [ ] Number
         - [ ] Integer
@@ -40,8 +40,9 @@ Let your users specify custom attributes for models in Filament. This package us
         - [ ] Other
         - [ ] Preview
     - [ ] Color
+- [ ] Sensible validations
 - [ ] Allow users to specify order of attributes
-- [ ] User interface for managing user attributes
+- [x] User interface for managing user attributes
 
 ## 📦 Requirements
 
