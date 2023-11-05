@@ -25,7 +25,6 @@ trait HasUserAttributesConfig
      * Fetches the desired model configs from the current config
      * model's (self) user attributes configuration.
      *
-     * @param string $model
      * @return Column[]
      */
     public function getUserAttributesColumns(string $model): array
@@ -47,28 +46,20 @@ trait HasUserAttributesConfig
     /**
      * Creates a user attribute configuration for the specified model.
      * Uses the specified label, type and extra options.
-     *
-     * @param string $model
-     * @param string $name
-     * @param string $label
-     * @param string $type
-     * @param array $options
-     *
-     * @return UserAttributeConfig
      */
     public function createUserAttributeConfig(
         string $model,
         string $name,
         string $label,
         string $type = 'text',
-        array $options = []): UserAttributeConfig
-    {
+        array $options = []
+    ): UserAttributeConfig {
         $config = $this->userAttributesConfigs()
             ->where('model_type', $model)
             ->where('name', $name)
             ->first();
 
-        if (!$config) {
+        if (! $config) {
             $config = new UserAttributeConfig();
             $config->model_type = $model;
             $config->name = $name;

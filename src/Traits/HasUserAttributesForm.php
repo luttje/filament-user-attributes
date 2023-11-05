@@ -8,9 +8,6 @@ trait HasUserAttributesForm
 {
     /**
      * Overrides the default form function to add user attributes.
-     *
-     * @param Form $form
-     * @return Form
      */
     public static function form(Form $form): Form
     {

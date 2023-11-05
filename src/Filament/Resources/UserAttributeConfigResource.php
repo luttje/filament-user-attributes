@@ -26,6 +26,7 @@ class UserAttributeConfigResource extends Resource
             ->map(function ($file) {
                 $model = 'App\\Models\\' . str_replace('/', '\\', $file->getRelativePathname());
                 $model = substr($model, 0, -strlen('.php'));
+
                 return $model;
             })
             ->filter(function ($className) {

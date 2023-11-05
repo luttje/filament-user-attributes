@@ -19,7 +19,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                     $model = $data['model_type'];
 
                     // TODO: Move this to the package (duplicate code of HasUserAttributesTable)
-                    if (!in_array(HasUserAttributesContract::class, class_implements($model))) {
+                    if (! in_array(HasUserAttributesContract::class, class_implements($model))) {
                         throw new \Exception('The model does not implement the HasUserAttributesContract interface.');
                     }
 
@@ -34,9 +34,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                     $newData['config'] = $data;
 
                     return $newData;
-                })
+                }),
         ];
     }
-
-
 }

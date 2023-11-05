@@ -27,6 +27,7 @@ class Category extends Model implements HasUserAttributesContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Mocks\Models\User */
         $user = Auth::user();
+
         return $user;
     }
 
