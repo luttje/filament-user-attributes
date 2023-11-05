@@ -17,18 +17,17 @@
 
 Let your users specify custom attributes for models in Filament. This package uses a polymorphic relationship to store the attributes in a JSON column.
 
-## 📦 Requirements
-
-- PHP 8.1 or higher
-- Filament 3.0 or higher
-- A database that supports JSON columns, e.g:
-    - MySQL 5.7.8 or higher
-    - PostgreSQL 9.2 or higher
-    - SQLite 3.38 or higher
-
 ## 🚀 Getting started
 
-1. <s>Install the package via composer:
+1. Make sure your project meets these requirements:
+    - PHP 8.1 or higher
+    - [Filament 3.0](https://filamentphp.com/docs) or higher
+    - A database that supports JSON columns, e.g:
+        - MySQL 5.7.8 or higher
+        - PostgreSQL 9.2 or higher
+        - SQLite 3.38 or higher
+
+2. <s>Install the [package via composer](https://packagist.org/packages/luttje/filament-user-attributes):
     
     ```bash
     composer require luttje/filament-user-attributes
@@ -48,7 +47,7 @@ Let your users specify custom attributes for models in Filament. This package us
     > 
     > Then run `composer require luttje/filament-user-attributes @dev`
 
-2. Run the following command to fully install the package:
+3. Run the following command to fully install the package:
 
     ```bash
     php artisan filament-user-attributes:install
@@ -56,7 +55,7 @@ Let your users specify custom attributes for models in Filament. This package us
 
     *This publishes the migrations to create the two required tables and runs them.*
 
-3. Add the `HasUserAttributesContract` interface and `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
+4. Add the `HasUserAttributesContract` interface and `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
 
     ```php
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
@@ -68,13 +67,27 @@ Let your users specify custom attributes for models in Filament. This package us
     }
     ```
 
+<table align="center">
+<tr>
+<td align="middle" colspan="2">
+<strong>🎉 You're now ready to:</strong>
+</td>
+</tr>
+<tr>
+<td align="middle">📎</td>
+<td><a href="#📎-minimal-usage">Set and use user attributes yourself</a></td>
+</tr>
+<tr>
+<td align="middle">🖇</td>
+<td><a href="#🖇-user-configured-attributes-for-models">Let your users configure which attributes should be added to models</a></td>
+</tr>
+</table>
+
 ## 🛠 Usage
 
 ### 📎 Minimal usage
 
 In these examples we'll assume you're using user attributes yourself, to store variable JSON customizations for models.
-
-> ⬇ If you want to let your users specify and create which attributes should be added to models, read the [advanced usage](#-advanced-usage) section.
 
 * You can easily set custom attributes to your model like this:
 
@@ -120,7 +133,7 @@ In these examples we'll assume you're using user attributes yourself, to store v
 
 You can let your users configure which attributes should be added to models.
 
-> Through a attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes. The attributes will be automatically added to the resource form and table if you follow the steps below.
+> Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes. The attributes will be automatically added to the resource form and table if you follow the steps below.
 
 1. Add the `HasUserAttributesConfigContract` interface and `HasUserAttributesConfig` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
