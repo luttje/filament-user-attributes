@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
 
 /**
@@ -39,13 +40,31 @@ trait HasUserAttributes
     // }
 
     /**
-     * Boots the trait and adds a saving hook to save the user attributes
+     * Boots the trait and adds a saved hook to save the user attributes
      * when the model is saved.
+     *
+     * Additionally removes user_attributes so it doesn't get saved to
+     * the database.
      *
      * @return void
      */
     protected static function bootHasUserAttributes()
     {
+        static::saving(function ($model) {
+            $userAttributes = $model->attributes['user_attributes'];
+
+            // In some cases (like when Filament is saving a model), the user_attributes
+            // may not have been added to dirtyUserAttributes yet. In this case, we
+            // need to add them now.
+            foreach ($userAttributes as $key => $value) {
+                if (! array_key_exists($key, $model->dirtyUserAttributes)) {
+                    $model->dirtyUserAttributes[$key] = $value;
+                }
+            }
+
+            unset($model->attributes['user_attributes']);
+        });
+
         static::saved(function ($model) {
             if ($model->shouldDestroyUserAttributes) {
                 $model->userAttributes()->delete();
@@ -81,7 +100,7 @@ trait HasUserAttributes
         return $this->morphOne(UserAttribute::class, 'model');
     }
 
-    public static function getUserAttributesConfig(): ?Model
+    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
     {
         // Override this method to return the model that should be used
         // to store the user attribute configurations.

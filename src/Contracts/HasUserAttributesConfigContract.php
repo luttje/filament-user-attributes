@@ -15,7 +15,12 @@ interface HasUserAttributesConfigContract
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig
      */
-    public function getUserAttributesColumns(string $model): array;
+    public function getUserAttributeColumns(string $model): array;
+
+    /**
+     * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig
+     */
+    public function getUserAttributeFields(string $model): array;
 
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig

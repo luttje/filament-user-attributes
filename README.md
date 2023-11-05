@@ -161,34 +161,37 @@ You can let your users configure which attributes should be added to models. You
     ```php
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+    use Illuminate\Support\Facades\Auth;
 
     class Product extends Model implements HasUserAttributesContract
     {
         use HasUserAttributes;
 
         // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
-        public function getUserAttributesConfig(): \Illuminate\Database\Eloquent\Model
+        public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
         {
-            return $this->user;
+            /** @var \App\Models\User */
+            $user = Auth::user();
+
+            return $user;
         }
     }
     ```
 
-3. For all the models with user attributes go to their resources and apply the `HasUserAttributesTable` and `HasUserAttributesForm` traits.
+3. For all the models with user attributes go to their resources and apply the `HasUserAttributesResource` trait.
 
 4. In your resources you will have to rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
 
     ```php
     // ...
 
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesForm;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesTable;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
     class ProductResource extends Resource
     {
         // This will add the user attributes to the form and table, based on the configuration for the Product model.
-        use HasUserAttributesForm;
-        use HasUserAttributesTable;
+        use HasUserAttributesResource;
 
         protected static ?string $model = Product::class;
 

@@ -53,5 +53,5 @@ interface HasUserAttributesContract
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
      */
-    public static function getUserAttributesConfig(): ?Model;
+    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract;
 }

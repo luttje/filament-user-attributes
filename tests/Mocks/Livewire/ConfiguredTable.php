@@ -10,11 +10,11 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Livewire\Component;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesTable;
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
 class ConfiguredTable extends Component implements HasForms, HasTable
 {
-    use HasUserAttributesTable;
+    use HasUserAttributesResource;
     use InteractsWithForms;
     use InteractsWithTable;
 

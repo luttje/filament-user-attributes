@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\CategoryFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
@@ -22,7 +23,7 @@ class Category extends Model implements HasUserAttributesContract
     protected $fillable = [
     ];
 
-    public static function getUserAttributesConfig(): ?Model
+    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Mocks\Models\User */
         $user = Auth::user();

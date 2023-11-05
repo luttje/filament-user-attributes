@@ -2,9 +2,11 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
+use Filament\Forms\Components\Field;
 use Filament\Tables\Columns\Column;
-use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeInput;
+use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
 trait HasUserAttributesConfig
@@ -18,6 +20,13 @@ trait HasUserAttributesConfig
             ->where('owner_type', static::class);
     }
 
+    private function getUserAttributesConfig(string $model): UserAttributeConfig
+    {
+        return $this->userAttributesConfigs
+            ->where('model_type', $model)
+            ->first();
+    }
+
     /**
      * Returns an array of columns to be added to the table.
      *
@@ -26,20 +35,51 @@ trait HasUserAttributesConfig
      *
      * @return Column[]
      */
-    public function getUserAttributesColumns(string $model): array
+    public function getUserAttributeColumns(string $model): array
     {
         $columns = [];
+        $userAttributesConfig = $this->getUserAttributesConfig($model);
 
-        $userAttributesConfigs = $this->userAttributesConfigs
-            ->where('model_type', $model);
+        foreach ($userAttributesConfig->config as $userAttribute) {
+            if($userAttribute['type'] === 'text') {
+                $column = UserAttributeColumn::make($userAttribute['name']);
+            } else {
+                throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");
+            }
 
-        foreach ($userAttributesConfigs as $userAttributesConfig) {
-            $columns[] = TextColumn::make($userAttributesConfig->config['name'])
-                ->label($userAttributesConfig->config['label'])
-                ->sortable($userAttributesConfig->config['sortable'] ?? false);
+            $columns[] = $column
+                ->label($userAttribute['label'])
+                ->sortable($userAttribute['sortable'] ?? false);
         }
 
         return $columns;
+    }
+
+    /**
+     * Returns an array of fields to be added to the form.
+     *
+     * Fetches the desired model configs from the current config
+     * model's (self) user attributes configuration.
+     *
+     * @return Field[]
+     */
+    public function getUserAttributeFields(string $model): array
+    {
+        $fields = [];
+        $userAttributesConfig = $this->getUserAttributesConfig($model);
+
+        foreach ($userAttributesConfig->config as $userAttribute) {
+            if($userAttribute['type'] === 'text') {
+                $field = UserAttributeInput::make($userAttribute['name']);
+            } else {
+                throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");
+            }
+
+            $fields[] = $field
+                ->label($userAttribute['label']);
+        }
+
+        return $fields;
     }
 
     /**

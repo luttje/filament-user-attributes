@@ -2,13 +2,11 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Resources;
 
-use Filament\Forms;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Form;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\File;
+use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
@@ -16,70 +14,27 @@ class UserAttributeConfigResource extends Resource
 {
     protected static ?string $model = UserAttributeConfig::class;
 
-    // TODO: Move into package
-    private static function getModelsThatImplementHasUserAttributesContract()
+    public static function getEloquentQuery(): Builder
     {
-        // Finds all models that have the HasUserAttributesContract interface
-        // TODO: Make model paths configurable
-        $path = app_path('Models');
-        $models = collect(File::allFiles($path))
-            ->map(function ($file) {
-                $model = 'App\\Models\\' . str_replace('/', '\\', $file->getRelativePathname());
-                $model = substr($model, 0, -strlen('.php'));
+        $models = ManageUserAttributeConfigs::getModelsThatImplementHasUserAttributesContract();
+        $query = parent::getEloquentQuery();
 
-                return $model;
-            })
-            ->filter(function ($className) {
-                return in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract::class, class_implements($className));
-            })
-            ->toArray();
+        foreach ($models as $model) {
+            $config = $model::getUserAttributesConfig();
 
-        return $models;
-    }
+            if (!$config) {
+                continue;
+            }
 
-    public static function form(Form $form): Form
-    {
-        $modelOptions = self::getModelsThatImplementHasUserAttributesContract();
+            // TODO: Use a scope for always set this
+            $query->orWhere(function ($query) use ($model, $config) {
+                $query->where('model_type', $model)
+                    ->where('owner_type', get_class($config))
+                    ->where('owner_id', $config->id);
+            });
+        }
 
-        return $form
-            ->schema([
-                Select::make('model_type')
-                    ->options(array_combine($modelOptions, $modelOptions))
-                    ->label(ucfirst(__('validation.attributes.model')))
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->label(ucfirst(__('validation.attributes.name')))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('label')
-                    ->label(ucfirst(__('validation.attributes.label')))
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'text' => 'Text',
-                        // 'textarea' => 'Textarea',
-                        // 'select' => 'Select',
-                        // 'checkbox' => 'Checkbox',
-                        // 'radio' => 'Radio',
-                        // 'date' => 'Date',
-                        // 'datetime' => 'Datetime',
-                        // 'time' => 'Time',
-                        // 'file' => 'File',
-                        // 'image' => 'Image',
-                        // 'password' => 'Password',
-                        // 'email' => 'Email',
-                        // 'number' => 'Number',
-                        // 'tel' => 'Tel',
-                        // 'url' => 'Url',
-                        // 'color' => 'Color',
-                        // 'range' => 'Range',
-                        // 'search' => 'Search',
-                        // 'hidden' => 'Hidden',
-                    ])
-                    ->label(ucfirst(__('validation.attributes.type')))
-                    ->required(),
-            ]);
+        return $query;
     }
 
     public static function table(Table $table): Table
@@ -88,24 +43,13 @@ class UserAttributeConfigResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('model_type')
                     ->label(ucfirst(__('validation.attributes.model_type'))),
-                Tables\Columns\TextColumn::make('config.name')
-                    ->label(ucfirst(__('validation.attributes.name'))),
-                Tables\Columns\TextColumn::make('config.label')
-                    ->label(ucfirst(__('validation.attributes.label'))),
-                Tables\Columns\TextColumn::make('config.type')
-                    ->label(ucfirst(__('validation.attributes.type'))),
-            ])
-            ->filters([
-                //
+                Tables\Columns\TextColumn::make('config')
+                    ->formatStateUsing(function (ArrayObject $state) {
+                        return __(':count custom attributes', ['count' => count($state)]);
+                    })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ])
             ->emptyStateActions([
                 Tables\Actions\CreateAction::make(),
