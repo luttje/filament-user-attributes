@@ -1,59 +1,26 @@
-# Filament User Attributes
+
+<div align="center">
+
+# ![Filament User Attributes](./.github/banner.jpeg)
+
+</div>
 
 > **Warning**
 > This package is still in development. It is not yet ready for production use, the API may change at any time and it is not yet available on Packagist.
 
-<p align="center">
-
-![banner showing package name and install command](./.github/banner.jpeg)
-
-</p>
+<div align="center">
 
 [![Tests](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml)
 [![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
 
+</div>
+
 Let your users specify custom attributes for models in Filament. This package uses a polymorphic relationship to store the attributes in a JSON column.
-
-## ✨ Features
-
-- [x] Add custom attributes to any model
-- [x] Support for UUIDs
-- [x] Support for ULIDs
-- [x] Easily display the attributes in a Filament form
-- [x] Easily display the attributes in a Filament table
-- [ ] Supported Input types
-    - [x] Text
-    - [ ] Textarea
-    - [ ] Number
-        - [ ] Integer
-        - [ ] Decimal
-        - [ ] Specific range
-        - [ ] Specific decimal places
-    - [ ] Select
-        - [ ] Specific options
-        - [ ] From a model
-    - [ ] Radio
-        - [ ] Specific options
-        - [ ] From a model
-    - [ ] Date
-        - [ ] Date
-        - [ ] Time
-        - [ ] Date and time
-    - [ ] Checkbox
-    - [ ] File
-        - [ ] Image
-        - [ ] PDF
-        - [ ] Other
-        - [ ] Preview
-    - [ ] Color
-- [ ] Sensible validations
-- [ ] Allow users to specify order of attributes
-- [x] User interface for managing user attributes
 
 ## 📦 Requirements
 
-- PHP 8.x or higher
-- Filament 3.x or higher
+- PHP 8.1 or higher
+- Filament 3.0 or higher
 - A database that supports JSON columns, e.g:
     - MySQL 5.7.8 or higher
     - PostgreSQL 9.2 or higher
@@ -87,11 +54,13 @@ Let your users specify custom attributes for models in Filament. This package us
     php artisan filament-user-attributes:install
     ```
 
+    *This publishes the migrations to create the two required tables and runs them.*
+
 3. Add the `HasUserAttributesContract` interface and `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
 
     ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
     class Product extends Model implements HasUserAttributesContract
     {
@@ -99,9 +68,11 @@ Let your users specify custom attributes for models in Filament. This package us
     }
     ```
 
-## 🛠 Basic usage
+## 🛠 Usage
 
-In these examples we'll assume you're using the user attributes yourself, to make your own customizations. 
+### 📎 Minimal usage
+
+In these examples we'll assume you're using user attributes yourself, to store variable JSON customizations for models.
 
 > ⬇ If you want to let your users specify and create which attributes should be added to models, read the [advanced usage](#-advanced-usage) section.
 
@@ -145,15 +116,17 @@ In these examples we'll assume you're using the user attributes yourself, to mak
 
 > You'll find all the attributes in the `user_attributes` table of your database. However you don't have to worry about it's existence. The `HasUserAttributes` trait handles all the database interactions for you.
 
-## 👩‍💻 Advanced usage
+### 🖇 User configured attributes for models
 
-You can let your users configure which attributes should be added to models. You'll present them a form where they can specify the name, type, order and other options for the attribute. You will then update the form and table schema's to automatically display those user configured attributes.
+You can let your users configure which attributes should be added to models.
 
-1. Add the `HasUserAttributesConfigContract` interface and `HasUserAttributesConfig` trait to a model you want to be able to configure user attributes. This should be your user or tenant model.
+> Through a attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes. The attributes will be automatically added to the resource form and table if you follow the steps below.
+
+1. Add the `HasUserAttributesConfigContract` interface and `HasUserAttributesConfig` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
     ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
     class User extends Authenticatable implements HasUserAttributesConfigContract
     {
@@ -166,9 +139,9 @@ You can let your users configure which attributes should be added to models. You
 2. Have the models with the `HasUserAttributes` trait implement the `getUserAttributesConfig()` method to return the model with the `HasUserAttributesConfig` trait.
 
     ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
     use Illuminate\Support\Facades\Auth;
 
     class Product extends Model implements HasUserAttributesContract
@@ -186,23 +159,20 @@ You can let your users configure which attributes should be added to models. You
     }
     ```
 
-3. For all the models with user attributes go to their resources and apply the `HasUserAttributesResource` trait.
+3. Go to the resources of all models with user attributes and apply the `HasUserAttributesResource` trait to the resource.
 
-4. In your resources you will have to rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
+4. In your resources rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
 
     ```php
-    // ...
-
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
     class ProductResource extends Resource
     {
         // This will add the user attributes to the form and table, based on the configuration for the Product model.
+        // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
         use HasUserAttributesResource;
 
         protected static ?string $model = Product::class;
-
-        // ...
 
         // Rename the `form` static method to `resourceForm`:
         public static function resourceForm(Form $form): Form
@@ -228,9 +198,11 @@ You can let your users configure which attributes should be added to models. You
     }
     ```
 
-    *This is so the traits we just added can add and sort the user attribute fields and columns.*
+    *Renaming is required so the trait can have control over the form and table.*
 
-5. Finally you need to show the user attributes configuration form somewhere. You can create your own resource completely or inherit from the `UserAttributeConfigResource` class:
+Finally you need to show the user attributes configuration form somewhere.
+
+5. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
     ```php
     namespace App\Filament\Resources;
@@ -245,7 +217,9 @@ You can let your users configure which attributes should be added to models. You
     }
     ```
 
-### Additional methods
+    *Or you can create your own resource from scratch. See the [source code](./src/Filament/Resources/) for inspiration.*
+
+### 🗃 Additional methods
 * Destroying all user attributes:
 
     ```php
@@ -253,6 +227,42 @@ You can let your users configure which attributes should be added to models. You
     unset($product->user_attributes);
     $product->save();
     ```
+
+## ✨ Features
+
+- [x] Add custom attributes to any model
+- [x] Support for UUIDs
+- [x] Support for ULIDs
+- [x] Easily display the attributes in a Filament form
+- [x] Easily display the attributes in a Filament table
+- [ ] Supported Input types
+    - [x] Text
+    - [ ] Textarea
+    - [ ] Number
+        - [ ] Integer
+        - [ ] Decimal
+        - [ ] Specific range
+        - [ ] Specific decimal places
+    - [ ] Select
+        - [ ] Specific options
+        - [ ] From a model
+    - [ ] Radio
+        - [ ] Specific options
+        - [ ] From a model
+    - [ ] Date
+        - [ ] Date
+        - [ ] Time
+        - [ ] Date and time
+    - [ ] Checkbox
+    - [ ] File
+        - [ ] Image
+        - [ ] PDF
+        - [ ] Other
+        - [ ] Preview
+    - [ ] Color
+- [ ] Sensible validations
+- [ ] Allow users to specify order of attributes
+- [x] User interface for managing user attributes
 
 ## ❤ Contributing
 
