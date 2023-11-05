@@ -20,7 +20,7 @@ trait HasUserAttributesConfig
             ->where('owner_type', static::class);
     }
 
-    private function getUserAttributesConfig(string $model): UserAttributeConfig
+    private function getUserAttributesConfigInstance(string $model): UserAttributeConfig
     {
         return $this->userAttributesConfigs
             ->where('model_type', $model)
@@ -38,7 +38,7 @@ trait HasUserAttributesConfig
     public function getUserAttributeColumns(string $model): array
     {
         $columns = [];
-        $userAttributesConfig = $this->getUserAttributesConfig($model);
+        $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             if ($userAttribute['type'] === 'text') {
@@ -66,7 +66,7 @@ trait HasUserAttributesConfig
     public function getUserAttributeFields(string $model): array
     {
         $fields = [];
-        $userAttributesConfig = $this->getUserAttributesConfig($model);
+        $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             if ($userAttribute['type'] === 'text') {

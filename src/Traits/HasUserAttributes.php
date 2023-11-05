@@ -51,6 +51,10 @@ trait HasUserAttributes
     protected static function bootHasUserAttributes()
     {
         static::saving(function ($model) {
+            if (! isset($model->attributes['user_attributes'])) {
+                return;
+            }
+
             $userAttributes = $model->attributes['user_attributes'];
 
             // In some cases (like when Filament is saving a model), the user_attributes
