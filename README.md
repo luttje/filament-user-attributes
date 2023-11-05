@@ -1,7 +1,13 @@
 # Filament User Attributes
 
 > **Warning**
-> This package is still in development. It is not yet ready for production use.
+> This package is still in development. It is not yet ready for production use, the API may change at any time and it is not yet available on Packagist.
+
+<p align="center">
+
+![banner showing package name and install command](./.github/banner.jpeg)
+
+</p>
 
 [![Tests](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml)
 [![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
