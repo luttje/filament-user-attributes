@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes\Traits;
 
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 
 trait HasUserAttributesTable
 {
