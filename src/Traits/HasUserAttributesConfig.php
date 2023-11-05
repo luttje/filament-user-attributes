@@ -41,7 +41,7 @@ trait HasUserAttributesConfig
         $userAttributesConfig = $this->getUserAttributesConfig($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
-            if($userAttribute['type'] === 'text') {
+            if ($userAttribute['type'] === 'text') {
                 $column = UserAttributeColumn::make($userAttribute['name']);
             } else {
                 throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");
@@ -69,7 +69,7 @@ trait HasUserAttributesConfig
         $userAttributesConfig = $this->getUserAttributesConfig($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
-            if($userAttribute['type'] === 'text') {
+            if ($userAttribute['type'] === 'text') {
                 $field = UserAttributeInput::make($userAttribute['name']);
             } else {
                 throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");

@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages;
 
-use Illuminate\Support\Facades\File;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Components\Wizard\Step;
@@ -10,7 +9,7 @@ use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
-use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 
@@ -36,7 +35,7 @@ class ManageUserAttributeConfigs extends ManageRecords
 
                     $config = $model::getUserAttributesConfig();
 
-                    if (!$config) {
+                    if (! $config) {
                         throw new \Exception('The model does override the getUserAttributesConfig() method, or the method does not return a model.');
                     }
 
@@ -47,7 +46,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                             'owner_type' => get_class($config),
                         ],
                         [
-                            'config' => $data['user_attribute_configs']
+                            'config' => $data['user_attribute_configs'],
                         ]
                     );
 
@@ -77,7 +76,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                 return $model;
             })
             ->filter(function ($model) {
-                if (!in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract::class, class_implements($model))) {
+                if (! in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract::class, class_implements($model))) {
                     return false;
                 }
 
@@ -150,7 +149,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                             ])
                             ->label(ucfirst(__('validation.attributes.type')))
                             ->required(),
-                        ]),
+                    ]),
             ]);
 
         return $steps;

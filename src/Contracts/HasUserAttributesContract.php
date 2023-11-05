@@ -3,7 +3,6 @@
 namespace Luttje\FilamentUserAttributes\Contracts;
 
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 /**

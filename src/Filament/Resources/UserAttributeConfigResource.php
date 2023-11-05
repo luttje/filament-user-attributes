@@ -2,10 +2,10 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Resources;
 
-use Illuminate\Database\Eloquent\Builder;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
@@ -22,7 +22,7 @@ class UserAttributeConfigResource extends Resource
         foreach ($models as $model) {
             $config = $model::getUserAttributesConfig();
 
-            if (!$config) {
+            if (! $config) {
                 continue;
             }
 
@@ -46,7 +46,7 @@ class UserAttributeConfigResource extends Resource
                 Tables\Columns\TextColumn::make('config')
                     ->formatStateUsing(function (ArrayObject $state) {
                         return __(':count custom attributes', ['count' => count($state)]);
-                    })
+                    }),
             ])
             ->actions([
                 Tables\Actions\DeleteAction::make(),
