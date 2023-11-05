@@ -11,8 +11,6 @@ return new class extends Migration
         /**
          * Contains the values for all user attributes on a model
          * to which a polymorphic relationship is attached.
-         *
-         * Models must use the HasUserAttributes trait.
          */
         Schema::create('user_attributes', function (Blueprint $table) {
             $table->id();

@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
@@ -78,6 +79,13 @@ trait HasUserAttributes
     public function userAttributes(): MorphOne
     {
         return $this->morphOne(UserAttribute::class, 'model');
+    }
+
+    public static function getUserAttributesConfig(): ?Model
+    {
+        // Override this method to return the model that should be used
+        // to store the user attribute configurations.
+        return null;
     }
 
     public function hasUserAttribute(string $key): bool

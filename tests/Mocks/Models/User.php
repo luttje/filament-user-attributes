@@ -5,16 +5,18 @@ namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\UserFactory as UserFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
-class User extends Authenticatable
+class User extends Authenticatable implements HasUserAttributesConfigContract, HasUserAttributesContract
 {
     use HasFactory;
     use HasUserAttributes;
-    use Notifiable;
     use HasUserAttributesConfig;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.

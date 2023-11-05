@@ -9,17 +9,19 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Livewire\Component;
-use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributesTable;
 
 class ConfiguredTable extends Component implements HasForms, HasTable
 {
+    use HasUserAttributesTable;
     use InteractsWithForms;
     use InteractsWithTable;
 
-    public function table(Table $table): Table
+    // TODO: Not static here? This is a filament thing, find out whats going on
+    public function resourceTable(Table $table): Table
     {
-        return FilamentUserAttributes::setupTable($table)
+        return $table
             ->query(Product::query())
             ->columns([
                 TextColumn::make('name'),

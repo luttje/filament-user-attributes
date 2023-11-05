@@ -19,24 +19,28 @@ class ManageUserAttributeConfigs extends ManageRecords
                     $model = $data['model_type'];
 
                     // TODO: Move this to the package (duplicate code of HasUserAttributesTable)
-                    if (!in_array(HasUserAttributesContract::class, class_implements($model))) {
+                    if (! in_array(HasUserAttributesContract::class, class_implements($model))) {
                         throw new \Exception('The model does not implement the HasUserAttributesContract interface.');
                     }
 
                     $config = $model::getUserAttributesConfig();
+
+                    if (! $config) {
+                        throw new \Exception('The model does override the getUserAttributesConfig() method, or the method does not return a model.');
+                    }
 
                     $newData = [
                         'model_type' => $model,
                         'owner_id' => $config->getKey(),
                         'owner_type' => $config->getMorphClass(),
                     ];
+
                     unset($data['model_type']);
+
                     $newData['config'] = $data;
 
                     return $newData;
-                })
+                }),
         ];
     }
-
-
 }

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Auth;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\CategoryFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
 class Category extends Model implements HasUserAttributesContract
 {
@@ -23,10 +22,11 @@ class Category extends Model implements HasUserAttributesContract
     protected $fillable = [
     ];
 
-    public function getUserAttributesConfig(): HasUserAttributesConfig
+    public static function getUserAttributesConfig(): ?Model
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Mocks\Models\User */
         $user = Auth::user();
+
         return $user;
     }
 

@@ -10,10 +10,6 @@ return new class extends Migration
     {
         /**
          * Contains the configurations for user attributes for a specified model.
-         *
-         * Models must use the HasUserAttributesConfig trait.
-         * Models to be configured must use the HasUserAttributes trait and
-         * implement the HasUserAttributesContract interface.
          */
         Schema::create('user_attribute_configs', function (Blueprint $table) {
             $table->id();

@@ -5,10 +5,11 @@ namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\ProductFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
-class Product extends Model
+class Product extends Model implements HasUserAttributesContract
 {
     use HasFactory;
     use HasUserAttributes;

@@ -80,12 +80,13 @@ Let your users specify custom attributes for models in Filament. This package us
     php artisan filament-user-attributes:install
     ```
 
-3. Add the `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
+3. Add the `HasUserAttributesContract` interface and `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
 
     ```php
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 
-    class Product extends Model
+    class Product extends Model implements HasUserAttributesContract
     {
         use HasUserAttributes;
     }
@@ -141,12 +142,13 @@ In these examples we'll assume you're using the user attributes yourself, to mak
 
 You can let your users configure which attributes should be added to models. You'll present them a form where they can specify the name, type, order and other options for the attribute. You will then update the form and table schema's to automatically display those user configured attributes.
 
-1. Add the `HasUserAttributesConfig` trait to a model you want to be able to configure user attributes. This should be your user or tenant model.
+1. Add the `HasUserAttributesConfigContract` interface and `HasUserAttributesConfig` trait to a model you want to be able to configure user attributes. This should be your user or tenant model.
 
     ```php
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 
-    class User extends Authenticatable
+    class User extends Authenticatable implements HasUserAttributesConfigContract
     {
         // This trait will store the user attributes configuration in relation to this model.
         // Later on we'll use this model to retrieve the configuration.
@@ -154,27 +156,27 @@ You can let your users configure which attributes should be added to models. You
     }
     ```
 
-2. Have the models with the `HasUserAttributes` trait implement the `HasUserAttributesContract` interface. It should implement `getUserAttributesConfig()` and return the model with the `HasUserAttributesConfig` trait.
+2. Have the models with the `HasUserAttributes` trait implement the `getUserAttributesConfig()` method to return the model with the `HasUserAttributesConfig` trait.
 
     ```php
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 
     class Product extends Model implements HasUserAttributesContract
     {
         use HasUserAttributes;
 
-        // This will be used to know which user attributes should be shown in the form and table.
-        public function getUserAttributesConfig(): HasUserAttributesConfig
+        // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
+        public function getUserAttributesConfig(): \Illuminate\Database\Eloquent\Model
         {
             return $this->user;
         }
     }
     ```
 
-3. Update the resources for your models with the `HasUserAttributes` traits to get the `HasUserAttributesTable` and `HasUserAttributesForm` traits.
+3. For all the models with user attributes go to their resources and apply the `HasUserAttributesTable` and `HasUserAttributesForm` traits.
 
-4. In your resources you will have to rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively. This is so the traits we just added can add and sort the user attribute fields and columns:
+4. In your resources you will have to rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
 
     ```php
     // ...
@@ -215,6 +217,8 @@ You can let your users configure which attributes should be added to models. You
         }
     }
     ```
+
+    *This is so the traits we just added can add and sort the user attribute fields and columns.*
 
 5. Finally you need to show the user attributes configuration form somewhere. You can create your own resource completely or inherit from the `UserAttributeConfigResource` class:
 
