@@ -141,20 +141,20 @@ In these examples we'll assume you're using the user attributes yourself, to mak
 
 You can let your users configure which attributes should be added to models. You'll present them a form where they can specify the name, type, order and other options for the attribute. You will then update the form and table schema's to automatically display those user configured attributes.
 
-1. Add the `HasUserAttributeConfig` trait to a model you want to be able to configure user attributes. This should be your user or tenant model.
+1. Add the `HasUserAttributesConfig` trait to a model you want to be able to configure user attributes. This should be your user or tenant model.
 
     ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributeConfig;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
     class User extends Authenticatable
     {
         // This trait will store the user attributes configuration in relation to this model.
         // Later on we'll use this model to retrieve the configuration.
-        use HasUserAttributeConfig;
+        use HasUserAttributesConfig;
     }
     ```
 
-2. Have the models with the `HasUserAttributes` trait implement the `HasUserAttributesContract` interface. It should implement `getUserAttributesConfig()` and return the model with the `HasUserAttributeConfig` trait.
+2. Have the models with the `HasUserAttributes` trait implement the `HasUserAttributesContract` interface. It should implement `getUserAttributesConfig()` and return the model with the `HasUserAttributesConfig` trait.
 
     ```php
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
@@ -165,45 +165,70 @@ You can let your users configure which attributes should be added to models. You
         use HasUserAttributes;
 
         // This will be used to know which user attributes should be shown in the form and table.
-        public function getUserAttributesConfig(): HasUserAttributeConfig
+        public function getUserAttributesConfig(): HasUserAttributesConfig
         {
             return $this->user;
         }
     }
     ```
 
-3. Update the resources for your models with the `HasUserAttributes` traits to wrap the schema in the `FilamentUserAttributes::form()` and `FilamentUserAttributes::table()` methods:
+3. Update the resources for your models with the `HasUserAttributes` traits to get the `HasUserAttributesTable` and `HasUserAttributesForm` traits.
+
+4. In your resources you will have to rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively. This is so the traits we just added can add and sort the user attribute fields and columns:
 
     ```php
-    use Luttje\FilamentUserAttributes\Filament\FilamentUserAttributes;
-
     // ...
 
-    public static function form(Form $form): Form
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesForm;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesTable;
+
+    class ProductResource extends Resource
     {
-        return $form
-            ->schema(FilamentUserAttributes::wrapForm([
-                // Your other form fields ...
+        // This will add the user attributes to the form and table, based on the configuration for the Product model.
+        use HasUserAttributesForm;
+        use HasUserAttributesTable;
 
-                // wrapForm will use the user attributes configuration to add the user attributes to the form in the correct order.
-            ]));
-    }
+        protected static ?string $model = Product::class;
 
-    public function table(Table $table): Table
-    {
-        return $table
-            ->columns(FilamentUserAttributes::wrapTable([
-                // Your other table columns
+        // ...
 
-                // wrapTable will use the user attributes configuration to add the user attributes to the table in the correct order.
-            ]));
+        // Rename the `form` static method to `resourceForm`:
+        public static function resourceForm(Form $form): Form
+        {
+            return $form
+                ->schema([
+                    // You add non user attribute fields here as you normally would in the `form` method.
+                ])
+                ->columns(3); // All form methods function without any changes.
+        }
+
+        // Rename the `table` static method to `resourceTable`:
+        public static function resourceTable(Table $table): Table
+        {
+            return $table
+                ->columns([
+                    // You add non user attribute columns here as you normally would in the `table` method.
+                ])
+                ->filters([
+                    // All table methods function without any changes.
+                ]);
+        }
     }
     ```
 
-4. Finally you need to show the user attributes configuration form somewhere. Here's how you show it in a Filament page:
+5. Finally you need to show the user attributes configuration form somewhere. You can create your own resource completely or inherit from the `UserAttributeConfigResource` class:
 
     ```php
-    // TODO
+    namespace App\Filament\Resources;
+
+    use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource as BaseUserAttributeConfigResource;
+
+    class UserAttributeConfigResource extends BaseUserAttributeConfigResource
+    {
+        protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+        // ...
+    }
     ```
 
 ### Additional methods

@@ -101,6 +101,7 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
     {
         return [
             'create_user_attributes_table',
+            'create_user_attribute_configs_table',
         ];
     }
 }

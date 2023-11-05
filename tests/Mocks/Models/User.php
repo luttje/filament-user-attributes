@@ -7,12 +7,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\UserFactory as UserFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
 class User extends Authenticatable
 {
     use HasFactory;
     use HasUserAttributes;
     use Notifiable;
+    use HasUserAttributesConfig;
 
     /**
      * The attributes that are mass assignable.
