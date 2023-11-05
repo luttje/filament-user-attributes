@@ -110,7 +110,7 @@ trait HasUserAttributes
 
     public function getUserAttributeValue(string $keyOrPath)
     {
-        $array = $this->userAttributes->values;
+        $array = $this->userAttributes?->values;
 
         if (! $array) {
             return null;

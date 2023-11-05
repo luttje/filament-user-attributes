@@ -175,6 +175,13 @@ it('can get a single attribute from an existing model', function () {
     expect(User::allUserAttributes('key')->toArray())->toMatchArray(['value']);
 });
 
+it('will get null when no user attributes are set on an existing model', function () {
+    $model = User::factory()->create();
+
+    expect($model->user_attributes->key)->toBeNull();
+    expect(User::allUserAttributes('key')->toArray())->toMatchArray([]);
+});
+
 it('can check if an existing model has a single attribute', function () {
     $model = User::factory()->create();
     $model->user_attributes = UserAttribute::make(['key' => 'value']);
