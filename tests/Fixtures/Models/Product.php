@@ -1,13 +1,13 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
+namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\ProductFactory;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories\ProductFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
 class Product extends Model implements HasUserAttributesContract

@@ -15,6 +15,7 @@ use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Livewire\LivewireServiceProvider;
 use Luttje\FilamentUserAttributes\FilamentUserAttributesServiceProvider;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\TestPanelProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
 use RyanChandler\BladeCaptureDirective\BladeCaptureDirectiveServiceProvider;
 
@@ -45,6 +46,7 @@ class TestCase extends Orchestra
             TablesServiceProvider::class,
             WidgetsServiceProvider::class,
             FilamentUserAttributesServiceProvider::class,
+            TestPanelProvider::class,
         ];
     }
 

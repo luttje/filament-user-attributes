@@ -1,6 +1,6 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Mocks\Livewire;
+namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -12,7 +12,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
 
 class ConfiguredManageComponent extends Component implements HasForms, HasTable

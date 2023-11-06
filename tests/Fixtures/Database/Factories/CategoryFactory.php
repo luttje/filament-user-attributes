@@ -1,13 +1,13 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories;
+namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
 
-class ProductFactory extends Factory
+class CategoryFactory extends Factory
 {
-    protected $model = Product::class;
+    protected $model = Category::class;
 
     public function definition()
     {
@@ -15,7 +15,6 @@ class ProductFactory extends Factory
             'name' => $this->faker->name,
             'slug' => $this->faker->slug,
             'description' => $this->faker->text,
-            'price' => $this->faker->randomFloat(2, 0, 1000),
         ];
     }
 }

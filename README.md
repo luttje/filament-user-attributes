@@ -282,7 +282,7 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
     }
 }
 ```
-*For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/main/tests/Mocks/Livewire/ConfiguredManageComponent.php).*
+*For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/main/tests/Fixtures/Livewire/ConfiguredManageComponent.php).*
 
 #### Additional methods
 

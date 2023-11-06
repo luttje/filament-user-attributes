@@ -1,17 +1,19 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
+namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Models;
 
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\UserFactory as UserFactory;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories\UserFactory as UserFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
-class User extends Authenticatable implements HasUserAttributesConfigContract, HasUserAttributesContract
+class User extends Authenticatable implements HasUserAttributesConfigContract, HasUserAttributesContract, FilamentUser
 {
     use HasFactory;
     use HasUserAttributes;
@@ -47,6 +49,11 @@ class User extends Authenticatable implements HasUserAttributesConfigContract, H
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
+    }
 
     /**
      * Create a new factory instance for the model.

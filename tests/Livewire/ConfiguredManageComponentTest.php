@@ -2,9 +2,9 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Livewire;
 
-use Luttje\FilamentUserAttributes\Tests\Mocks\Livewire\ConfiguredManageComponent;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\User;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire\ConfiguredManageComponent;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 use Livewire\Livewire;
 
 it('can render a form with configured user attributes', function () {

@@ -2,8 +2,8 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Livewire;
 
-use Luttje\FilamentUserAttributes\Tests\Mocks\Livewire\SimpleTable;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire\SimpleTable;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 
 use function Pest\Livewire\livewire;
 

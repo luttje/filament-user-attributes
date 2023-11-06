@@ -3,8 +3,8 @@
 namespace Luttje\FilamentUserAttributes\Tests\Models;
 
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\User;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 
 it('can add a custom attribute to a new model', function () {
     $model = Product::factory()->make();

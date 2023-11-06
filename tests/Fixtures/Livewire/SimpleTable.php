@@ -1,6 +1,6 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Mocks\Livewire;
+namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire;
 
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -10,7 +10,7 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Livewire\Component;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 
 class SimpleTable extends Component implements HasForms, HasTable
 {

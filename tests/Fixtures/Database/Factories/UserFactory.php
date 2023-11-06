@@ -1,8 +1,8 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories;
+namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories;
 
-use Luttje\FilamentUserAttributes\Tests\Mocks\Models\User;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 use Orchestra\Testbench\Factories\UserFactory as OrchestraUserFactory;
 
 class UserFactory extends OrchestraUserFactory
