@@ -212,3 +212,14 @@ it('does not break regular unset', function () {
 
     expect($model->name)->toBeNull();
 });
+
+it('can create a model with user attributes through mass assignment', function () {
+    $model = User::factory()->create([
+        'user_attributes' => UserAttribute::make(['key' => 'value']),
+    ]);
+
+    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
+    expect($model->userAttributes->model->id)->toBe($model->id);
+    expect($model->user_attributes->key)->toBe('value');
+});

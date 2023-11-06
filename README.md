@@ -155,7 +155,6 @@ You can let your users configure which attributes should be added to models.
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
     use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
-    use Illuminate\Support\Facades\Auth;
 
     class Product extends Model implements HasUserAttributesContract
     {
@@ -232,42 +231,59 @@ Finally you need to show the user attributes configuration form somewhere.
 
     *Or you can create your own resource from scratch. See the [source code](./src/Filament/Resources/) for inspiration.*
 
-### 🗃 Additional situations
-* For Filament Livewire components you need to specify the `HasUserAttributesResource` trait a bit differently:
+### 🗃 Additional examples
 
-    ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+#### Filament Livewire Components
 
-    class ConfiguredTable extends Component implements HasForms, HasTable
-    {
-        use InteractsWithForms;
-        use InteractsWithTable;
-        use HasUserAttributesResource {
-            HasUserAttributesResource::table insteadof InteractsWithTable;
-            HasUserAttributesResource::form insteadof InteractsWithForms;
-        }
+For Filament Livewire components you need to specify the `HasUserAttributesResource` trait a bit differently and specify which model to get the configuration for:
 
-        public static function resourceTable(Table $table): Table
-        {
-            return $table
-                // Be sure to specify the query (so we know which model to get the configuration for):
-                ->query(Product::query())
-                ->columns([
-                    TextColumn::make('name'),
-                ]);
-        }
+```php
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
-        public static function resourceForm(Form $form): Form
-        {
-            return $form
-                ->schema([
-                    TextInput::make('name'),
-                ])
-                // Be sure to specify the model to get the configuration for:
-                ->model(Product::class);
-        }
+class ConfiguredManageComponent extends Component implements HasForms, HasTable
+{
+    // 'insteadof' is required for components, so PHP knows to use the methods from the trait.
+    use HasUserAttributesResource {
+        HasUserAttributesResource::form insteadof InteractsWithForms;
+        HasUserAttributesResource::table insteadof InteractsWithTable;
     }
-    ```
+
+    use InteractsWithForms;
+    use InteractsWithTable;
+
+    public ?array $data = [];
+
+    public function mount(): void
+    {
+        $this->form->fill();
+    }
+
+    public function resourceTable(Table $table): Table
+    {
+        return $table
+            // Specify a query so the trait knows which model to get the configuration for:
+            ->query(Product::query())
+            ->columns([
+                TextColumn::make('slug'),
+                TextColumn::make('name'),
+            ]);
+    }
+
+    public function resourceForm(Form $form): Form
+    {
+        return $form
+            ->schema([
+                TextInput::make('name'),
+            ])
+            ->statePath('data')
+            // Specify a model so the trait knows which model to get the configuration for:
+            ->model(Product::class);
+    }
+}
+```
+*For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/main/tests/Mocks/Livewire/ConfiguredManageComponent.php).*
+
+#### Additional methods
 
 * Destroying all user attributes:
 

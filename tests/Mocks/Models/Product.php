@@ -22,6 +22,8 @@ class Product extends Model implements HasUserAttributesContract
      * @var array<int, string>
      */
     protected $fillable = [
+        'name',
+        'slug'
     ];
 
     public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract

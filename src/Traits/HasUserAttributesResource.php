@@ -12,13 +12,13 @@ trait HasUserAttributesResource
     /**
      * Overrides the default table function to add user attributes.
      */
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
-        if (!method_exists(static::class, 'resourceTable')) {
+        if (!method_exists($this, 'resourceTable')) {
             return $table;
         }
 
-        $columns = static::resourceTable($table)
+        $columns = $this->resourceTable($table)
             ->getColumns();
         $model = $table->getModel();
         $customColumns = static::getUserAttributeColumns($model);
@@ -35,13 +35,13 @@ trait HasUserAttributesResource
     /**
      * Overrides the default form function to add user attributes.
      */
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        if (!method_exists(static::class, 'resourceForm')) {
+        if (!method_exists($this, 'resourceForm')) {
             return $form;
         }
 
-        $components = static::resourceForm($form)
+        $components = $this->resourceForm($form)
             ->getComponents();
         $model = $form->getModel();
         $customFields = static::getUserAttributeFields($model);

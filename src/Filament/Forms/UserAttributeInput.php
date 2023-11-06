@@ -2,8 +2,9 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Forms;
 
-// use Filament\Forms\Components\Component;
 use Filament\Forms\Components\TextInput;
+use Illuminate\Database\Eloquent\Model;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 
 class UserAttributeInput extends TextInput
 {
@@ -14,9 +15,15 @@ class UserAttributeInput extends TextInput
         $this->statePath('user_attributes.' . $this->getName());
 
         $this->afterStateHydrated(static function (UserAttributeInput $component, string | array | null $state): void {
-            $component->state(function ($record) use ($component) {
+            $component->state(function (?Model $record) use ($component) {
+                if ($record === null) {
+                    return null;
+                }
+
                 $key = $component->getName();
 
+                /** @var HasUserAttributesContract */
+                $record = $record;
                 return $record->user_attributes->$key;
             });
         });

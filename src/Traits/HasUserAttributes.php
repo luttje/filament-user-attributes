@@ -4,7 +4,6 @@ namespace Luttje\FilamentUserAttributes\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
@@ -30,14 +29,18 @@ trait HasUserAttributes
      */
     private $__userAttributesInstance;
 
-    // TODO: This should be a config option
-    // /**
-    //  * Always eager load the user attributes.
-    //  */
-    // protected function initializeHasUserAttributes()
-    // {
-    //     $this->with[] = 'userAttributes';
-    // }
+    /**
+     * Setup the model to make user_attributes fillable (so they reach the 'saving' hook).
+     *
+     * Optionally eager load the userAttributes relationship.
+     */
+    protected function initializeHasUserAttributes()
+    {
+        // TODO: This should be a config option
+        //$this->with[] = 'userAttributes';
+
+        $this->mergeFillable(['user_attributes']);
+    }
 
     /**
      * Boots the trait and adds a saved hook to save the user attributes
