@@ -51,7 +51,7 @@ trait HasUserAttributes
     protected static function bootHasUserAttributes()
     {
         static::saving(function ($model) {
-            if (! isset($model->attributes['user_attributes'])) {
+            if (!isset($model->attributes['user_attributes'])) {
                 return;
             }
 
@@ -61,7 +61,7 @@ trait HasUserAttributes
             // may not have been added to dirtyUserAttributes yet. In this case, we
             // need to add them now.
             foreach ($userAttributes as $key => $value) {
-                if (! array_key_exists($key, $model->dirtyUserAttributes)) {
+                if (!array_key_exists($key, $model->dirtyUserAttributes)) {
                     $model->dirtyUserAttributes[$key] = $value;
                 }
             }
@@ -77,7 +77,7 @@ trait HasUserAttributes
                 return;
             }
 
-            if (! empty($model->dirtyUserAttributes)) {
+            if (!empty($model->dirtyUserAttributes)) {
                 // If the model already has user attributes, merge them, otherwise create a new record
                 if ($model->userAttributes()->exists()) {
                     $newValues = array_merge($model->userAttributes->values->toArray(), $model->dirtyUserAttributes);
@@ -143,7 +143,7 @@ trait HasUserAttributes
     {
         $array = $this->userAttributes?->values;
 
-        if (! $array) {
+        if (!$array) {
             return null;
         }
 
@@ -227,9 +227,8 @@ trait HasUserAttributes
     public function __get($key)
     {
         if ($key === 'user_attributes') {
-            if (! $this->__userAttributesInstance) {
-                $this->__userAttributesInstance = new class($this)
-                {
+            if (!$this->__userAttributesInstance) {
+                $this->__userAttributesInstance = new class ($this) {
                     private $owner;
 
                     public function __construct($owner)
@@ -265,7 +264,7 @@ trait HasUserAttributes
     public function __set($key, $value)
     {
         if ($key === 'user_attributes') {
-            if (! is_object($value)) {
+            if (!is_object($value)) {
                 // We throw, because if a developer would set `$model->user_attributes = ['key' => 'value']`, it would
                 // mess with the IDE's ability to recognize `user_attributes` as an object (thanks to the PHPdoc and __get)
                 throw new \Exception('The user_attributes property must be an object. Be sure to wrap arrays with UserAttribute::make($yourArray) or cast them to an object.');

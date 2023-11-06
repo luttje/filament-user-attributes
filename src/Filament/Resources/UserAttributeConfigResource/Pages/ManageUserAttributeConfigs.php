@@ -29,13 +29,13 @@ class ManageUserAttributeConfigs extends ManageRecords
                     $model = $data['model_type'];
 
                     // TODO: Move this to the package (duplicate code of HasUserAttributesResource)
-                    if (! in_array(HasUserAttributesContract::class, class_implements($model))) {
+                    if (!in_array(HasUserAttributesContract::class, class_implements($model))) {
                         throw new \Exception('The model does not implement the HasUserAttributesContract interface.');
                     }
 
                     $config = $model::getUserAttributesConfig();
 
-                    if (! $config) {
+                    if (!$config) {
                         throw new \Exception('The model does override the getUserAttributesConfig() method, or the method does not return a model.');
                     }
 
@@ -76,7 +76,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                 return $model;
             })
             ->filter(function ($model) {
-                if (! in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract::class, class_implements($model))) {
+                if (!in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract::class, class_implements($model))) {
                     return false;
                 }
 

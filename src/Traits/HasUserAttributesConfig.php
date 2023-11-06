@@ -98,7 +98,7 @@ trait HasUserAttributesConfig
             ->where('name', $name)
             ->first();
 
-        if (! $config) {
+        if (!$config) {
             $config = new UserAttributeConfig();
             $config->model_type = $model;
             $config->name = $name;

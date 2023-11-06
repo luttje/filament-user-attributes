@@ -22,7 +22,7 @@ class UserAttributeConfigResource extends Resource
         foreach ($models as $model) {
             $config = $model::getUserAttributesConfig();
 
-            if (! $config) {
+            if (!$config) {
                 continue;
             }
 

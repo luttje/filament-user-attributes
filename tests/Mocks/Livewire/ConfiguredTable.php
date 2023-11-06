@@ -14,12 +14,15 @@ use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
 class ConfiguredTable extends Component implements HasForms, HasTable
 {
-    use HasUserAttributesResource;
+    use HasUserAttributesResource {
+        HasUserAttributesResource::table insteadof InteractsWithTable;
+        HasUserAttributesResource::form insteadof InteractsWithForms;
+    }
+
     use InteractsWithForms;
     use InteractsWithTable;
 
-    // TODO: Not static here? This is a filament thing, find out whats going on
-    public function resourceTable(Table $table): Table
+    public static function resourceTable(Table $table): Table
     {
         return $table
             ->query(Product::query())

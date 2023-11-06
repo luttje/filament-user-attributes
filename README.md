@@ -232,7 +232,43 @@ Finally you need to show the user attributes configuration form somewhere.
 
     *Or you can create your own resource from scratch. See the [source code](./src/Filament/Resources/) for inspiration.*
 
-### 🗃 Additional methods
+### 🗃 Additional situations
+* For Filament Livewire components you need to specify the `HasUserAttributesResource` trait a bit differently:
+
+    ```php
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+
+    class ConfiguredTable extends Component implements HasForms, HasTable
+    {
+        use InteractsWithForms;
+        use InteractsWithTable;
+        use HasUserAttributesResource {
+            HasUserAttributesResource::table insteadof InteractsWithTable;
+            HasUserAttributesResource::form insteadof InteractsWithForms;
+        }
+
+        public static function resourceTable(Table $table): Table
+        {
+            return $table
+                // Be sure to specify the query (so we know which model to get the configuration for):
+                ->query(Product::query())
+                ->columns([
+                    TextColumn::make('name'),
+                ]);
+        }
+
+        public static function resourceForm(Form $form): Form
+        {
+            return $form
+                ->schema([
+                    TextInput::make('name'),
+                ])
+                // Be sure to specify the model to get the configuration for:
+                ->model(Product::class);
+        }
+    }
+    ```
+
 * Destroying all user attributes:
 
     ```php

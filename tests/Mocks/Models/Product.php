@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes\Tests\Mocks\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Database\Factories\ProductFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
@@ -22,6 +23,11 @@ class Product extends Model implements HasUserAttributesContract
      */
     protected $fillable = [
     ];
+
+    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
+    {
+        return auth()->user();
+    }
 
     /**
      * Create a new factory instance for the model.

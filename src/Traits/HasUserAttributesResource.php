@@ -14,9 +14,22 @@ trait HasUserAttributesResource
      */
     public static function table(Table $table): Table
     {
-        $table = $table->columns(static::getUserAttributeColumns());
+        if (!method_exists(static::class, 'resourceTable')) {
+            return $table;
+        }
 
-        return static::resourceTable($table);
+        $columns = static::resourceTable($table)
+            ->getColumns();
+        $model = $table->getModel();
+        $customColumns = static::getUserAttributeColumns($model);
+
+        foreach ($customColumns as $customColumn) {
+            $columns[] = $customColumn;
+        }
+
+        $table->columns($columns);
+
+        return $table;
     }
 
     /**
@@ -24,9 +37,14 @@ trait HasUserAttributesResource
      */
     public static function form(Form $form): Form
     {
+        if (!method_exists(static::class, 'resourceForm')) {
+            return $form;
+        }
+
         $components = static::resourceForm($form)
             ->getComponents();
-        $customFields = static::getUserAttributeFields();
+        $model = $form->getModel();
+        $customFields = static::getUserAttributeFields($model);
 
         // TODO: Recognize there being a tab component and add the fields to the tab (if the user wants to)
         foreach ($customFields as $customField) {
@@ -41,15 +59,13 @@ trait HasUserAttributesResource
     /**
      * Returns the user attribute columns.
      */
-    protected static function getUserAttributeColumns(): array
+    protected static function getUserAttributeColumns(string $model): array
     {
-        $model = static::getModel();
-
         /** @var HasUserAttributesConfig */
         $config = static::getUserAttributeConfig($model);
 
-        if (! in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
-            throw new \Exception('The model does not use the HasUserAttributesConfig trait.');
+        if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
+            throw new \Exception("The model '$model' does not use the HasUserAttributesConfig trait");
         }
 
         return $config->getUserAttributeColumns($model);
@@ -58,15 +74,13 @@ trait HasUserAttributesResource
     /**
      * Returns the user attribute fields.
      */
-    protected static function getUserAttributeFields(): array
+    protected static function getUserAttributeFields(string $model): array
     {
-        $model = static::getModel();
-
         /** @var HasUserAttributesConfig */
         $config = static::getUserAttributeConfig($model);
 
-        if (! in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
-            throw new \Exception('The model does not use the HasUserAttributesConfig trait.');
+        if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
+            throw new \Exception("The model '$model' does not use the HasUserAttributesConfig trait");
         }
 
         return $config->getUserAttributeFields($model);
@@ -77,13 +91,18 @@ trait HasUserAttributesResource
      */
     protected static function getUserAttributeConfig(string $model): HasUserAttributesConfigContract
     {
-        if (! in_array(HasUserAttributesContract::class, class_implements($model))) {
-            throw new \Exception('The model does not implement the HasUserAttributesContract interface.');
+        if (!in_array(HasUserAttributesContract::class, class_implements($model))) {
+            throw new \Exception("The model '$model' does not implement the HasUserAttributesContract interface.");
         }
 
-        /** @var HasUserAttributesContract */
+        /** @var ?HasUserAttributesContract */
         $model = $model;
+        $config = $model::getUserAttributesConfig();
 
-        return $model::getUserAttributesConfig();
+        if ($config === null) {
+            throw new \Exception("The model '$model' did not return a configuration model from the getUserAttributesConfig function (or it was null).");
+        }
+
+        return $config;
     }
 }
