@@ -56,7 +56,7 @@
         "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
         "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest --configuration=phpunit.xml",
-        "test-ci": "vendor/bin/pest --configuration=phpunit.xml.ci --ci",
+        "test-ci": "vendor/bin/pest --configuration=phpunit.xml.ci --coverage --ci",
         "test-coverage": "@test --coverage",
         "format": "vendor/bin/pint"
     },
