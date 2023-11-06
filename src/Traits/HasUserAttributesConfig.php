@@ -2,10 +2,12 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
+use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
+use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Column;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeInput;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
@@ -70,10 +72,25 @@ trait HasUserAttributesConfig
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             if ($userAttribute['type'] === 'text') {
-                $field = UserAttributeInput::make($userAttribute['name']);
+                $field = TextInput::make($userAttribute['name']);
             } else {
                 throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");
             }
+
+            $field->statePath('user_attributes.' . $userAttribute['name']);
+            $field->afterStateHydrated(static function (Component $component, string | array | null $state): void {
+                $component->state(function (?Model $record) use ($component) {
+                    if ($record === null) {
+                        return null;
+                    }
+
+                    $key = $component->getName();
+
+                    /** @var HasUserAttributesContract */
+                    $record = $record;
+                    return $record->user_attributes->$key;
+                });
+            });
 
             $fields[] = $field
                 ->label($userAttribute['label']);
