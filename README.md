@@ -6,11 +6,12 @@
 </div>
 
 > **Warning**
-> This package is still in development. It is not yet ready for production use, the API may change at any time and it is not yet available on Packagist.
+> This package is still in development. It is not yet ready for production use and the API may change at any time.
 
 <div align="center">
 
 [![Tests](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml)
+[![Coverage Status](https://coveralls.io/repos/github/luttje/filament-user-attributes/badge.svg?branch=main)](https://coveralls.io/github/luttje/filament-user-attributes?branch=main)
 [![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
 
 </div>
@@ -23,31 +24,25 @@ Let your users specify custom attributes for models in Filament. This package us
 
 1. Make sure your project meets these requirements:
     - PHP 8.1 or higher
+    - [Livewire 3.0.3](https://livewire.laravel.com/) or higher
     - [Filament 3.0](https://filamentphp.com/docs) or higher
     - A database that supports JSON columns, e.g:
         - MySQL 5.7.8 or higher
         - PostgreSQL 9.2 or higher
         - SQLite 3.38 or higher
 
-2. <s>Install the [package via composer](https://packagist.org/packages/luttje/filament-user-attributes):
+2. Install the [package via composer](https://packagist.org/packages/luttje/filament-user-attributes):
     
     ```bash
     composer require luttje/filament-user-attributes
     ```
-    </s>
 
     > **Note** 
-    > This package is not yet available on Packagist. You can install it by adding the repository to your `composer.json` file:
+    > This package is currently only available on Packagist with the `dev-main` stability flag. To require this package in your project you need to add the following to your `composer.json` file:
     > ```json
-    > "repositories": [
-    >     {
-    >         "type": "vcs",
-    >         "url": "https://github.com/luttje/filament-user-attributes"
-    >     }
-    > ]
+    > "minimum-stability": "dev",
+    > "prefer-stable": true,
     > ```
-    > 
-    > Then run `composer require luttje/filament-user-attributes @dev`
 
 3. Run the following command to fully install the package:
 
@@ -82,6 +77,10 @@ Let your users specify custom attributes for models in Filament. This package us
 <tr>
 <td align="middle">🖇</td>
 <td><a href="#-user-configured-attributes-for-models">Let your users configure which attributes should be added to models</a></td>
+</tr>
+<tr>
+<td align="middle">🎈</td>
+<td><a href="#filament-livewire-components">Have the custom attribute fields and columns display in a Livewire component</a></td>
 </tr>
 </table>
 
