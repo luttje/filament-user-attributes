@@ -1,7 +1,7 @@
 
 <div align="center">
 
-# ![Filament User Attributes](./.github/banner.jpeg)
+![Filament User Attributes](./.github/banner.jpeg)
 
 </div>
 
@@ -14,6 +14,8 @@
 [![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
 
 </div>
+
+# Filament User Attributes
 
 Let your users specify custom attributes for models in Filament. This package uses a polymorphic relationship to store the attributes in a JSON column.
 
@@ -75,11 +77,11 @@ Let your users specify custom attributes for models in Filament. This package us
 </tr>
 <tr>
 <td align="middle">📎</td>
-<td><a href="#📎-minimal-usage">Set and use user attributes yourself</a></td>
+<td><a href="#-minimal-usage">Set and use user attributes yourself</a></td>
 </tr>
 <tr>
 <td align="middle">🖇</td>
-<td><a href="#🖇-user-configured-attributes-for-models">Let your users configure which attributes should be added to models</a></td>
+<td><a href="#-user-configured-attributes-for-models">Let your users configure which attributes should be added to models</a></td>
 </tr>
 </table>
 
