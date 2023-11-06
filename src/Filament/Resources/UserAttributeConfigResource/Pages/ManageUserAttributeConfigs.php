@@ -121,10 +121,6 @@ class ManageUserAttributeConfigs extends ManageRecords
                             ->label(ucfirst(__('validation.attributes.name')))
                             ->required()
                             ->maxLength(255),
-                        Forms\Components\TextInput::make('label')
-                            ->label(ucfirst(__('validation.attributes.label')))
-                            ->required()
-                            ->maxLength(255),
                         Forms\Components\Select::make('type')
                             ->options([
                                 'text' => 'Text',
@@ -135,17 +131,8 @@ class ManageUserAttributeConfigs extends ManageRecords
                                 // 'date' => 'Date',
                                 // 'datetime' => 'Datetime',
                                 // 'time' => 'Time',
-                                // 'file' => 'File',
-                                // 'image' => 'Image',
-                                // 'password' => 'Password',
-                                // 'email' => 'Email',
-                                // 'number' => 'Number',
-                                // 'tel' => 'Tel',
-                                // 'url' => 'Url',
                                 // 'color' => 'Color',
-                                // 'range' => 'Range',
-                                // 'search' => 'Search',
-                                // 'hidden' => 'Hidden',
+                                // others...
                             ])
                             ->label(ucfirst(__('validation.attributes.type')))
                             ->required(),

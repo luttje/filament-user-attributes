@@ -237,17 +237,17 @@ Finally you need to show the user attributes configuration form somewhere.
 
 #### Filament Livewire Components
 
-For Filament Livewire components you need to specify the `HasUserAttributesResource` trait a bit differently and specify which model to get the configuration for:
+For Filament Livewire components you need to specify the `HasUserAttributesComponent` trait. And we need to specify which model to get the configuration for:
 
 ```php
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
 
 class ConfiguredManageComponent extends Component implements HasForms, HasTable
 {
     // 'insteadof' is required for components, so PHP knows to use the methods from the trait.
-    use HasUserAttributesResource {
-        HasUserAttributesResource::form insteadof InteractsWithForms;
-        HasUserAttributesResource::table insteadof InteractsWithTable;
+    use HasUserAttributesComponent {
+        HasUserAttributesComponent::form insteadof InteractsWithForms;
+        HasUserAttributesComponent::table insteadof InteractsWithTable;
     }
 
     use InteractsWithForms;

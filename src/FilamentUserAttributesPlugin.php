@@ -19,7 +19,7 @@ class FilamentUserAttributesPlugin implements Plugin
 
     public function boot(Panel $panel): void
     {
-        //
+        FilamentUserAttributes::registerUserAttributeFieldFactories();
     }
 
     public static function make(): static

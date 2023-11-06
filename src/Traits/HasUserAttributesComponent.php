@@ -6,18 +6,18 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 
-trait HasUserAttributesResource
+trait HasUserAttributesComponent
 {
     /**
      * Overrides the default table function to add user attributes.
      */
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
-        if (!method_exists(self::class, 'resourceTable')) {
+        if (!method_exists($this, 'resourceTable')) {
             return $table;
         }
 
-        $columns = self::resourceTable($table)
+        $columns = $this->resourceTable($table)
             ->getColumns();
         $model = $table->getModel();
         $customColumns = FilamentUserAttributes::getUserAttributeColumns($model);
@@ -34,13 +34,13 @@ trait HasUserAttributesResource
     /**
      * Overrides the default form function to add user attributes.
      */
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
-        if (!method_exists(self::class, 'resourceForm')) {
+        if (!method_exists($this, 'resourceForm')) {
             return $form;
         }
 
-        $components = self::resourceForm($form)
+        $components = $this->resourceForm($form)
             ->getComponents();
         $model = $form->getModel();
         $customFields = FilamentUserAttributes::getUserAttributeFields($model);

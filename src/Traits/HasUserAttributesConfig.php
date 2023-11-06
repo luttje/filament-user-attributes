@@ -8,6 +8,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeFieldFactoryRegistry;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
@@ -71,11 +72,18 @@ trait HasUserAttributesConfig
         $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
-            if ($userAttribute['type'] === 'text') {
-                $field = TextInput::make($userAttribute['name']);
-            } else {
-                throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");
+            $type = $userAttribute['type'];
+            $factory = UserAttributeFieldFactoryRegistry::getFactory($type);
+
+            if (!isset($factory)) {
+                throw new \Exception("The user attribute type '{$type}' is not yet supported.");
             }
+
+            /** @var UserAttributeFieldFactoryInterface $factory */
+            $factoryClass = $factory;
+            $factory = new $factoryClass();
+
+            $field = $factory->makeField($userAttribute);
 
             $field->statePath('user_attributes.' . $userAttribute['name']);
             $field->afterStateHydrated(static function (Component $component, string | array | null $state): void {
@@ -92,8 +100,7 @@ trait HasUserAttributesConfig
                 });
             });
 
-            $fields[] = $field
-                ->label($userAttribute['label']);
+            $fields[] = $field;
         }
 
         return $fields;

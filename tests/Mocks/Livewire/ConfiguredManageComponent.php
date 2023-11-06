@@ -13,13 +13,13 @@ use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Livewire\Component;
 use Luttje\FilamentUserAttributes\Tests\Mocks\Models\Product;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
 
 class ConfiguredManageComponent extends Component implements HasForms, HasTable
 {
-    use HasUserAttributesResource {
-        HasUserAttributesResource::form insteadof InteractsWithForms;
-        HasUserAttributesResource::table insteadof InteractsWithTable;
+    use HasUserAttributesComponent {
+        HasUserAttributesComponent::form insteadof InteractsWithForms;
+        HasUserAttributesComponent::table insteadof InteractsWithTable;
     }
 
     use InteractsWithForms;
