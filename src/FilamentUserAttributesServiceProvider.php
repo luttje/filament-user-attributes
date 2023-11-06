@@ -51,7 +51,7 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
-        FilamentUserAttributes::registerUserAttributeFieldFactories();
+        FilamentUserAttributes::registerUserAttributeComponentFactories();
 
         // Asset Registration
         FilamentAsset::register(

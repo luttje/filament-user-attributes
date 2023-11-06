@@ -43,7 +43,7 @@ trait HasUserAttributesResource
         $components = self::resourceForm($form)
             ->getComponents();
         $model = $form->getModel();
-        $customFields = FilamentUserAttributes::getUserAttributeFields($model);
+        $customFields = FilamentUserAttributes::getUserAttributeComponents($model);
 
         // TODO: Recognize there being a tab component and add the fields to the tab (if the user wants to)
         foreach ($customFields as $customField) {

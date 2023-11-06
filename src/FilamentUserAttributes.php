@@ -4,7 +4,7 @@ namespace Luttje\FilamentUserAttributes;
 
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeFieldFactoryRegistry;
+use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
 class FilamentUserAttributes
@@ -12,20 +12,18 @@ class FilamentUserAttributes
     /**
      * Registers all types of user attribute field factories.
      */
-    public static function registerUserAttributeFieldFactories(): void
+    public static function registerUserAttributeComponentFactories(): void
     {
-        UserAttributeFieldFactoryRegistry::register('text', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\TextFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('textarea', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\TextareaFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('richeditor', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\RichEditorFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('tags', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\TagsInputFieldFactory::class);
+        UserAttributeComponentFactoryRegistry::register('text', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\TextComponentFactory::class);
+        UserAttributeComponentFactoryRegistry::register('textarea', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\TextareaComponentFactory::class);
+        UserAttributeComponentFactoryRegistry::register('richeditor', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\RichEditorComponentFactory::class);
+        UserAttributeComponentFactoryRegistry::register('tags', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\TagsInputComponentFactory::class);
 
-        UserAttributeFieldFactoryRegistry::register('select', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\SelectFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('checkbox', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\CheckboxFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('radio', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\RadioFieldFactory::class);
+        UserAttributeComponentFactoryRegistry::register('select', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\SelectComponentFactory::class);
+        UserAttributeComponentFactoryRegistry::register('checkbox', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\CheckboxComponentFactory::class);
+        UserAttributeComponentFactoryRegistry::register('radio', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\RadioComponentFactory::class);
 
-        UserAttributeFieldFactoryRegistry::register('date', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\DateTimeFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('datetime', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\DateTimeFieldFactory::class);
-        UserAttributeFieldFactoryRegistry::register('time', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\DateTimeFieldFactory::class);
+        UserAttributeComponentFactoryRegistry::register('datetime', \Luttje\FilamentUserAttributes\Filament\Forms\Factories\DateTimeComponentFactory::class);
     }
 
     /**
@@ -33,7 +31,6 @@ class FilamentUserAttributes
      */
     public static function getUserAttributeColumns(string $model): array
     {
-        /** @var HasUserAttributesConfig */
         $config = static::getUserAttributeConfig($model);
 
         if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
@@ -46,16 +43,15 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute fields.
      */
-    public static function getUserAttributeFields(string $model): array
+    public static function getUserAttributeComponents(string $model): array
     {
-        /** @var HasUserAttributesConfig */
         $config = static::getUserAttributeConfig($model);
 
         if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
             throw new \Exception("The model '$model' does not use the HasUserAttributesConfig trait");
         }
 
-        return $config->getUserAttributeFields($model);
+        return $config->getUserAttributeComponents($model);
     }
 
     /**
@@ -72,7 +68,7 @@ class FilamentUserAttributes
         $config = $model::getUserAttributesConfig();
 
         if ($config === null) {
-            throw new \Exception("The model '$model' did not return a configuration model from the getUserAttributesConfig function (or it was null).");
+            throw new \Exception("The model '" . strval($model) . "' did not return a configuration model from the getUserAttributesConfig function (or it was null).");
         }
 
         return $config;

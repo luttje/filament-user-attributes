@@ -4,12 +4,10 @@ namespace Luttje\FilamentUserAttributes\Traits;
 
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeFieldFactoryRegistry;
-use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
+use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
 trait HasUserAttributesConfig
@@ -44,14 +42,20 @@ trait HasUserAttributesConfig
         $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
-            if ($userAttribute['type'] === 'text') {
-                $column = UserAttributeColumn::make($userAttribute['name']);
-            } else {
-                throw new \Exception("The user attribute type '{$userAttribute['type']}' is not yet supported.");
+            $type = $userAttribute['type'];
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
+
+            if (!isset($factory)) {
+                throw new \Exception("The user attribute type '{$type}' is not yet supported.");
             }
 
+            /** @var UserAttributeComponentFactoryInterface $factory */
+            $factoryClass = $factory;
+            $factory = new $factoryClass();
+
+            $column = $factory->makeColumn($userAttribute);
+
             $columns[] = $column
-                ->label($userAttribute['label'])
                 ->sortable($userAttribute['sortable'] ?? false);
         }
 
@@ -66,24 +70,25 @@ trait HasUserAttributesConfig
      *
      * @return Field[]
      */
-    public function getUserAttributeFields(string $model): array
+    public function getUserAttributeComponents(string $model): array
     {
         $fields = [];
         $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             $type = $userAttribute['type'];
-            $factory = UserAttributeFieldFactoryRegistry::getFactory($type);
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
 
             if (!isset($factory)) {
                 throw new \Exception("The user attribute type '{$type}' is not yet supported.");
             }
 
-            /** @var UserAttributeFieldFactoryInterface $factory */
+            /** @var UserAttributeComponentFactoryInterface $factory */
             $factoryClass = $factory;
             $factory = new $factoryClass();
 
             $field = $factory->makeField($userAttribute);
+            $field->required($userAttribute['required'] ?? false);
 
             $field->statePath('user_attributes.' . $userAttribute['name']);
             $field->afterStateHydrated(static function (Component $component, string | array | null $state): void {

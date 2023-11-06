@@ -11,7 +11,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeFieldFactoryRegistry;
+use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 
 class ManageUserAttributeConfigs extends ManageRecords
@@ -115,21 +115,14 @@ class ManageUserAttributeConfigs extends ManageRecords
                 $set('user_attribute_configs', $userAttributeConfigs?->config->toArray() ?? []);
             });
 
-        $factories = UserAttributeFieldFactoryRegistry::getRegisteredTypes();
+        $factories = UserAttributeComponentFactoryRegistry::getRegisteredTypes();
         $steps[] = Step::make('Modify the list of attributes')
             ->schema([
                 Forms\Components\Repeater::make('user_attribute_configs')
+                    ->reorderable(false)
+                    ->grid(['md' => 2, 'lg' => 3])
                     ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label(ucfirst(__('validation.attributes.name')))
-                            ->required()
-                            ->maxLength(255),
-                        Forms\Components\Select::make('type')
-                            ->options(array_combine($factories, $factories))
-                            ->label(ucfirst(__('validation.attributes.type')))
-                            ->required()
-                            ->reactive(),
-                        ...UserAttributeFieldFactoryRegistry::getConfigurationSchemas(),
+                        ...UserAttributeComponentFactoryRegistry::getConfigurationSchemas(),
                     ]),
             ]);
 

@@ -304,7 +304,7 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
 - [x] Easily display the attributes in a Filament table
 - [ ] Supported Input types
     - [x] Text
-    - [ ] Textarea
+    - [x] Textarea
     - [ ] Number
         - [ ] Integer
         - [ ] Decimal
@@ -316,10 +316,10 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
     - [ ] Radio
         - [ ] Specific options
         - [ ] From a model
-    - [ ] Date
-        - [ ] Date
-        - [ ] Time
-        - [ ] Date and time
+    - [x] Date
+        - [x] Date
+        - [x] Time
+        - [x] Date and time
     - [ ] Checkbox
     - [ ] File
         - [ ] Image
