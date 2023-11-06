@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
 use Livewire\Features\SupportTesting\Testable;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Testing\TestsFilamentUserAttributes;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -50,6 +51,8 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
 
     public function packageBooted(): void
     {
+        FilamentUserAttributes::registerUserAttributeFieldFactories();
+
         // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),

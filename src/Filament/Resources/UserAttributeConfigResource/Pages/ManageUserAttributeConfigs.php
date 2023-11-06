@@ -11,6 +11,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeFieldFactoryRegistry;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 
 class ManageUserAttributeConfigs extends ManageRecords
@@ -25,6 +26,7 @@ class ManageUserAttributeConfigs extends ManageRecords
             Actions\Action::make('Manage user attributes')
                 ->steps(self::getSteps())
                 ->requiresConfirmation()
+                ->modalWidth('5xl')
                 ->action(function (array $data) {
                     $model = $data['model_type'];
 
@@ -113,6 +115,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                 $set('user_attribute_configs', $userAttributeConfigs?->config->toArray() ?? []);
             });
 
+        $factories = UserAttributeFieldFactoryRegistry::getRegisteredTypes();
         $steps[] = Step::make('Modify the list of attributes')
             ->schema([
                 Forms\Components\Repeater::make('user_attribute_configs')
@@ -122,20 +125,11 @@ class ManageUserAttributeConfigs extends ManageRecords
                             ->required()
                             ->maxLength(255),
                         Forms\Components\Select::make('type')
-                            ->options([
-                                'text' => 'Text',
-                                // 'textarea' => 'Textarea',
-                                // 'select' => 'Select',
-                                // 'checkbox' => 'Checkbox',
-                                // 'radio' => 'Radio',
-                                // 'date' => 'Date',
-                                // 'datetime' => 'Datetime',
-                                // 'time' => 'Time',
-                                // 'color' => 'Color',
-                                // others...
-                            ])
+                            ->options(array_combine($factories, $factories))
                             ->label(ucfirst(__('validation.attributes.type')))
-                            ->required(),
+                            ->required()
+                            ->reactive(),
+                        ...UserAttributeFieldFactoryRegistry::getConfigurationSchemas(),
                     ]),
             ]);
 

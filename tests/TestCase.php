@@ -63,8 +63,6 @@ class TestCase extends Orchestra
 
         config()->set('app.env', env('APP_ENV', 'testing'));
         config()->set('app.key', env('APP_KEY', 'base64:1Md1nEHvllkgVM2HYdStk7utktyuk5MDSClm55PUlLk='));
-
-        FilamentUserAttributes::registerUserAttributeFieldFactories();
     }
 
     protected function defineDatabaseMigrations()

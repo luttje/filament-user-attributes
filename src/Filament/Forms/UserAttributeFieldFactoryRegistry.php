@@ -2,6 +2,8 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Forms;
 
+use Filament\Forms\Get;
+
 class UserAttributeFieldFactoryRegistry
 {
     protected static $factories = [];
@@ -23,5 +25,24 @@ class UserAttributeFieldFactoryRegistry
     public static function getRegisteredTypes(): array
     {
         return array_keys(static::$factories);
+    }
+
+    public static function getConfigurationSchemas(): array
+    {
+        $schemas = [];
+
+        foreach (static::$factories as $type => $factoryClass) {
+            /** @var UserAttributeFieldFactoryInterface */
+            $factory = new $factoryClass;
+            $factorySchemas = $factory->makeConfigurationSchema();
+
+            foreach ($factorySchemas as $schema) {
+                $schema->hidden(fn (Get $get) => $get('type') !== $type);
+            }
+
+            $schemas = array_merge($schemas, $factorySchemas);
+        }
+
+        return $schemas;
     }
 }
