@@ -14,7 +14,7 @@ it('can render a resource with configured user attributes', function () {
     // Pretend that the user configured what attributes exist for products
     $user->userAttributesConfigs()->create(
         [
-            'resource_type' => Category::class,
+            'resource_type' => CategoryResource::class,
             // TODO: Use a scope for always set this:
             'owner_type' => get_class($user),
             'config' => [

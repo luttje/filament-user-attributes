@@ -19,7 +19,7 @@ trait HasUserAttributesComponent
 
         $columns = $this->resourceTable($table)
             ->getColumns();
-        $customColumns = FilamentUserAttributes::getUserAttributeColumns($this);
+        $customColumns = FilamentUserAttributes::getUserAttributeColumns(self::class);
 
         foreach ($customColumns as $customColumn) {
             $columns[] = $customColumn;
@@ -41,15 +41,8 @@ trait HasUserAttributesComponent
 
         $components = $this->resourceForm($form)
             ->getComponents();
-        $customFields = FilamentUserAttributes::getUserAttributeComponents(self::class);
 
-        throw new \Exception('Not implemented');
-        // TODO: Recognize there being a tab component and add the fields to the tab (if the user wants to)
-        foreach ($customFields as $customField) {
-            $components[] = $customField;
-        }
-
-        $form->components($components);
+        FilamentUserAttributes::mergeCustomFormFields($form, $components, self::class);
 
         return $form;
     }
