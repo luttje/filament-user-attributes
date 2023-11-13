@@ -9,8 +9,12 @@ return [
     'suggestions' => 'suggestions',
     'format' => 'format',
     'placeholder' => 'placeholder',
-    'model_type' => 'model type',
+    'resource_type' => 'resource type',
     'decimal_places' => 'decimal places',
     'minimum' => 'minimum',
     'maximum' => 'maximum',
+    'order_sibling' => 'order sibling',
+    'order_position' => 'order position',
+    'order_position_before' => 'before',
+    'order_position_after' => 'after',
 ];

@@ -19,7 +19,7 @@ it('can add a custom attribute to a new model', function () {
 
     expect($model->userAttributes()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
-    expect($model->userAttributes->model->id)->toBe($model->id);
+    expect($model->userAttributes->resource->id)->toBe($model->id);
 });
 
 it('can add arrays to a new model', function () {
@@ -58,7 +58,7 @@ it('can add a custom attribute to an existing model', function () {
 
     expect($model->userAttributes()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
-    expect($model->userAttributes->model->id)->toBe($model->id);
+    expect($model->userAttributes->resource->id)->toBe($model->id);
 });
 
 it('can update a custom attribute on an existing model', function () {
@@ -71,7 +71,7 @@ it('can update a custom attribute on an existing model', function () {
 
     expect($model->userAttributes()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $newValues);
-    expect($model->userAttributes->model->id)->toBe($model->id);
+    expect($model->userAttributes->resource->id)->toBe($model->id);
 });
 
 it('can remove a custom attribute from an existing model', function () {
@@ -163,7 +163,7 @@ it('can update a single attribute on an existing model', function () {
 
     expect($model->userAttributes()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'new value']);
-    expect($model->userAttributes->model->id)->toBe($model->id);
+    expect($model->userAttributes->resource->id)->toBe($model->id);
 });
 
 it('can get a single attribute from an existing model', function () {
@@ -220,6 +220,6 @@ it('can create a model with user attributes through mass assignment', function (
 
     expect($model->userAttributes()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
-    expect($model->userAttributes->model->id)->toBe($model->id);
+    expect($model->userAttributes->resource->id)->toBe($model->id);
     expect($model->user_attributes->key)->toBe('value');
 });

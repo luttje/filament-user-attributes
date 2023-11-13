@@ -14,7 +14,7 @@ it('can render a form with configured user attributes', function () {
     // Pretend that the user configured what attributes exist for products
     $user->userAttributesConfigs()->create(
         [
-            'model_type' => Product::class,
+            'resource_type' => Product::class,
             // TODO: Use a scope for always set this:
             'owner_type' => get_class($user),
             'config' => [

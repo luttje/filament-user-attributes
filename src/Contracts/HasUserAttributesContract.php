@@ -48,9 +48,4 @@ interface HasUserAttributesContract
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
      */
     public function getUserAttributeValues(): ArrayObject;
-
-    /**
-     * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
-     */
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract;
 }

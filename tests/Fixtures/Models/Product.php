@@ -26,11 +26,6 @@ class Product extends Model implements HasUserAttributesContract
         'slug'
     ];
 
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
-    {
-        return auth()->user();
-    }
-
     /**
      * Create a new factory instance for the model.
      *

@@ -10,7 +10,7 @@ class UserAttributeConfig extends Model
     protected $fillable = [
         'owner_type',
         'owner_id',
-        'model_type',
+        'resource_type',
         'config',
     ];
 

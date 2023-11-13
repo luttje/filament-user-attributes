@@ -150,16 +150,16 @@ You can let your users configure which attributes should be added to models.
     }
     ```
 
-2. Have the models with the `HasUserAttributes` trait implement the `getUserAttributesConfig()` method to return the model with the `HasUserAttributesConfig` trait.
+2. Have the resources with the `HasUserAttributesResource` trait implement `HasUserAttributesResourceContract` and the `getUserAttributesConfig()` method to return the model with the `HasUserAttributesConfig` trait.
 
     ```php
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
     use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
-    class Product extends Model implements HasUserAttributesContract
+    class ProductResource extends Resource implements HasUserAttributesResourceContract
     {
-        use HasUserAttributes;
+        use HasUserAttributesResource;
 
         // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
         public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract

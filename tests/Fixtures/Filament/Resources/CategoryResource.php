@@ -10,11 +10,14 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource\Pages;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
 
-class CategoryResource extends Resource
+class CategoryResource extends Resource implements HasUserAttributesResourceContract
 {
     use HasUserAttributesResource;
 
@@ -23,6 +26,14 @@ class CategoryResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?string $navigationLabel = 'Categories';
+
+    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
+    {
+        /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
+        $user = Auth::user();
+
+        return $user;
+    }
 
     public static function resourceForm(Form $form): Form
     {

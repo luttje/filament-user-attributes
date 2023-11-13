@@ -2,6 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes\Filament;
 
+use \Str;
 use Filament\Forms;
 use Filament\Forms\Get;
 
@@ -28,7 +29,7 @@ class UserAttributeComponentFactoryRegistry
         return array_keys(static::$factories);
     }
 
-    public static function getConfigurationSchemas(): array
+    public static function getConfigurationSchemas(string $resource): array
     {
         $schemas = [];
 
@@ -48,6 +49,31 @@ class UserAttributeComponentFactoryRegistry
             ->label(ucfirst(__('filament-user-attributes::attributes.type')))
             ->required()
             ->live();
+
+        // Will be filled by the previous wizard step, with the resource this is for.
+        $schemas[] = Forms\Components\Select::make('order_sibling')
+            ->selectablePlaceholder()
+            ->live()
+            ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_order')))
+            ->options(function () use ($resource) {
+                $fields = $resource::getFieldsForOrdering();
+                $fields = array_combine(array_column($fields, 'label'), array_column($fields, 'label'));
+                return $fields;
+            })
+            ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
+            ->label(ucfirst(__('filament-user-attributes::attributes.order_sibling')));
+
+        // Before or after the order sibling field
+        $schemas[] = Forms\Components\Select::make('order_position')
+            ->options([
+                'before' => __('filament-user-attributes::attributes.order_position_before'),
+                'after' => __('filament-user-attributes::attributes.order_position_after'),
+            ])
+            ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
+            ->required(function (Get $get) {
+                $sibling = $get('order_sibling');
+                return $sibling !== null && $sibling !== '';
+            });
 
         foreach (static::$factories as $type => $factoryClass) {
             /** @var UserAttributeComponentFactoryInterface */

@@ -21,25 +21,25 @@ trait HasUserAttributesConfig
             ->where('owner_type', static::class);
     }
 
-    private function getUserAttributesConfigInstance(string $model): UserAttributeConfig
+    private function getUserAttributesConfigInstance(string $resource): UserAttributeConfig
     {
         return $this->userAttributesConfigs
-            ->where('model_type', $model)
+            ->where('resource_type', $resource)
             ->first();
     }
 
     /**
      * Returns an array of columns to be added to the table.
      *
-     * Fetches the desired model configs from the current config
+     * Fetches the desired resource configs from the current config
      * model's (self) user attributes configuration.
      *
      * @return Column[]
      */
-    public function getUserAttributeColumns(string $model): array
+    public function getUserAttributeColumns(string $resource): array
     {
         $columns = [];
-        $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
+        $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             $type = $userAttribute['type'];
@@ -65,15 +65,15 @@ trait HasUserAttributesConfig
     /**
      * Returns an array of fields to be added to the form.
      *
-     * Fetches the desired model configs from the current config
+     * Fetches the desired resource configs from the current config
      * model's (self) user attributes configuration.
      *
      * @return Field[]
      */
-    public function getUserAttributeComponents(string $model): array
+    public function getUserAttributeComponents(string $resource): array
     {
         $fields = [];
-        $userAttributesConfig = $this->getUserAttributesConfigInstance($model);
+        $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             $type = $userAttribute['type'];
@@ -113,31 +113,37 @@ trait HasUserAttributesConfig
                 });
             });
 
-            $fields[] = $field;
+            $fields[] = [
+                'component' => $field,
+                'ordering' => [
+                    'before' => isset($userAttribute['order_position']) && $userAttribute['order_position'] === 'before',
+                    'sibling' => $userAttribute['order_sibling'] ?? null,
+                ]
+            ];
         }
 
         return $fields;
     }
 
     /**
-     * Creates a user attribute configuration for the specified model.
+     * Creates a user attribute configuration for the specified resource.
      * Uses the specified label, type and extra options.
      */
     public function createUserAttributeConfig(
-        string $model,
+        string $resource,
         string $name,
         string $label,
         string $type = 'text',
         array $options = []
     ): UserAttributeConfig {
         $config = $this->userAttributesConfigs()
-            ->where('model_type', $model)
+            ->where('resource_type', $resource)
             ->where('name', $name)
             ->first();
 
         if (!$config) {
             $config = new UserAttributeConfig();
-            $config->model_type = $model;
+            $config->resource_type = $resource;
             $config->name = $name;
         }
 

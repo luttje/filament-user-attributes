@@ -11,6 +11,9 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 
 class NumberInputComponentFactory implements UserAttributeComponentFactoryInterface
 {
+    public const DEFAULT_MINIMUM = -999999;
+    public const DEFAULT_MAXIMUM = 999999;
+
     public function makeColumn(array $userAttribute): Column
     {
         return UserAttributeColumn::make($userAttribute['name'])
@@ -24,8 +27,8 @@ class NumberInputComponentFactory implements UserAttributeComponentFactoryInterf
             ->numeric()
             ->label($userAttribute['label'])
             ->step(10 ** ($userAttribute['decimal_places'] ?? 0))
-            ->minValue($userAttribute['minimum'] ?? 0)
-            ->maxValue($userAttribute['maximum'] ?? PHP_INT_MAX);
+            ->minValue($userAttribute['minimum'] ?? static::DEFAULT_MINIMUM)
+            ->maxValue($userAttribute['maximum'] ?? static::DEFAULT_MAXIMUM);
     }
 
     public function makeDefaultValue(array $userAttribute): mixed
@@ -46,14 +49,14 @@ class NumberInputComponentFactory implements UserAttributeComponentFactoryInterf
                 ->numeric()
                 ->label(ucfirst(__('filament-user-attributes::attributes.minimum')))
                 ->step(fn (Get $get) => $get('decimal_places') * 0.1)
-                ->minValue(PHP_INT_MIN)
-                ->default(PHP_INT_MIN),
+                ->minValue(static::DEFAULT_MINIMUM)
+                ->default(static::DEFAULT_MINIMUM),
             TextInput::make('maximum')
                 ->numeric()
                 ->label(ucfirst(__('filament-user-attributes::attributes.maximum')))
                 ->step(fn (Get $get) => $get('decimal_places') * 0.1)
-                ->maxValue(PHP_INT_MAX)
-                ->default(PHP_INT_MAX),
+                ->maxValue(static::DEFAULT_MAXIMUM)
+                ->default(static::DEFAULT_MAXIMUM),
         ];
     }
 }

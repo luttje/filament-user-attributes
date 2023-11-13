@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes\Traits;
 
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 
 trait HasUserAttributesComponent
@@ -19,8 +20,7 @@ trait HasUserAttributesComponent
 
         $columns = $this->resourceTable($table)
             ->getColumns();
-        $model = $table->getModel();
-        $customColumns = FilamentUserAttributes::getUserAttributeColumns($model);
+        $customColumns = FilamentUserAttributes::getUserAttributeColumns($this);
 
         foreach ($customColumns as $customColumn) {
             $columns[] = $customColumn;
@@ -42,8 +42,9 @@ trait HasUserAttributesComponent
 
         $components = $this->resourceForm($form)
             ->getComponents();
-        $model = $form->getModel();
-        $customFields = FilamentUserAttributes::getUserAttributeComponents($model);
+        $customFields = FilamentUserAttributes::getUserAttributeComponents(self::class);
+
+        throw new \Exception('Not implemented');
 
         // TODO: Recognize there being a tab component and add the fields to the tab (if the user wants to)
         foreach ($customFields as $customField) {
@@ -53,5 +54,23 @@ trait HasUserAttributesComponent
         $form->components($components);
 
         return $form;
+    }
+
+    /**
+     * Calls the resourceForm function to get which fields exist.
+     */
+    public static function getFieldsForOrdering(): array
+    {
+        throw new \Exception('Not implemented');
+        return [];
+    }
+
+    /**
+     * Calls the resourceTable function to get which columns exist.
+     */
+    public static function getColumnsForOrdering(): array
+    {
+        throw new \Exception('Not implemented');
+        return [];
     }
 }

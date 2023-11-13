@@ -2,8 +2,10 @@
 
 namespace Luttje\FilamentUserAttributes;
 
+use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
 
@@ -30,48 +32,78 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute columns.
      */
-    public static function getUserAttributeColumns(string $model): array
+    public static function getUserAttributeColumns(string $resource): array
     {
-        $config = static::getUserAttributeConfig($model);
+        $config = static::getUserAttributeConfig($resource);
 
         if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
-            throw new \Exception("The model '$model' does not use the HasUserAttributesConfig trait");
+            throw new \Exception("The resource '$resource' does not correctly use the HasUserAttributesConfig trait");
         }
 
-        return $config->getUserAttributeColumns($model);
+        return $config->getUserAttributeColumns($resource);
     }
 
     /**
      * Returns the user attribute fields.
      */
-    public static function getUserAttributeComponents(string $model): array
+    public static function getUserAttributeComponents(string $resource): array
     {
-        $config = static::getUserAttributeConfig($model);
+        $config = static::getUserAttributeConfig($resource);
 
         if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
-            throw new \Exception("The model '$model' does not use the HasUserAttributesConfig trait");
+            throw new \Exception("The resource '$resource' does not use the HasUserAttributesConfig trait");
         }
 
-        return $config->getUserAttributeComponents($model);
+        return $config->getUserAttributeComponents($resource);
     }
 
     /**
      * Returns the user attribute configuration model.
      */
-    public static function getUserAttributeConfig(string $model): HasUserAttributesConfigContract
+    public static function getUserAttributeConfig(string $resource): HasUserAttributesConfigContract
     {
-        if (!in_array(HasUserAttributesContract::class, class_implements($model))) {
-            throw new \Exception("The model '$model' does not implement the HasUserAttributesContract interface.");
+        if (!in_array(HasUserAttributesResourceContract::class, class_implements($resource))) {
+            throw new \Exception("The resource '$resource' does not implement the HasUserAttributesResourceContract interface.");
         }
 
-        /** @var ?HasUserAttributesContract */
-        $model = $model;
-        $config = $model::getUserAttributesConfig();
+        /** @var ?HasUserAttributesResourceContract */
+        $resource = $resource;
+        $config = $resource::getUserAttributesConfig();
 
         if ($config === null) {
-            throw new \Exception("The model '" . strval($model) . "' did not return a configuration model from the getUserAttributesConfig function (or it was null).");
+            throw new \Exception("The resource '" . strval($resource) . "' did not return a configuration model from the getUserAttributesConfig function (or it was null).");
         }
 
         return $config;
+    }
+
+    /**
+     * Finds all resources that have the HasUserAttributesContract interface
+     */
+    public static function getResourcesImplementingHasUserAttributesResourceContract()
+    {
+        // TODO: Make resource paths configurable in package config
+        $path = app_path('Filament');
+        $resources = collect(File::allFiles($path))
+            ->map(function ($file) {
+                $type = 'App\\Filament\\' . str_replace('/', '\\', $file->getRelativePathname());
+                $type = substr($type, 0, -strlen('.php'));
+
+                return $type;
+            })
+            ->filter(function ($type) {
+                if (!class_exists($type)) {
+                    return false;
+                }
+
+                if (!in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract::class, class_implements($type))) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->toArray();
+
+        return $resources;
     }
 }

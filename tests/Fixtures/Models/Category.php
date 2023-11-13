@@ -23,14 +23,6 @@ class Category extends Model implements HasUserAttributesContract
     protected $fillable = [
     ];
 
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
-    {
-        /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
-        $user = Auth::user();
-
-        return $user;
-    }
-
     /**
      * Create a new factory instance for the model.
      *
