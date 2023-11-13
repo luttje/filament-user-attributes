@@ -5,6 +5,12 @@ namespace Luttje\FilamentUserAttributes\Models;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string $owner_type
+ * @property string $owner_id
+ * @property string $resource_type
+ * @property array $config
+ */
 class UserAttributeConfig extends Model
 {
     protected $fillable = [
