@@ -89,10 +89,11 @@ trait HasUserAttributesConfig
 
             $field = $factory->makeField($userAttribute);
             $field->required($userAttribute['required'] ?? false);
+            $defaultValue = $factory->makeDefaultValue($userAttribute);
 
             $field->statePath('user_attributes.' . $userAttribute['name']);
-            $field->afterStateHydrated(static function (Component $component, string | array | null $state): void {
-                $component->state(function (?Model $record) use ($component) {
+            $field->afterStateHydrated(static function (Component $component, string | array | null $state) use ($defaultValue): void {
+                $component->state(function (?Model $record) use ($component, $defaultValue) {
                     if ($record === null) {
                         return null;
                     }
@@ -101,7 +102,14 @@ trait HasUserAttributesConfig
 
                     /** @var HasUserAttributesContract */
                     $record = $record;
-                    return $record->user_attributes->$key;
+
+                    $value = $record->user_attributes->$key;
+
+                    if ($value === null) {
+                        return $defaultValue;
+                    }
+
+                    return $value;
                 });
             });
 

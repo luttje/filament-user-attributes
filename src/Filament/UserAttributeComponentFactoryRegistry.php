@@ -34,7 +34,7 @@ class UserAttributeComponentFactoryRegistry
 
         // TODO: Make configs for these
         $schemas[] = Forms\Components\TextInput::make('name')
-            ->label(ucfirst(__('validation.attributes.name')))
+            ->label(ucfirst(__('filament-user-attributes::attributes.name')))
             ->required()
             ->maxLength(255);
         $schemas[] = Forms\Components\Checkbox::make('required')
@@ -45,7 +45,7 @@ class UserAttributeComponentFactoryRegistry
                 ->maxLength(255);
         $schemas[] = Forms\Components\Select::make('type')
             ->options(array_combine(static::getRegisteredTypes(), static::getRegisteredTypes()))
-            ->label(ucfirst(__('validation.attributes.type')))
+            ->label(ucfirst(__('filament-user-attributes::attributes.type')))
             ->required()
             ->live();
 

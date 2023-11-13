@@ -304,22 +304,25 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
 - [ ] Supported Input types
     - [x] Text
     - [x] Textarea
-    - [ ] Number
-        - [ ] Integer
-        - [ ] Decimal
-        - [ ] Specific range
-        - [ ] Specific decimal places
-    - [ ] Select
-        - [ ] Specific options
-        - [ ] From a model
-    - [ ] Radio
-        - [ ] Specific options
-        - [ ] From a model
+    - [x] Number
+        - [x] Integer
+        - [x] Decimal
+        - [x] Specific range
+        - [x] Specific decimal places
+    - [x] Select
+        - [x] Specific options
+        - [ ] From an existing model property
+    - [x] Radio
+        - [x] Specific options
+        - [ ] From an existing model property
+    - [x] Tags
+        - [x] With suggestions
     - [x] Date
         - [x] Date
         - [x] Time
         - [x] Date and time
-    - [ ] Checkbox
+    - [x] Checkbox
+        - [x] With default
     - [ ] File
         - [ ] Image
         - [ ] PDF

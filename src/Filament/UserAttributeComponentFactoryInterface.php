@@ -11,5 +11,7 @@ interface UserAttributeComponentFactoryInterface
 
     public function makeField(array $userAttribute): Field;
 
+    public function makeDefaultValue(array $userAttribute): mixed;
+
     public function makeConfigurationSchema(): array;
 }

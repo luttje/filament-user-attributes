@@ -22,6 +22,11 @@ class RichEditorComponentFactory implements UserAttributeComponentFactoryInterfa
             ->label($userAttribute['label']);
     }
 
+    public function makeDefaultValue(array $userAttribute): mixed
+    {
+        return '';
+    }
+
     public function makeConfigurationSchema(): array
     {
         return [

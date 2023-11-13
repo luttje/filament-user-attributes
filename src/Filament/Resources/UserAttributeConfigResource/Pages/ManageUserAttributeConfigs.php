@@ -104,7 +104,7 @@ class ManageUserAttributeConfigs extends ManageRecords
             ->schema([
                 Forms\Components\Select::make('model_type')
                     ->options(array_combine($models, $models))
-                    ->label(ucfirst(__('validation.attributes.model_type')))
+                    ->label(ucfirst(__('filament-user-attributes::attributes.model_type')))
                     ->required(),
             ])
             ->afterValidation(function (Get $get, Set $set) {
