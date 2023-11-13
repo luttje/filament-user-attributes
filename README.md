@@ -136,33 +136,33 @@ You can let your users configure which attributes should be added to models.
 
 > Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes. The attributes will be automatically added to the resource form and table if you follow the steps below.
 
-1. Add the `HasUserAttributesConfigContract` interface and `HasUserAttributesConfig` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
+1. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
     ```php
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
+    use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
-    class User extends Authenticatable implements HasUserAttributesConfigContract
+    class User extends Authenticatable implements ConfiguresUserAttributesContract
     {
         // This trait will store the user attributes configuration in relation to this model.
         // Later on we'll use this model to retrieve the configuration.
-        use HasUserAttributesConfig;
+        use ConfiguresUserAttributes;
     }
     ```
 
-2. Have the resources with the `HasUserAttributesResource` trait implement `HasUserAttributesResourceContract` and the `getUserAttributesConfig()` method to return the model with the `HasUserAttributesConfig` trait.
+2. Have the resources with the `UserAttributesResource` trait implement `UserAttributesConfigContract` and the `getUserAttributesConfig()` method to return the model with the `ConfiguresUserAttributes` trait.
 
     ```php
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+    use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+    use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-    class ProductResource extends Resource implements HasUserAttributesResourceContract
+    class ProductResource extends Resource implements UserAttributesConfigContract
     {
-        use HasUserAttributesResource;
+        use UserAttributesResource;
 
         // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
-        public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
+        public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
         {
             /** @var \App\Models\User */
             $user = Auth::user();
@@ -172,18 +172,18 @@ You can let your users configure which attributes should be added to models.
     }
     ```
 
-3. Go to the resources of all models with user attributes and apply the `HasUserAttributesResource` trait to the resource.
+3. Go to the resources of all models with user attributes and apply the `UserAttributesResource` trait to the resource.
 
 4. In your resources rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
 
     ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+    use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
     class ProductResource extends Resource
     {
         // This will add the user attributes to the form and table, based on the configuration for the Product model.
         // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
-        use HasUserAttributesResource;
+        use UserAttributesResource;
 
         protected static ?string $model = Product::class;
 
@@ -236,17 +236,19 @@ Finally you need to show the user attributes configuration form somewhere.
 
 #### Filament Livewire Components
 
-For Filament Livewire components you need to specify the `HasUserAttributesComponent` trait. And we need to specify which model to get the configuration for:
+For Filament Livewire components you need to specify the `UserAttributesComponent` trait with `insteadof` for the `form` and `table` methods:
 
 ```php
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesComponent;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable
+class ConfiguredManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
     // 'insteadof' is required for components, so PHP knows to use the methods from the trait.
-    use HasUserAttributesComponent {
-        HasUserAttributesComponent::form insteadof InteractsWithForms;
-        HasUserAttributesComponent::table insteadof InteractsWithTable;
+    use UserAttributesComponent {
+        UserAttributesComponent::form insteadof InteractsWithForms;
+        UserAttributesComponent::table insteadof InteractsWithTable;
     }
 
     use InteractsWithForms;
@@ -259,10 +261,17 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
         $this->form->fill();
     }
 
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
+    {
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        return $user;
+    }
+
     public function resourceTable(Table $table): Table
     {
         return $table
-            // Specify a query so the trait knows which model to get the configuration for:
             ->query(Product::query())
             ->columns([
                 TextColumn::make('slug'),
@@ -277,7 +286,6 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
                 TextInput::make('name'),
             ])
             ->statePath('data')
-            // Specify a model so the trait knows which model to get the configuration for:
             ->model(Product::class);
     }
 }
@@ -301,37 +309,39 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
 - [x] Support for ULIDs
 - [x] Easily display the attributes in a Filament form
 - [x] Easily display the attributes in a Filament table
-- [ ] Supported Input types
-    - [x] Text
-    - [x] Textarea
-    - [x] Number
-        - [x] Integer
-        - [x] Decimal
-        - [x] Specific range
-        - [x] Specific decimal places
-    - [x] Select
-        - [x] Specific options
-        - [ ] From an existing model property
-    - [x] Radio
-        - [x] Specific options
-        - [ ] From an existing model property
-    - [x] Tags
-        - [x] With suggestions
-    - [x] Date
-        - [x] Date
-        - [x] Time
-        - [x] Date and time
-    - [x] Checkbox
-        - [x] With default
-    - [ ] File
-        - [ ] Image
-        - [ ] PDF
-        - [ ] Other
-        - [ ] Preview
-    - [ ] Color
-- [ ] Sensible validations
-- [ ] Allow users to specify order of attributes
+- [x] Sensible validations for input types
+- [x] Allow users to specify order of attributes
 - [x] User interface for managing user attributes
+
+**Supported Input types:**
+
+- [x] Text
+- [x] Textarea
+- [x] Number
+    - [x] Integer
+    - [x] Decimal
+    - [x] Specific range
+    - [x] Specific decimal places
+- [x] Select
+    - [x] Specific options
+    - [ ] From an existing model property
+- [x] Radio
+    - [x] Specific options
+    - [ ] From an existing model property
+- [x] Tags
+    - [x] With suggestions
+- [x] Date
+    - [x] Date
+    - [x] Time
+    - [x] Date and time
+- [x] Checkbox
+    - [x] With default
+- [ ] File
+    - [ ] Image
+    - [ ] PDF
+    - [ ] Other
+    - [ ] Preview
+- [ ] Color
 
 ## ❤ Contributing
 

@@ -11,15 +11,15 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource\Pages;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class CategoryResource extends Resource implements HasUserAttributesResourceContract
+class CategoryResource extends Resource implements UserAttributesConfigContract
 {
-    use HasUserAttributesResource;
+    use UserAttributesResource;
 
     protected static ?string $model = Category::class;
 
@@ -27,7 +27,7 @@ class CategoryResource extends Resource implements HasUserAttributesResourceCont
 
     protected static ?string $navigationLabel = 'Categories';
 
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
         $user = Auth::user();

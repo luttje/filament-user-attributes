@@ -7,17 +7,17 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories\UserFactory as UserFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
+use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
-class User extends Authenticatable implements HasUserAttributesConfigContract, HasUserAttributesContract, FilamentUser
+class User extends Authenticatable implements ConfiguresUserAttributesContract, HasUserAttributesContract, FilamentUser
 {
     use HasFactory;
     use HasUserAttributes;
-    use HasUserAttributesConfig;
+    use ConfiguresUserAttributes;
     use Notifiable;
 
     /**

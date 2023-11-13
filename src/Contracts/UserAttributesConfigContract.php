@@ -2,9 +2,9 @@
 
 namespace Luttje\FilamentUserAttributes\Contracts;
 
-interface HasUserAttributesResourceContract
+interface UserAttributesConfigContract
 {
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract;
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract;
 
     public static function getFieldsForOrdering(): array;
 

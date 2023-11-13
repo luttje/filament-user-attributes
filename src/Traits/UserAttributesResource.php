@@ -2,22 +2,25 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
+use Filament\Forms\Components\Component;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 
-trait HasUserAttributesComponent
+trait UserAttributesResource
 {
     /**
      * Overrides the default table function to add user attributes.
      */
-    public function table(Table $table): Table
+    public static function table(Table $table): Table
     {
-        if (!method_exists($this, 'resourceTable')) {
+        if (!method_exists(self::class, 'resourceTable')) {
             return $table;
         }
 
-        $columns = $this->resourceTable($table)
+        $columns = self::resourceTable($table)
             ->getColumns();
         $customColumns = FilamentUserAttributes::getUserAttributeColumns(self::class);
 
@@ -33,13 +36,13 @@ trait HasUserAttributesComponent
     /**
      * Overrides the default form function to add user attributes.
      */
-    public function form(Form $form): Form
+    public static function form(Form $form): Form
     {
-        if (!method_exists($this, 'resourceForm')) {
+        if (!method_exists(self::class, 'resourceForm')) {
             return $form;
         }
 
-        $components = $this->resourceForm($form)
+        $components = self::resourceForm($form)
             ->getComponents();
 
         FilamentUserAttributes::mergeCustomFormFields($form, $components, self::class);
@@ -52,8 +55,15 @@ trait HasUserAttributesComponent
      */
     public static function getFieldsForOrdering(): array
     {
-        throw new \Exception('Not implemented');
-        return [];
+        if (!method_exists(self::class, 'resourceForm')) {
+            return [];
+        }
+
+        $form = Form::make(new FormsCapturer());
+        $components = self::resourceForm($form)
+            ->getComponents();
+
+        return FilamentUserAttributes::getAllFieldComponents($components);
     }
 
     /**
@@ -61,7 +71,14 @@ trait HasUserAttributesComponent
      */
     public static function getColumnsForOrdering(): array
     {
-        throw new \Exception('Not implemented');
         return [];
     }
+}
+
+/**
+ * Shim class to capture the form components that are being configured.
+ */
+class FormsCapturer extends Component implements HasForms
+{
+    use InteractsWithForms;
 }

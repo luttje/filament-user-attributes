@@ -5,11 +5,11 @@ namespace Luttje\FilamentUserAttributes;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
 use Illuminate\Support\Facades\File;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
+use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
 class FilamentUserAttributes
 {
@@ -38,8 +38,8 @@ class FilamentUserAttributes
     {
         $config = static::getUserAttributeConfig($resource);
 
-        if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
-            throw new \Exception("The resource '$resource' does not correctly use the HasUserAttributesConfig trait");
+        if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
+            throw new \Exception("The resource '$resource' does not correctly use the ConfiguresUserAttributes trait");
         }
 
         return $config->getUserAttributeColumns($resource);
@@ -52,8 +52,8 @@ class FilamentUserAttributes
     {
         $config = static::getUserAttributeConfig($resource);
 
-        if (!in_array(HasUserAttributesConfig::class, class_uses_recursive($config))) {
-            throw new \Exception("The resource '$resource' does not use the HasUserAttributesConfig trait");
+        if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
+            throw new \Exception("The resource '$resource' does not use the ConfiguresUserAttributes trait");
         }
 
         return $config->getUserAttributeComponents($resource);
@@ -62,13 +62,13 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute configuration model.
      */
-    public static function getUserAttributeConfig(string $resource): HasUserAttributesConfigContract
+    public static function getUserAttributeConfig(string $resource): ConfiguresUserAttributesContract
     {
-        if (!in_array(HasUserAttributesResourceContract::class, class_implements($resource))) {
-            throw new \Exception("The resource '$resource' does not implement the HasUserAttributesResourceContract interface.");
+        if (!in_array(UserAttributesConfigContract::class, class_implements($resource))) {
+            throw new \Exception("The resource '$resource' does not implement the UserAttributesConfigContract interface.");
         }
 
-        /** @var ?HasUserAttributesResourceContract */
+        /** @var ?UserAttributesConfigContract */
         $resource = $resource;
         $config = $resource::getUserAttributesConfig();
 
@@ -98,7 +98,7 @@ class FilamentUserAttributes
                     return false;
                 }
 
-                if (!in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract::class, class_implements($type))) {
+                if (!in_array(\Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract::class, class_implements($type))) {
                     return false;
                 }
 
@@ -131,7 +131,7 @@ class FilamentUserAttributes
         $namesWithLabels = [];
 
         foreach ($components as $component) {
-            $label = static::getComponentLabel($component, $parentLabel);
+            $label = self::getComponentLabel($component, $parentLabel);
 
             if ($component instanceof \Filament\Forms\Components\Field) {
                 $namesWithLabels[] = [
@@ -163,7 +163,7 @@ class FilamentUserAttributes
         $newComponents = [];
 
         foreach ($components as $component) {
-            $label = static::getComponentLabel($component, $parentLabel);
+            $label = self::getComponentLabel($component, $parentLabel);
 
             $newComponents[] = $component;
 

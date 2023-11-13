@@ -13,16 +13,16 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesResourceContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesComponent;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable, HasUserAttributesResourceContract
+class ConfiguredManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
-    use HasUserAttributesComponent {
-        HasUserAttributesComponent::form insteadof InteractsWithForms;
-        HasUserAttributesComponent::table insteadof InteractsWithTable;
+    use UserAttributesComponent {
+        UserAttributesComponent::form insteadof InteractsWithForms;
+        UserAttributesComponent::table insteadof InteractsWithTable;
     }
 
     use InteractsWithForms;
@@ -35,7 +35,7 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable,
         $this->form->fill();
     }
 
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
         $user = Auth::user();

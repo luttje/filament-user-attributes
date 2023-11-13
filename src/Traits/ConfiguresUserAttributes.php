@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
-trait HasUserAttributesConfig
+trait ConfiguresUserAttributes
 {
     /**
      * Returns the user attributes configuration models.

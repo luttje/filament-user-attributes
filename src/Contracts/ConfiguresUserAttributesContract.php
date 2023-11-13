@@ -5,25 +5,25 @@ namespace Luttje\FilamentUserAttributes\Contracts;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
-interface HasUserAttributesConfigContract
+interface ConfiguresUserAttributesContract
 {
     /**
-     * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig
+     * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
     public function userAttributesConfigs(): HasMany;
 
     /**
-     * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig
+     * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
     public function getUserAttributeColumns(string $resource): array;
 
     /**
-     * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig
+     * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
     public function getUserAttributeComponents(string $resource): array;
 
     /**
-     * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig
+     * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
     public function createUserAttributeConfig(
         string $resource,
