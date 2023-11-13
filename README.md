@@ -144,13 +144,22 @@ You can let your users configure which attributes should be added to models.
 
     class User extends Authenticatable implements ConfiguresUserAttributesContract
     {
-        // This trait will store the user attributes configuration in relation to this model.
-        // Later on we'll use this model to retrieve the configuration.
+        // This trait will store the user attributes configurations for each user. Meaning each user can specify different attributes unique to them.
         use ConfiguresUserAttributes;
     }
     ```
 
-2. Have the resources with the `UserAttributesResource` trait implement `UserAttributesConfigContract` and the `getUserAttributesConfig()` method to return the model with the `ConfiguresUserAttributes` trait.
+Now it's time to setup a resource that should display the user attributes:
+
+2. Have the resource use the `UserAttributesResource` trait.
+
+3. In your resource rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively.
+
+    *Renaming is required so the trait can have control over the form and table.*
+
+4. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` method to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user).
+
+**Your resource should now look something like this:**
 
     ```php
     use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
@@ -159,7 +168,11 @@ You can let your users configure which attributes should be added to models.
 
     class ProductResource extends Resource implements UserAttributesConfigContract
     {
+        // This will add the user attributes to the form and table, based on the configuration for the Product model.
+        // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
         use UserAttributesResource;
+
+        protected static ?string $model = Product::class;
 
         // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
         public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
@@ -169,23 +182,6 @@ You can let your users configure which attributes should be added to models.
 
             return $user;
         }
-    }
-    ```
-
-3. Go to the resources of all models with user attributes and apply the `UserAttributesResource` trait to the resource.
-
-4. In your resources rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
-
-    ```php
-    use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
-
-    class ProductResource extends Resource
-    {
-        // This will add the user attributes to the form and table, based on the configuration for the Product model.
-        // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
-        use UserAttributesResource;
-
-        protected static ?string $model = Product::class;
 
         // Rename the `form` static method to `resourceForm`:
         public static function resourceForm(Form $form): Form
@@ -211,9 +207,7 @@ You can let your users configure which attributes should be added to models.
     }
     ```
 
-    *Renaming is required so the trait can have control over the form and table.*
-
-Finally you need to show the user attributes configuration form somewhere.
+Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
 5. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
@@ -236,7 +230,9 @@ Finally you need to show the user attributes configuration form somewhere.
 
 #### Filament Livewire Components
 
-For Filament Livewire components you need to specify the `UserAttributesComponent` trait with `insteadof` for the `form` and `table` methods:
+For Filament Livewire components you need to specify the `UserAttributesComponent` trait with `insteadof` for the `form` and `table` methods.
+
+We implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the user model.
 
 ```php
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
