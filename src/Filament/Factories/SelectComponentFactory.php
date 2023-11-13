@@ -1,14 +1,14 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Filament\Forms\Factories;
+namespace Luttje\FilamentUserAttributes\Filament\Factories;
 
-use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Field;
+use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryInterface;
+use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class CheckboxComponentFactory implements UserAttributeComponentFactoryInterface
+class SelectComponentFactory implements UserAttributeComponentFactoryInterface
 {
     public function makeColumn(array $userAttribute): Column
     {
@@ -18,7 +18,8 @@ class CheckboxComponentFactory implements UserAttributeComponentFactoryInterface
 
     public function makeField(array $userAttribute): Field
     {
-        return Checkbox::make($userAttribute['name'])
+        return Select::make($userAttribute['name'])
+            ->options($userAttribute['options'] ?? [])
             ->label($userAttribute['label']);
     }
 

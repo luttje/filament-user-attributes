@@ -7,7 +7,7 @@ use Filament\Forms\Components\Field;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryRegistry;
+use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
 trait HasUserAttributesConfig

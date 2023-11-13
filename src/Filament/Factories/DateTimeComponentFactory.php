@@ -1,6 +1,6 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Filament\Forms\Factories;
+namespace Luttje\FilamentUserAttributes\Filament\Factories;
 
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\DatePicker;
@@ -10,7 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryInterface;
+use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
 class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Filament\Forms;
+namespace Luttje\FilamentUserAttributes\Filament;
 
 use Filament\Forms;
 use Filament\Forms\Get;

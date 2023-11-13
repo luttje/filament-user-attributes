@@ -11,7 +11,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ManageRecords;
 use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-use Luttje\FilamentUserAttributes\Filament\Forms\UserAttributeComponentFactoryRegistry;
+use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 
 class ManageUserAttributeConfigs extends ManageRecords

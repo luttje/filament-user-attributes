@@ -1,6 +1,6 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Filament\Forms;
+namespace Luttje\FilamentUserAttributes\Filament;
 
 use Filament\Forms\Components\Field;
 use Filament\Tables\Columns\Column;
