@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
 
 /**

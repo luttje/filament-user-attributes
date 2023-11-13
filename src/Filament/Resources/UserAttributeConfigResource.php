@@ -2,10 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Resources;
 
-use Filament\Actions;
 use Filament\Forms;
-use Filament\Forms\Components\Wizard\Step;
-use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;

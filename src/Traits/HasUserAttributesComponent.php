@@ -4,7 +4,6 @@ namespace Luttje\FilamentUserAttributes\Traits;
 
 use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 
 trait HasUserAttributesComponent
@@ -45,7 +44,6 @@ trait HasUserAttributesComponent
         $customFields = FilamentUserAttributes::getUserAttributeComponents(self::class);
 
         throw new \Exception('Not implemented');
-
         // TODO: Recognize there being a tab component and add the fields to the tab (if the user wants to)
         foreach ($customFields as $customField) {
             $components[] = $customField;

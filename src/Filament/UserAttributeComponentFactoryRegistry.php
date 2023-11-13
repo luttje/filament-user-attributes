@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Filament;
 
-use \Str;
 use Filament\Forms;
 use Filament\Forms\Get;
 

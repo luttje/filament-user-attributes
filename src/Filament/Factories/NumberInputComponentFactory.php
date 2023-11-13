@@ -12,6 +12,7 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 class NumberInputComponentFactory implements UserAttributeComponentFactoryInterface
 {
     public const DEFAULT_MINIMUM = -999999;
+
     public const DEFAULT_MAXIMUM = 999999;
 
     public function makeColumn(array $userAttribute): Column

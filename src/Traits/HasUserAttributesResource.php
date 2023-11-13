@@ -6,9 +6,7 @@ use Filament\Forms\Components\Component;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Form;
-use Filament\Tables\Actions\Contracts\HasTable;
 use Filament\Tables\Table;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 
 trait HasUserAttributesResource
