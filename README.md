@@ -139,6 +139,9 @@ You can let your users configure which attributes (custom fields) should be adde
 > The attributes can then be added to the resource form and optionally the table:
 > ![](./.github/screenshot-resulting-form.png)
 
+> **Note**
+> Before you proceed, make sure you've completed the [🚀 Getting Started](#-getting-started) and implemented `HasUserAttributesContract` with the `HasUserAttributes` trait on the model you want to let your users specify custom attributes for.
+
 1. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
     ```php

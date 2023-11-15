@@ -21,7 +21,7 @@ trait ConfiguresUserAttributes
             ->where('owner_type', static::class);
     }
 
-    private function getUserAttributesConfigInstance(string $resource): UserAttributeConfig
+    private function getUserAttributesConfigInstance(string $resource): ?UserAttributeConfig
     {
         return $this->userAttributesConfigs
             ->where('resource_type', $resource)
@@ -40,6 +40,10 @@ trait ConfiguresUserAttributes
     {
         $fields = [];
         $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
+
+        if (!$userAttributesConfig) {
+            return $fields;
+        }
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             if (isset($userAttribute['order_position_form'])
@@ -108,6 +112,10 @@ trait ConfiguresUserAttributes
     {
         $columns = [];
         $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
+
+        if (!$userAttributesConfig) {
+            return $columns;
+        }
 
         foreach ($userAttributesConfig->config as $userAttribute) {
             if (isset($userAttribute['order_position_table'])
