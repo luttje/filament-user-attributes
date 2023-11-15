@@ -52,7 +52,12 @@ class UserAttributeConfigResource extends Resource
             $userAttributeConfigs = $config
                 ->userAttributesConfigs()
                 ->where('resource_type', $resource)
-                ->first();
+                ->firstOrCreate([
+                    'resource_type' => $resource,
+                    'owner_type' => get_class($config),
+                    'owner_id' => $config->id,
+                    'config' => [],
+                ]);
 
             return $userAttributeConfigs;
         }
