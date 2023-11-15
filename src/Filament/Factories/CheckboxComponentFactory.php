@@ -10,22 +10,22 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 
 class CheckboxComponentFactory implements UserAttributeComponentFactoryInterface
 {
-    public function makeColumn(array $userAttribute): Column
+    public function makeColumn(array $userAttribute, array $customizations): Column
     {
         return UserAttributeColumn::make($userAttribute['name'])
             ->label($userAttribute['label']);
     }
 
-    public function makeField(array $userAttribute): Field
+    public function makeField(array $userAttribute, array $customizations): Field
     {
         return Checkbox::make($userAttribute['name'])
             ->label($userAttribute['label'])
-            ->default($userAttribute['default'] ?? false);
+            ->default($customizations['default'] ?? false);
     }
 
-    public function makeDefaultValue(array $userAttribute): mixed
+    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
     {
-        return $userAttribute['default'] ?? false;
+        return $customizations['default'] ?? false;
     }
 
     public function makeConfigurationSchema(): array

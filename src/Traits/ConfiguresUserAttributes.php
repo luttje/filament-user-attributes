@@ -58,9 +58,9 @@ trait ConfiguresUserAttributes
             $factoryClass = $factory;
             $factory = new $factoryClass();
 
-            $field = $factory->makeField($userAttribute);
+            $field = $factory->makeField($userAttribute, $userAttribute['customizations'] ?? []);
             $field->required($userAttribute['required'] ?? false);
-            $defaultValue = $factory->makeDefaultValue($userAttribute);
+            $defaultValue = $factory->makeDefaultValue($userAttribute, $userAttribute['customizations'] ?? []);
 
             $field->statePath('user_attributes.' . $userAttribute['name']);
             $field->afterStateHydrated(static function (Component $component, string | array | null $state) use ($defaultValue): void {
@@ -126,7 +126,7 @@ trait ConfiguresUserAttributes
             $factoryClass = $factory;
             $factory = new $factoryClass();
 
-            $column = $factory->makeColumn($userAttribute)
+            $column = $factory->makeColumn($userAttribute, $userAttribute['customizations'] ?? [])
                 ->sortable($userAttribute['sortable'] ?? false);
 
             $columns[] = [

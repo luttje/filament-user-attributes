@@ -91,8 +91,28 @@ class UserAttributeComponentFactoryRegistry
 
             $schemas[] = Forms\Components\Fieldset::make('customizations_for_' . $type)
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.customizations_for', ['type' => $type])))
+                ->statePath('customizations')
                 ->schema($factorySchema)
-                ->hidden(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0);
+                ->mutateDehydratedStateUsing(function (Get $get, $state) use ($type, $factorySchema) {
+                    if ($get('type') !== $type) {
+                        return null;
+                    }
+
+                    // Unset all names that are not in the schema
+                    // TODO: Why doesn't filament just ignore things that are hidden or disabled?
+                    $names = collect($factorySchema)->map(function ($item) {
+                        return $item->getName();
+                    });
+                    $state = collect($state)
+                        ->filter(function ($value, $name) use ($names) {
+                            return $names->contains($name);
+                        })
+                        ->toArray();
+
+                    return $state;
+                })
+                ->hidden(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0)
+                ->disabled(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0);
         }
 
         $schemas[] = Forms\Components\Fieldset::make('ordering')

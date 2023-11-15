@@ -34,6 +34,7 @@ class TestPanelProvider extends PanelProvider
             // ->emailVerification()
             ->profile()
             ->default()
+            ->discoverResources(in: static::localPath('../../../src/Filament/Resources'), for: 'Luttje\\FilamentUserAttributes\\Filament\\Resources')
             ->discoverResources(in: static::localPath('Resources'), for: 'Luttje\\FilamentUserAttributes\\Tests\\Fixtures\\Filament\\Resources')
             ->discoverPages(in: static::localPath('Pages'), for: 'Luttje\\FilamentUserAttributes\\Tests\\Fixtures\\Filament\\Pages')
             ->discoverWidgets(in: static::localPath('Widgets'), for: 'Luttje\\FilamentUserAttributes\\Tests\\Fixtures\\Filament\\Widgets')

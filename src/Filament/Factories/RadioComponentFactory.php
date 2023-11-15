@@ -12,15 +12,15 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 
 class RadioComponentFactory implements UserAttributeComponentFactoryInterface
 {
-    public function makeColumn(array $userAttribute): Column
+    public function makeColumn(array $userAttribute, array $customizations): Column
     {
         return UserAttributeColumn::make($userAttribute['name'])
             ->label($userAttribute['label']);
     }
 
-    public function makeField(array $userAttribute): Field
+    public function makeField(array $userAttribute, array $customizations): Field
     {
-        $options = collect($userAttribute['options'] ?? [])
+        $options = collect($customizations['options'] ?? [])
             ->mapWithKeys(function ($option) {
                 return [$option['id'] => $option['label']];
             });
@@ -30,7 +30,7 @@ class RadioComponentFactory implements UserAttributeComponentFactoryInterface
             ->label($userAttribute['label']);
     }
 
-    public function makeDefaultValue(array $userAttribute): mixed
+    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
     {
         return null;
     }

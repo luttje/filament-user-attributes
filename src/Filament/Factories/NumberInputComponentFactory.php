@@ -15,24 +15,24 @@ class NumberInputComponentFactory implements UserAttributeComponentFactoryInterf
 
     public const DEFAULT_MAXIMUM = 999999;
 
-    public function makeColumn(array $userAttribute): Column
+    public function makeColumn(array $userAttribute, array $customizations): Column
     {
         return UserAttributeColumn::make($userAttribute['name'])
             ->numeric()
             ->label($userAttribute['label']);
     }
 
-    public function makeField(array $userAttribute): Field
+    public function makeField(array $userAttribute, array $customizations): Field
     {
         return TextInput::make($userAttribute['name'])
             ->numeric()
             ->label($userAttribute['label'])
-            ->step(10 ** ($userAttribute['decimal_places'] ?? 0))
-            ->minValue($userAttribute['minimum'] ?? static::DEFAULT_MINIMUM)
-            ->maxValue($userAttribute['maximum'] ?? static::DEFAULT_MAXIMUM);
+            ->step(10 ** ($customizations['decimal_places'] ?? 0))
+            ->minValue($customizations['minimum'] ?? static::DEFAULT_MINIMUM)
+            ->maxValue($customizations['maximum'] ?? static::DEFAULT_MAXIMUM);
     }
 
-    public function makeDefaultValue(array $userAttribute): mixed
+    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
     {
         return 0;
     }

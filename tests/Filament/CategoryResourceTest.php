@@ -1,6 +1,6 @@
 <?php
 
-namespace Luttje\FilamentUserAttributes\Tests\Livewire;
+namespace Luttje\FilamentUserAttributes\Tests\Filament;
 
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;

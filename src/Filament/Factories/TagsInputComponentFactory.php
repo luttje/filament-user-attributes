@@ -10,21 +10,21 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 
 class TagsInputComponentFactory implements UserAttributeComponentFactoryInterface
 {
-    public function makeColumn(array $userAttribute): Column
+    public function makeColumn(array $userAttribute, array $customizations): Column
     {
         return UserAttributeColumn::make($userAttribute['name'])
             ->label($userAttribute['label']);
     }
 
-    public function makeField(array $userAttribute): Field
+    public function makeField(array $userAttribute, array $customizations): Field
     {
         return TagsInput::make($userAttribute['name'])
             ->splitKeys(['Tab', ' '])
             ->label($userAttribute['label'])
-            ->suggestions($userAttribute['suggestions'] ?? []);
+            ->suggestions($customizations['suggestions'] ?? []);
     }
 
-    public function makeDefaultValue(array $userAttribute): mixed
+    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
     {
         return [];
     }

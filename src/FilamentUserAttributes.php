@@ -83,27 +83,39 @@ class FilamentUserAttributes
      */
     public static function getResourcesImplementingHasUserAttributesResourceContract()
     {
-        // TODO: Make resource paths configurable in package config
-        $path = app_path('Filament');
-        $resources = collect(File::allFiles($path))
-            ->map(function ($file) {
-                $type = 'App\\Filament\\' . str_replace('/', '\\', $file->getRelativePathname());
-                $type = substr($type, 0, -strlen('.php'));
+        // TODO: Make these paths configurable
+        $paths = ['Filament', 'Livewire'];
+        $resources = [];
 
-                return $type;
-            })
-            ->filter(function ($type) {
-                if (!class_exists($type)) {
-                    return false;
-                }
+        foreach ($paths as $path) {
+            $path = app_path($path);
 
-                if (!in_array(\Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract::class, class_implements($type))) {
-                    return false;
-                }
+            if (!File::exists($path)) {
+                continue;
+            }
 
-                return true;
-            })
-            ->toArray();
+            $resourcesForPath = collect(File::allFiles($path))
+                ->map(function ($file) {
+                    $type = 'App\\' . str_replace('/', '\\', $file->getRelativePathname());
+                    $type = substr($type, 0, -strlen('.php'));
+
+                    return $type;
+                })
+                ->filter(function ($type) {
+                    if (!class_exists($type)) {
+                        return false;
+                    }
+
+                    if (!in_array(\Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract::class, class_implements($type))) {
+                        return false;
+                    }
+
+                    return true;
+                })
+                ->toArray();
+
+            $resources = array_merge($resources, $resourcesForPath);
+        }
 
         return $resources;
     }

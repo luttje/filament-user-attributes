@@ -7,11 +7,11 @@ use Filament\Tables\Columns\Column;
 
 interface UserAttributeComponentFactoryInterface
 {
-    public function makeColumn(array $userAttribute): Column;
+    public function makeColumn(array $userAttribute, array $customizations): Column;
 
-    public function makeField(array $userAttribute): Field;
+    public function makeField(array $userAttribute, array $customizations): Field;
 
-    public function makeDefaultValue(array $userAttribute): mixed;
+    public function makeDefaultValue(array $userAttribute, array $customizations): mixed;
 
     public function makeConfigurationSchema(): array;
 }

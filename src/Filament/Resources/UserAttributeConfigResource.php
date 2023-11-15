@@ -79,7 +79,7 @@ class UserAttributeConfigResource extends Resource
                     ->reorderable(false)
                     ->schema([
                         ...UserAttributeComponentFactoryRegistry::getConfigurationSchemas($model),
-                    ]),
+                    ])
                 ])
             ->columns(1);
     }

@@ -14,9 +14,9 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 
 class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
 {
-    public function makeColumn(array $userAttribute): Column
+    public function makeColumn(array $userAttribute, array $customizations): Column
     {
-        $dateFormat = match ($userAttribute['format'] ?? 'date') {
+        $dateFormat = match ($customizations['format'] ?? 'date') {
             'datetime' => 'd-m-Y H:i:s',
             'date' => 'd-m-Y',
             'time' => 'H:i:s',
@@ -27,9 +27,9 @@ class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
             ->label($userAttribute['label']);
     }
 
-    public function makeField(array $userAttribute): Field
+    public function makeField(array $userAttribute, array $customizations): Field
     {
-        switch ($userAttribute['format'] ?? 'date') {
+        switch ($customizations['format'] ?? 'date') {
             case 'datetime':
                 $field = DateTimePicker::make($userAttribute['name']);
                 break;
@@ -41,14 +41,14 @@ class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
                 $field = DatePicker::make($userAttribute['name']);
         }
 
-        if (!$userAttribute['allow_before_now']) {
+        if (!$customizations['allow_before_now']) {
             $field->minDate(now());
         }
 
         return $field->label($userAttribute['label']);
     }
 
-    public function makeDefaultValue(array $userAttribute): mixed
+    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
     {
         return now();
     }
