@@ -16,6 +16,13 @@ class UserAttributeColumn extends TextColumn
             /** @var HasUserAttributesContract */
             $record = $record;
 
+            $userAttributes = $record->user_attributes;
+
+            if ($userAttributes === null) {
+                $class = get_class($record);
+                throw new \Exception("User attributes not available for instance of $class. Did you forget to implement Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract with the Luttje\FilamentUserAttributes\Traits\HasUserAttributes trait on this model?");
+            }
+
             return $record->user_attributes->{$this->name};
         });
     }

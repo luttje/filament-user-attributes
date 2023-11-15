@@ -13,7 +13,10 @@ class CheckboxComponentFactory implements UserAttributeComponentFactoryInterface
     public function makeColumn(array $userAttribute, array $customizations): Column
     {
         return UserAttributeColumn::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+            ->label($userAttribute['label'])
+            ->formatStateUsing(function ($state) {
+                return $state ? __('filament-user-attributes::user-attributes.checkbox_display_yes') : __('filament-user-attributes::user-attributes.checkbox_display_no');
+            });
     }
 
     public function makeField(array $userAttribute, array $customizations): Field

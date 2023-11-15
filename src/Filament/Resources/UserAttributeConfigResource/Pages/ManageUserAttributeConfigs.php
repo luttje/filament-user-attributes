@@ -21,14 +21,13 @@ class ManageUserAttributeConfigs extends ManageRecords
 
     protected function getHeaderActions(): array
     {
-        $resources = FilamentUserAttributes::getResourcesImplementingHasUserAttributesResourceContract();
-        sort($resources);
+        $resources = FilamentUserAttributes::getConfigurableResources();
 
         return [
             Actions\Action::make('Manage user attributes')
                 ->form([
                     Forms\Components\Select::make('resource_type')
-                        ->options(array_combine($resources, $resources))
+                        ->options($resources)
                         ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.resource_type')))
                         ->required(),
                 ])

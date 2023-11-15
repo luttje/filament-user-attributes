@@ -2,6 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes;
 
+use Closure;
 use Filament\Forms\Components\Component;
 use Filament\Tables\Columns\Column;
 use Illuminate\Support\Facades\File;
@@ -12,6 +13,30 @@ use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
 class FilamentUserAttributes
 {
+    protected static array | Closure $registeredResources = [];
+
+    protected static ?array $cachedDiscoveredResources = null;
+
+    /**
+     * Register resources that can be configured with user attributes.
+     * You can provide an associative array of resources, where the key
+     * is the resource class and the value is the resource label to show
+     * to users.
+     *
+     * You can also provide a closure that returns an array of resources
+     * in the same format.
+     *
+     * Call this in your AppServiceProvider's boot function.
+     */
+    public static function registerResources(array | Closure $resources): void
+    {
+        if (is_array($resources)) {
+            self::$registeredResources = array_merge(self::$registeredResources, $resources);
+        } elseif ($resources instanceof Closure) {
+            self::$registeredResources = $resources;
+        }
+    }
+
     /**
      * Registers all types of user attribute field factories.
      */
@@ -81,10 +106,32 @@ class FilamentUserAttributes
     /**
      * Finds all resources that have the HasUserAttributesContract interface
      */
-    public static function getResourcesImplementingHasUserAttributesResourceContract()
+    public static function getConfigurableResources()
     {
-        // TODO: Make these paths configurable
-        $paths = ['Filament', 'Livewire'];
+        $discoverPaths = config('filament-user-attributes.discover_resources');
+
+        if ($discoverPaths === false) {
+            $resources = self::$registeredResources;
+
+            if ($resources instanceof Closure) {
+                return $resources();
+            }
+
+            return $resources;
+        }
+
+        if (self::$cachedDiscoveredResources === null) {
+            self::$cachedDiscoveredResources = self::discoverConfigurableResources($discoverPaths);
+        }
+
+        return self::$cachedDiscoveredResources;
+    }
+
+    /**
+     * Discovers all resources that have the HasUserAttributesContract interface
+     */
+    public static function discoverConfigurableResources(array $paths): array
+    {
         $resources = [];
 
         foreach ($paths as $targetPath) {
@@ -93,6 +140,8 @@ class FilamentUserAttributes
             if (!File::exists($path)) {
                 continue;
             }
+
+            $nameTransformer = config('filament-user-attributes.discovery_resource_name_transformer');
 
             $resourcesForPath = collect(File::allFiles($path))
                 ->map(function ($file) use ($targetPath) {
@@ -111,6 +160,9 @@ class FilamentUserAttributes
                     }
 
                     return true;
+                })
+                ->mapWithKeys(function ($type) use ($nameTransformer){
+                    return [$type => $nameTransformer($type)];
                 })
                 ->toArray();
 
@@ -301,5 +353,18 @@ class FilamentUserAttributes
         }
 
         return array_merge($columns, $customColumns->pluck('column')->toArray());
+    }
+
+    /**
+     * Converts a class name to a human readable label by getting
+     * the last part of the name and adding spaces between words.
+     */
+    public static function classNameToLabel(string $className): string
+    {
+        $className = basename($className);
+        $className = preg_replace('/(?<!^)[A-Z]/', ' $0', $className);
+        $className = preg_replace('/Resource$/', 'Page', $className);
+
+        return $className;
     }
 }

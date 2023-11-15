@@ -35,8 +35,9 @@ trait HasUserAttributes
      */
     protected function initializeHasUserAttributes()
     {
-        // TODO: This should be a config option
-        //$this->with[] = 'userAttributes';
+        if (config('filament-user-attributes.eager_load_user_attributes', false)) {
+            $this->with[] = 'userAttributes';
+        }
 
         $this->mergeFillable(['user_attributes']);
     }

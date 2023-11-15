@@ -25,10 +25,10 @@ class UserAttributeConfigResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $resources = FilamentUserAttributes::getResourcesImplementingHasUserAttributesResourceContract();
+        $resources = FilamentUserAttributes::getConfigurableResources();
         $query = parent::getEloquentQuery();
 
-        foreach ($resources as $resource) {
+        foreach ($resources as $resource => $_) {
             $config = $resource::getUserAttributesConfig();
 
             if (!$config) {
