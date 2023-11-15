@@ -60,16 +60,10 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 
     *This publishes the migrations to create the two required tables and runs them.*
 
-4. Add the `HasUserAttributesContract` interface and `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
+4. Run the wizard command to help you setup your project code:
 
-    ```php
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
-
-    class Product extends Model implements HasUserAttributesContract
-    {
-        use HasUserAttributes;
-    }
+    ```bash
+    php artisan filament-user-attributes:wizard
     ```
 
 <table align="center">
@@ -92,9 +86,12 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 </tr>
 </table>
 
-## 🛠 Usage
+## 🛠 Manual configurations
 
 ### 📎 User configured attributes for models
+
+> **Note**
+> The steps described below can also be done automatically by running the [🚀 Getting Started](#-getting-started) wizard (`php artisan filament-user-attributes:wizard`) command.
 
 You can let your users configure which custom attributes should be added to your filament tables and forms.
 
@@ -206,6 +203,9 @@ Finally you need to show the user attributes configuration form somewhere. That 
 ### 🗃 Additional examples
 
 #### 🎈 Filament Livewire Components
+
+> **Note**
+> The steps described below can also be done automatically by running the [🚀 Getting Started](#-getting-started) wizard (`php artisan filament-user-attributes:wizard`) command.
 
 Filament Livewire components work roughly the same. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
 
@@ -332,6 +332,7 @@ If you want you can access the user attributes directly as a developer. This way
     - [x] In the table
 - [x] User interface for managing user attributes
 - [x] Support for Tabs and Sections in the form
+- [x] Wizard command to help you setup your project code
 
 **Supported Input types:**
 
@@ -362,6 +363,23 @@ If you want you can access the user attributes directly as a developer. This way
     - [ ] Other
     - [ ] Preview
 - [ ] Color
+
+## 📚 Manual Installation
+
+If you don't want to use the wizard command you can manually install the package:
+
+1. Add the `HasUserAttributesContract` interface and `HasUserAttributes` trait to one or more models you want to have custom user attributes on.
+
+    ```php
+    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+
+    class Product extends Model implements HasUserAttributesContract
+    {
+        use HasUserAttributes;
+    }
+    ```
+
 
 ## ❤ Contributing
 

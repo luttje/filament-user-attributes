@@ -145,7 +145,7 @@ class FilamentUserAttributes
 
             $resourcesForPath = collect(File::allFiles($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = 'App\\' . $targetPath . '\\' . $file->getRelativePathName();
+                    $type = app()->getNamespace() . $targetPath . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;

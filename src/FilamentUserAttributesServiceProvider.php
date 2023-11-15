@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes;
 
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
+use Luttje\FilamentUserAttributes\Commands\WizardCommand;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
@@ -18,6 +19,7 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
     public function configurePackage(Package $package): void
     {
         $package->name(static::$name)
+            ->hasCommand(WizardCommand::class)
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
                     ->publishConfigFile()
