@@ -4,9 +4,7 @@ namespace Luttje\FilamentUserAttributes\Filament;
 
 use Closure;
 use Filament\Forms;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Get;
-use Luttje\FilamentUserAttributes\Models\UserAttribute;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
 class UserAttributeComponentFactoryRegistry
