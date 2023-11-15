@@ -17,4 +17,5 @@ return [
     'order_position' => 'order position',
     'order_position_before' => 'before',
     'order_position_after' => 'after',
+    'required' => 'required',
 ];

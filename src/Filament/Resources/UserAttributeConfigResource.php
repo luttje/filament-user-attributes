@@ -69,7 +69,7 @@ class UserAttributeConfigResource extends Resource
                 Forms\Components\Repeater::make('config')
                     ->reorderable(false)
                     ->schema([
-                        ...UserAttributeComponentFactoryRegistry::getConfigurationSchemas($model->resource_type),
+                        ...UserAttributeComponentFactoryRegistry::getConfigurationSchemas($model),
                     ]),
                 ])
             ->columns(1);

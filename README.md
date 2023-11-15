@@ -157,55 +157,55 @@ Now it's time to setup a resource that should display the user attributes:
 
     *Renaming is required so the trait can have control over the form and table.*
 
-4. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` method to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user).
+4. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user).
 
 **Your resource should now look something like this:**
 
-    ```php
-    use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
-    use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-    use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
+```php
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-    class ProductResource extends Resource implements UserAttributesConfigContract
+class ProductResource extends Resource implements UserAttributesConfigContract
+{
+    // This will add the user attributes to the form and table, based on the configuration for the Product model.
+    // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
+    use UserAttributesResource;
+
+    protected static ?string $model = Product::class;
+
+    // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
-        // This will add the user attributes to the form and table, based on the configuration for the Product model.
-        // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
-        use UserAttributesResource;
+        /** @var \App\Models\User */
+        $user = Auth::user();
 
-        protected static ?string $model = Product::class;
-
-        // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
-        public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
-        {
-            /** @var \App\Models\User */
-            $user = Auth::user();
-
-            return $user;
-        }
-
-        // Rename the `form` static method to `resourceForm`:
-        public static function resourceForm(Form $form): Form
-        {
-            return $form
-                ->schema([
-                    // You add non user attribute fields here as you normally would in the `form` method.
-                ])
-                ->columns(3); // All form methods function without any changes.
-        }
-
-        // Rename the `table` static method to `resourceTable`:
-        public static function resourceTable(Table $table): Table
-        {
-            return $table
-                ->columns([
-                    // You add non user attribute columns here as you normally would in the `table` method.
-                ])
-                ->filters([
-                    // All table methods function without any changes.
-                ]);
-        }
+        return $user;
     }
-    ```
+
+    // Rename the `form` static method to `resourceForm`:
+    public static function resourceForm(Form $form): Form
+    {
+        return $form
+            ->schema([
+                // You add non user attribute fields here as you normally would in the `form` method.
+            ])
+            ->columns(3); // All form methods function without any changes.
+    }
+
+    // Rename the `table` static method to `resourceTable`:
+    public static function resourceTable(Table $table): Table
+    {
+        return $table
+            ->columns([
+                // You add non user attribute columns here as you normally would in the `table` method.
+            ])
+            ->filters([
+                // All table methods function without any changes.
+            ]);
+    }
+}
+```
 
 Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
@@ -232,14 +232,14 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 For Filament Livewire components you need to specify the `UserAttributesComponent` trait with `insteadof` for the `form` and `table` methods.
 
-We implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the user model.
+We implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
 
 ```php
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesComponent;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
+class ProductManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
     // 'insteadof' is required for components, so PHP knows to use the methods from the trait.
     use UserAttributesComponent {
