@@ -14,67 +14,71 @@ use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 trait UserAttributesResource
 {
     /**
-     * Overrides the default form function to add user attributes.
+     * Inserts the user attributes into the given fields schema.
      */
-    public static function form(Form $form): Form
+    public static function withUserAttributeFields(array $schema): array
     {
-        if (!method_exists(self::class, 'resourceForm')) {
-            return $form;
-        }
-
-        $components = self::resourceForm($form)
-            ->getComponents();
-
-        FilamentUserAttributes::mergeCustomFormFields($form, $components, self::class);
-
-        return $form;
+        return FilamentUserAttributes::mergeCustomFormFields($schema, self::class);
     }
 
     /**
-     * Overrides the default table function to add user attributes.
+     * Inserts the user attributes into the given columns schema.
      */
-    public static function table(Table $table): Table
+    public static function withUserAttributeColumns(array $schema): array
     {
-        if (!method_exists(self::class, 'resourceTable')) {
-            return $table;
-        }
-
-        $columns = self::resourceTable($table)
-            ->getColumns();
-
-        FilamentUserAttributes::mergeCustomTableColumns($table, $columns, self::class);
-
-        return $table;
+        return FilamentUserAttributes::mergeCustomTableColumns($schema, self::class);
     }
 
     /**
-     * Calls the resourceForm function to get which fields exist.
+     * Helper to call the given method on the instance if it exists, or on the
+     * static class if it doesn't.
+     */
+    private static function callInstanceOrStatic(string $methodName, $object)
+    {
+        if (!method_exists(self::class, $methodName)) {
+            return null;
+        }
+
+        $reflectionMethod = new \ReflectionMethod(self::class, $methodName);
+
+        if ($reflectionMethod->isStatic()) {
+            return self::$methodName($object);
+        } else {
+            $instance = app(self::class);
+            return $instance->$methodName($object);
+        }
+    }
+
+    /**
+     * Calls the `form` function to get which fields exist.
      */
     public static function getFieldsForOrdering(): array
     {
-        if (!method_exists(self::class, 'resourceForm')) {
+        $form = Form::make(new FormsCapturer());
+        $result = self::callInstanceOrStatic('form', $form);
+
+        if (!$result) {
             return [];
         }
 
-        $form = Form::make(new FormsCapturer());
-        $components = self::resourceForm($form)
-            ->getComponents();
+        $components = $result->getComponents();
 
         return FilamentUserAttributes::getAllFieldComponents($components);
     }
 
     /**
-     * Calls the resourceTable function to get which columns exist.
+     * Calls the `table` function to get which columns exist.
      */
     public static function getColumnsForOrdering(): array
     {
-        if (!method_exists(self::class, 'resourceTable')) {
+        $table = Table::make(new TablesCapturer());
+        $result = self::callInstanceOrStatic('table', $table);
+
+        if (!$result) {
             return [];
         }
 
-        $table = Table::make(new TablesCapturer());
-        $columns = self::resourceTable($table)
-            ->getColumns();
+        $columns = $result->getColumns();
 
         return FilamentUserAttributes::getAllTableColumns($columns);
     }
@@ -96,4 +100,3 @@ class TablesCapturer extends Component implements HasTable
     use InteractsWithForms;
     use InteractsWithTable;
 }
-

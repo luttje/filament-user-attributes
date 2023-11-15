@@ -153,11 +153,11 @@ Now it's time to setup a resource that should display the user attributes:
 
 2. Have the resource use the `UserAttributesResource` trait.
 
-3. In your resource rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively.
+3. In your resource wrap the array for your fields (in the `form` method) in `self::withUserAttributeFields()`.
 
-    *Renaming is required so the trait can have control over the form and table.*
+4. Similarly wrap the array for your columns (in the `table` method) in `self::withUserAttributeColumns()`.
 
-4. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user).
+5. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user).
 
 **Your resource should now look something like this:**
 
@@ -168,8 +168,7 @@ use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
 class ProductResource extends Resource implements UserAttributesConfigContract
 {
-    // This will add the user attributes to the form and table, based on the configuration for the Product model.
-    // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
+    // This will add the user attributes to the form and table, based on the configuration for the Product model, specified by the User.
     use UserAttributesResource;
 
     protected static ?string $model = Product::class;
@@ -183,25 +182,31 @@ class ProductResource extends Resource implements UserAttributesConfigContract
         return $user;
     }
 
-    // Rename the `form` static method to `resourceForm`:
-    public static function resourceForm(Form $form): Form
+    public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                // You add non user attribute fields here as you normally would in the `form` method.
-            ])
-            ->columns(3); // All form methods function without any changes.
+            ->schema(
+                self::withUserAttributeFields([
+                    // You add non user attribute fields here as you normally would in the `form` method, e.g:
+                    TextInput::make('name'),
+                ])
+            )
+            ->columns(3);
     }
 
-    // Rename the `table` static method to `resourceTable`:
-    public static function resourceTable(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                // You add non user attribute columns here as you normally would in the `table` method.
-            ])
+            ->columns(
+                self::withUserAttributeColumns([
+                    // You add non user attribute columns here as you normally would in the `table` method, e.g:
+                    Tables\Columns\TextColumn::make('name')
+                        ->sortable()
+                        ->searchable()
+                ])
+            )
             ->filters([
-                // All table methods function without any changes.
+                // etc...
             ]);
     }
 }
@@ -230,23 +235,16 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 #### Filament Livewire Components
 
-For Filament Livewire components you need to specify the `UserAttributesComponent` trait with `insteadof` for the `form` and `table` methods.
-
-We implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
+Filament Livewire components work roughly the same. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
 
 ```php
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Traits\UserAttributesComponent;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
 class ProductManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
-    // 'insteadof' is required for components, so PHP knows to use the methods from the trait.
-    use UserAttributesComponent {
-        UserAttributesComponent::form insteadof InteractsWithForms;
-        UserAttributesComponent::table insteadof InteractsWithTable;
-    }
-
+    use UserAttributesResource;
     use InteractsWithForms;
     use InteractsWithTable;
 
@@ -265,22 +263,26 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
         return $user;
     }
 
-    public function resourceTable(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->query(Product::query())
-            ->columns([
-                TextColumn::make('slug'),
-                TextColumn::make('name'),
-            ]);
+            ->columns(
+                self::withUserAttributeColumns([
+                    TextColumn::make('slug'),
+                    TextColumn::make('name'),
+                ])
+            );
     }
 
-    public function resourceForm(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                TextInput::make('name'),
-            ])
+            ->schema(
+                self::withUserAttributeFields([
+                    TextInput::make('name'),
+                ])
+            )
             ->statePath('data')
             ->model(Product::class);
     }

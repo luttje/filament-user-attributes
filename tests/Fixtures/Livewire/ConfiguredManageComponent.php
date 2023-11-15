@@ -16,15 +16,11 @@ use Livewire\Component;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
-use Luttje\FilamentUserAttributes\Traits\UserAttributesComponent;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
 class ConfiguredManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
-    use UserAttributesComponent {
-        UserAttributesComponent::form insteadof InteractsWithForms;
-        UserAttributesComponent::table insteadof InteractsWithTable;
-    }
-
+    use UserAttributesResource;
     use InteractsWithForms;
     use InteractsWithTable;
 
@@ -43,22 +39,26 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable,
         return $user;
     }
 
-    public function resourceTable(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
             ->query(Product::query())
-            ->columns([
-                TextColumn::make('slug'),
-                TextColumn::make('name'),
-            ]);
+            ->columns(
+                self::withUserAttributeColumns([
+                    TextColumn::make('slug'),
+                    TextColumn::make('name'),
+                ])
+            );
     }
 
-    public function resourceForm(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                TextInput::make('name'),
-            ])
+            ->schema(
+                self::withUserAttributeFields([
+                    TextInput::make('name'),
+                ])
+            )
             ->statePath('data')
             ->model(Product::class);
     }

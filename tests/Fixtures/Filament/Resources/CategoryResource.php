@@ -35,50 +35,54 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
         return $user;
     }
 
-    public static function resourceForm(Form $form): Form
+    public static function form(Form $form): Form
     {
         return $form
-            ->schema([
-                Section::make()
-                    ->schema([
-                        Tabs::make()
-                            ->persistTabInQueryString()
-                            ->tabs([
-                                Tabs\Tab::make('Basic Information')
-                                    ->schema([
-                                        TextInput::make('name')
-                                            ->maxLength(255)
-                                            ->required(),
-                                        Textarea::make('description')
-                                            ->maxLength(5000),
-                                    ]),
-                                Tabs\Tab::make('Additional Settings')
-                                    ->schema([
-                                            // TODO: Have some User Attributes show here automatically based on user configuration
+            ->schema(
+                self::withUserAttributeFields([
+                    Section::make()
+                        ->schema([
+                            Tabs::make()
+                                ->persistTabInQueryString()
+                                ->tabs([
+                                    Tabs\Tab::make('Basic Information')
+                                        ->schema([
+                                            TextInput::make('name')
+                                                ->maxLength(255)
+                                                ->required(),
+                                            Textarea::make('description')
+                                                ->maxLength(5000),
                                         ]),
+                                    Tabs\Tab::make('Additional Settings')
+                                        ->schema([
+                                                // TODO: Have some User Attributes show here automatically based on user configuration
+                                            ]),
 
-                                Tabs\Tab::make('Attachments')
-                                    ->schema([
-                                        // TODO: Have some User Attributes show here automatically based on user configuration
-                                    ])
-                            ]),
-                    ]),
-            ]);
+                                    Tabs\Tab::make('Attachments')
+                                        ->schema([
+                                            // TODO: Have some User Attributes show here automatically based on user configuration
+                                        ])
+                                ]),
+                        ]),
+                ])
+            );
     }
 
-    private static function resourceTable(Table $table): Table
+    public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('slug')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('description')
-                    ->searchable(),
-            ]);
+            ->columns(
+                self::withUserAttributeColumns([
+                    Tables\Columns\TextColumn::make('slug')
+                        ->sortable()
+                        ->searchable(),
+                    Tables\Columns\TextColumn::make('name')
+                        ->searchable()
+                        ->sortable(),
+                    Tables\Columns\TextColumn::make('description')
+                        ->searchable(),
+                ])
+            );
     }
 
     public static function getPages(): array

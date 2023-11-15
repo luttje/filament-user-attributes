@@ -239,7 +239,7 @@ class FilamentUserAttributes
     /**
      * Merges the custom fields into the form.
      */
-    public static function mergeCustomFormFields(Form $form, array $components, string $resource): void
+    public static function mergeCustomFormFields(array $components, string $resource): array
     {
         $customFields = FilamentUserAttributes::getUserAttributeFields($resource);
 
@@ -258,9 +258,7 @@ class FilamentUserAttributes
             );
         }
 
-        $components = array_merge($components, $appendFields);
-
-        $form->components($components);
+        return array_merge($components, $appendFields);
     }
 
     /**
@@ -269,11 +267,9 @@ class FilamentUserAttributes
      * Because of this we should not re-insert the existing columns, but instead append the new ones and then
      * re-order them within the column layout.
      */
-    public static function mergeCustomTableColumns(Table $table, array $columns, $resource): void
+    public static function mergeCustomTableColumns(array $columns, $resource): array
     {
         $customColumns = FilamentUserAttributes::getUserAttributeColumns($resource);
-        $table->columns(collect($customColumns)->pluck('column')->toArray());
-
         $appendColumns = [];
 
         foreach ($customColumns as $customColumn) {
@@ -289,21 +285,6 @@ class FilamentUserAttributes
             );
         }
 
-        $columns = array_merge($columns, $appendColumns);
-
-        // TODO: Make PR to filament and don't have to resort to this hacky workaround
-        // $table->clearColumns();  // Doesn't exist, so hacky workaround to reset the table columns
-        $reflection = new \ReflectionClass($table);
-        $property = $reflection->getProperty('columns');
-        $property->setValue($table, []);
-        $property = $reflection->getProperty('columnsLayout');
-        $property->setValue($table, []);
-        $property = $reflection->getProperty('collapsibleColumnsLayout');
-        $property->setValue($table, null);
-        $property = $reflection->getProperty('hasColumnsLayout');
-        $property->setValue($table, false);
-        // TODO: End of workaround
-
-        $table->columns($columns);
+        return array_merge($columns, $appendColumns);
     }
 }
