@@ -22,12 +22,11 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 
 > **Demonstration:** showing the creation of a custom user attribute for the 'Locations' resource of this app:
 > 
-> <video src="./.github/demonstration.mp4" width="500"></video>
->
+> https://github.com/luttje/filament-user-attributes/assets/2738114/f0c070a7-2845-4e54-973d-e9d661fa55a0
+> 
 > In this demonstration:
 > 1. A checkbox is added and it's order in the table and form is specified.
 > 2. The checkbox is displayed in the table and form. Users can now toggle the checkbox and view the value in the table.
-> 
 
 ## 🚀 Getting started
 
