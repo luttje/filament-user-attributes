@@ -29,40 +29,6 @@ trait ConfiguresUserAttributes
     }
 
     /**
-     * Returns an array of columns to be added to the table.
-     *
-     * Fetches the desired resource configs from the current config
-     * model's (self) user attributes configuration.
-     *
-     * @return Column[]
-     */
-    public function getUserAttributeColumns(string $resource): array
-    {
-        $columns = [];
-        $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
-
-        foreach ($userAttributesConfig->config as $userAttribute) {
-            $type = $userAttribute['type'];
-            $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
-
-            if (!isset($factory)) {
-                throw new \Exception("The user attribute type '{$type}' is not yet supported.");
-            }
-
-            /** @var UserAttributeComponentFactoryInterface $factory */
-            $factoryClass = $factory;
-            $factory = new $factoryClass();
-
-            $column = $factory->makeColumn($userAttribute);
-
-            $columns[] = $column
-                ->sortable($userAttribute['sortable'] ?? false);
-        }
-
-        return $columns;
-    }
-
-    /**
      * Returns an array of fields to be added to the form.
      *
      * Fetches the desired resource configs from the current config
@@ -70,7 +36,7 @@ trait ConfiguresUserAttributes
      *
      * @return Field[]
      */
-    public function getUserAttributeComponents(string $resource): array
+    public function getUserAttributeFields(string $resource): array
     {
         $fields = [];
         $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
@@ -114,15 +80,55 @@ trait ConfiguresUserAttributes
             });
 
             $fields[] = [
-                'component' => $field,
+                'field' => $field,
                 'ordering' => [
-                    'before' => isset($userAttribute['order_position']) && $userAttribute['order_position'] === 'before',
-                    'sibling' => $userAttribute['order_sibling'] ?? null,
+                    'before' => isset($userAttribute['order_position_form']) && $userAttribute['order_position_form'] === 'before',
+                    'sibling' => $userAttribute['order_sibling_form'] ?? null,
                 ]
             ];
         }
 
         return $fields;
+    }
+
+    /**
+     * Returns an array of columns to be added to the table.
+     *
+     * Fetches the desired resource configs from the current config
+     * model's (self) user attributes configuration.
+     *
+     * @return Column[]
+     */
+    public function getUserAttributeColumns(string $resource): array
+    {
+        $columns = [];
+        $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
+
+        foreach ($userAttributesConfig->config as $userAttribute) {
+            $type = $userAttribute['type'];
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
+
+            if (!isset($factory)) {
+                throw new \Exception("The user attribute type '{$type}' is not yet supported.");
+            }
+
+            /** @var UserAttributeComponentFactoryInterface $factory */
+            $factoryClass = $factory;
+            $factory = new $factoryClass();
+
+            $column = $factory->makeColumn($userAttribute)
+                ->sortable($userAttribute['sortable'] ?? false);
+
+            $columns[] = [
+                'column' => $column,
+                'ordering' => [
+                    'before' => isset($userAttribute['order_position_table']) && $userAttribute['order_position_table'] === 'before',
+                    'sibling' => $userAttribute['order_sibling_table'] ?? null,
+                ]
+            ];
+        }
+
+        return $columns;
     }
 
     /**

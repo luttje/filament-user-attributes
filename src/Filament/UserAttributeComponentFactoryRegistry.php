@@ -99,31 +99,62 @@ class UserAttributeComponentFactoryRegistry
 
         $schemas[] = Forms\Components\Fieldset::make('ordering')
             ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering')))
-            ->schema(function () use ($configModel) {
-                return [
-                    Forms\Components\Select::make('order_position')
-                        ->options([
-                            'before' => __('filament-user-attributes::attributes.order_position_before'),
-                            'after' => __('filament-user-attributes::attributes.order_position_after'),
-                        ])
-                        ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
-                        ->required(function (Get $get) {
-                            $sibling = $get('order_sibling');
-                            return $sibling !== null && $sibling !== '';
-                        }),
-                    Forms\Components\Select::make('order_sibling')
-                        ->selectablePlaceholder()
-                        ->live()
-                        ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_order')))
-                        ->options(function () use ($configModel) {
-                            $fields = $configModel->resource_type::getFieldsForOrdering();
-                            $fields = array_combine(array_column($fields, 'label'), array_column($fields, 'label'));
-                            return $fields;
-                        })
-                        ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
-                        ->label(ucfirst(__('filament-user-attributes::attributes.order_sibling'))),
-                ];
-            });
+            ->schema([
+                Forms\Components\Fieldset::make('ordering_form')
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering_form')))
+                    ->schema(function () use ($configModel) {
+                        return [
+                            Forms\Components\Select::make('order_position_form')
+                                ->options([
+                                    'before' => __('filament-user-attributes::attributes.order_position_before'),
+                                    'after' => __('filament-user-attributes::attributes.order_position_after'),
+                                ])
+                                ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
+                                ->required(function (Get $get) {
+                                    $sibling = $get('order_sibling_form');
+                                    return $sibling !== null && $sibling !== '';
+                                }),
+                            Forms\Components\Select::make('order_sibling_form')
+                                ->selectablePlaceholder()
+                                ->live()
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
+                                ->options(function () use ($configModel) {
+                                    $fields = $configModel->resource_type::getFieldsForOrdering();
+                                    $fields = array_combine(array_column($fields, 'label'), array_column($fields, 'label'));
+                                    return $fields;
+                                })
+                                ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
+                                ->label(ucfirst(__('filament-user-attributes::attributes.order_sibling'))),
+                        ];
+                    }),
+                Forms\Components\Fieldset::make('ordering_table')
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering_table')))
+                    ->schema(function () use ($configModel) {
+                        return [
+                            Forms\Components\Select::make('order_position_table')
+                                ->options([
+                                    'before' => __('filament-user-attributes::attributes.order_position_before'),
+                                    'after' => __('filament-user-attributes::attributes.order_position_after'),
+                                ])
+                                ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
+                                ->required(function (Get $get) {
+                                    $sibling = $get('order_sibling_table');
+                                    return $sibling !== null && $sibling !== '';
+                                }),
+                            Forms\Components\Select::make('order_sibling_table')
+                                ->selectablePlaceholder()
+                                ->live()
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
+                                ->options(function () use ($configModel) {
+                                    $columns = $configModel->resource_type::getColumnsForOrdering();
+                                    $columns = array_combine(array_column($columns, 'label'), array_column($columns, 'label'));
+                                    return $columns;
+                                })
+                                ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
+                                ->label(ucfirst(__('filament-user-attributes::attributes.order_sibling'))),
+                        ];
+                    }),
+            ]);
 
         return $schemas;
     }

@@ -307,6 +307,12 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
 - [x] Easily display the attributes in a Filament table
 - [x] Sensible validations for input types
 - [x] Allow users to specify order of attributes
+    - [x] In the form
+    - [x] In the table
+    - [ ] In table without hacky internal workaround
+- [ ] Allow users to hide attributes
+    - [ ] In the form
+    - [ ] In the table
 - [x] User interface for managing user attributes
 
 **Supported Input types:**

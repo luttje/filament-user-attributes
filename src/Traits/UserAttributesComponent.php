@@ -9,28 +9,6 @@ use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 trait UserAttributesComponent
 {
     /**
-     * Overrides the default table function to add user attributes.
-     */
-    public function table(Table $table): Table
-    {
-        if (!method_exists($this, 'resourceTable')) {
-            return $table;
-        }
-
-        $columns = $this->resourceTable($table)
-            ->getColumns();
-        $customColumns = FilamentUserAttributes::getUserAttributeColumns(self::class);
-
-        foreach ($customColumns as $customColumn) {
-            $columns[] = $customColumn;
-        }
-
-        $table->columns($columns);
-
-        return $table;
-    }
-
-    /**
      * Overrides the default form function to add user attributes.
      */
     public function form(Form $form): Form
@@ -48,12 +26,37 @@ trait UserAttributesComponent
     }
 
     /**
+     * Overrides the default table function to add user attributes.
+     */
+    public function table(Table $table): Table
+    {
+        if (!method_exists($this, 'resourceTable')) {
+            return $table;
+        }
+
+        $columns = $this->resourceTable($table)
+            ->getColumns();
+
+        FilamentUserAttributes::mergeCustomTableColumns($table, $columns, self::class);
+
+        return $table;
+    }
+
+    /**
      * Calls the resourceForm function to get which fields exist.
      */
     public static function getFieldsForOrdering(): array
     {
-        throw new \Exception('Not implemented');
-        return [];
+        $shim = app(self::class);
+        if (!method_exists($shim, 'resourceForm')) {
+            return [];
+        }
+
+        $form = Form::make(new FormsCapturer());
+        $components = $shim->resourceForm($form)
+            ->getComponents();
+
+        return FilamentUserAttributes::getAllFieldComponents($components);
     }
 
     /**
@@ -61,7 +64,15 @@ trait UserAttributesComponent
      */
     public static function getColumnsForOrdering(): array
     {
-        throw new \Exception('Not implemented');
-        return [];
+        $shim = app(self::class);
+        if (!method_exists($shim, 'resourceTable')) {
+            return [];
+        }
+
+        $table = Table::make(new TablesCapturer());
+        $columns = $shim->resourceTable($table)
+            ->getColumns();
+
+        return FilamentUserAttributes::getAllTableColumns($columns);
     }
 }

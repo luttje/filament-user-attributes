@@ -20,7 +20,7 @@ interface ConfiguresUserAttributesContract
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
-    public function getUserAttributeComponents(string $resource): array;
+    public function getUserAttributeFields(string $resource): array;
 
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes

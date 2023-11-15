@@ -4,6 +4,8 @@ namespace Luttje\FilamentUserAttributes;
 
 use Filament\Forms\Components\Component;
 use Filament\Forms\Form;
+use Filament\Tables\Columns\Column;
+use Filament\Tables\Table;
 use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
@@ -48,7 +50,7 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute fields.
      */
-    public static function getUserAttributeComponents(string $resource): array
+    public static function getUserAttributeFields(string $resource): array
     {
         $config = static::getUserAttributeConfig($resource);
 
@@ -56,7 +58,7 @@ class FilamentUserAttributes
             throw new \Exception("The resource '$resource' does not use the ConfiguresUserAttributes trait");
         }
 
-        return $config->getUserAttributeComponents($resource);
+        return $config->getUserAttributeFields($resource);
     }
 
     /**
@@ -155,10 +157,28 @@ class FilamentUserAttributes
     }
 
     /**
+     * Gets all columns as a flat array of names with labels
+     */
+    public static function getAllTableColumns(array $columns): array
+    {
+        $namesWithLabels = [];
+
+        foreach ($columns as $column) {
+            $label = self::getComponentLabel($column);
+            $namesWithLabels[] = [
+                'name' => $column->getName(),
+                'label' => $label,
+            ];
+        }
+
+        return $namesWithLabels;
+    }
+
+    /**
      * Search the components and child components until the component with the given name is found,
      * then add the given component after it.
      */
-    public static function addComponentAfterComponent(array $components, string $siblingComponentName, bool $before, Component $componentToAdd, ?string $parentLabel = null): array
+    public static function addFieldBesidesField(array $components, string $siblingComponentName, bool $before, Component $componentToAdd, ?string $parentLabel = null): array
     {
         $newComponents = [];
 
@@ -177,7 +197,7 @@ class FilamentUserAttributes
             }
 
             if ($component instanceof Component) {
-                $childComponents = static::addComponentAfterComponent(
+                $childComponents = static::addFieldBesidesField(
                     $component->getChildComponents(),
                     $siblingComponentName,
                     $before,
@@ -193,29 +213,97 @@ class FilamentUserAttributes
     }
 
     /**
+     * Search the columns and child columns until the column with the given name is found,
+     * unlike with forms, tables simply have columns in a flat array next to each other.
+     */
+    public static function addColumnBesidesColumn(array $columns, string $siblingColumnName, bool $before, Column $columnToAdd): array
+    {
+        $newColumns = [];
+
+        foreach ($columns as $column) {
+            $label = self::getComponentLabel($column);
+            $newColumns[] = $column;
+
+            if ($label === $siblingColumnName) {
+                if (!$before) {
+                    $newColumns[] = $columnToAdd;
+                } else {
+                    array_splice($newColumns, count($newColumns) - 1, 0, [$columnToAdd]);
+                }
+            }
+        }
+
+        return $newColumns;
+    }
+
+    /**
      * Merges the custom fields into the form.
      */
     public static function mergeCustomFormFields(Form $form, array $components, string $resource): void
     {
-        $customFields = FilamentUserAttributes::getUserAttributeComponents($resource);
+        $customFields = FilamentUserAttributes::getUserAttributeFields($resource);
 
-        $appendComponents = [];
+        $appendFields = [];
 
         foreach ($customFields as $customField) {
             if ($customField['ordering']['sibling'] === null) {
-                $appendComponents[] = $customField['component'];
+                $appendFields[] = $customField['field'];
                 continue;
             }
-            $components = self::addComponentAfterComponent(
+            $components = self::addFieldBesidesField(
                 $components,
                 $customField['ordering']['sibling'],
                 $customField['ordering']['before'],
-                $customField['component']
+                $customField['field']
             );
         }
 
-        $components = array_merge($components, $appendComponents);
+        $components = array_merge($components, $appendFields);
 
         $form->components($components);
+    }
+
+    /**
+     * Merges the custom columns into the table.
+     * Note that Filament has already set the columns (unlike with forms where they get reset).
+     * Because of this we should not re-insert the existing columns, but instead append the new ones and then
+     * re-order them within the column layout.
+     */
+    public static function mergeCustomTableColumns(Table $table, array $columns, $resource): void
+    {
+        $customColumns = FilamentUserAttributes::getUserAttributeColumns($resource);
+        $table->columns(collect($customColumns)->pluck('column')->toArray());
+
+        $appendColumns = [];
+
+        foreach ($customColumns as $customColumn) {
+            if ($customColumn['ordering']['sibling'] === null) {
+                $appendColumns[] = $customColumn['column'];
+                continue;
+            }
+            $columns = self::addColumnBesidesColumn(
+                $columns,
+                $customColumn['ordering']['sibling'],
+                $customColumn['ordering']['before'],
+                $customColumn['column']
+            );
+        }
+
+        $columns = array_merge($columns, $appendColumns);
+
+        // TODO: Make PR to filament and don't have to resort to this hacky workaround
+        // $table->clearColumns();  // Doesn't exist, so hacky workaround to reset the table columns
+        $reflection = new \ReflectionClass($table);
+        $property = $reflection->getProperty('columns');
+        $property->setValue($table, []);
+        $property = $reflection->getProperty('columnsLayout');
+        $property->setValue($table, []);
+        $property = $reflection->getProperty('collapsibleColumnsLayout');
+        $property->setValue($table, null);
+        $property = $reflection->getProperty('hasColumnsLayout');
+        $property->setValue($table, false);
+        // TODO: End of workaround
+
+        $table->columns($columns);
     }
 }

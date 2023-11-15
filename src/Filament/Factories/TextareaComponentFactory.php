@@ -21,7 +21,8 @@ class TextareaComponentFactory implements UserAttributeComponentFactoryInterface
     {
         return Textarea::make($userAttribute['name'])
             ->label($userAttribute['label'])
-            ->placeholder($userAttribute['placeholder'] ?? null);
+            ->placeholder($userAttribute['placeholder'] ?? null)
+            ->maxLength(9000);
     }
 
     public function makeDefaultValue(array $userAttribute): mixed
