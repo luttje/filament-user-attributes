@@ -79,68 +79,24 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 </td>
 </tr>
 <tr>
-<td align="middle">📎</td>
-<td><a href="#-minimal-usage">Set and use user attributes yourself</a></td>
-</tr>
-<tr>
 <td align="middle">🖇</td>
 <td><a href="#-user-configured-attributes-for-models">Let your users configure which attributes should be added to models</a></td>
 </tr>
 <tr>
 <td align="middle">🎈</td>
-<td><a href="#filament-livewire-components">Have the custom attribute fields and columns display in a Livewire component</a></td>
+<td><a href="#-filament-livewire-components">Have the custom attribute fields and columns display in a Livewire component</a></td>
+</tr>
+<tr>
+<td align="middle">📎</td>
+<td><a href="#-custom-usage">Set and use the user attributes yourself</a></td>
 </tr>
 </table>
 
 ## 🛠 Usage
 
-### 📎 Minimal usage
+### 📎 User configured attributes for models
 
-In these examples we'll assume you're using user attributes as a developer, to easily store variable customizations for models.
-
-* You can easily set custom attributes to your model like this:
-
-    ```php
-    $product = new Product();
-    $product->user_attributes->color = 'red';
-    $product->user_attributes->customizations = [
-        'size' => 'large',
-        'material' => 'synthetic',
-    ];
-    $product->save();
-    ```
-
-* Getting the attribute is just as easy:
-
-    ```php
-    $product = Product::find(1);
-    echo $product->user_attributes->color; // 'red'
-    echo $product->user_attributes->customizations['material']; // 'synthetic'
-    ```
-
-* To display a single user attribute as a column use the `UserAttributeColumn` class:
-    ```php
-    use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-
-    //...
-
-    public function table(Table $table): Table
-    {
-        return $table
-            ->query(Product::query())
-            ->columns([
-                UserAttributeColumn::make('color'),
-                UserAttributeColumn::make('stock.synthetic'),
-            ])
-            // ...
-    }
-    ```
-
-> You'll find all the attributes in the `user_attributes` table of your database. However you don't have to worry about it's existence. The `HasUserAttributes` trait handles all the database interactions for you.
-
-### 🖇 User configured attributes for models
-
-You can let your users configure which attributes (custom fields) should be added to your filament tables and forms.
+You can let your users configure which custom attributes should be added to your filament tables and forms.
 
 > Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes.
 > ![](./.github/screenshot-management-form.png)
@@ -249,7 +205,7 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 ### 🗃 Additional examples
 
-#### Filament Livewire Components
+#### 🎈 Filament Livewire Components
 
 Filament Livewire components work roughly the same. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
 
@@ -308,7 +264,47 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
 ```
 *For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/main/tests/Fixtures/Livewire/ConfiguredManageComponent.php).*
 
-#### Additional methods
+#### 🖇 Custom usage
+
+If you want you can access the user attributes directly as a developer. This way you can use this package to easily store variable customizations for models.
+
+* You can easily set custom attributes to your model like this:
+
+    ```php
+    $product = new Product();
+    $product->user_attributes->color = 'red';
+    $product->user_attributes->customizations = [
+        'size' => 'large',
+        'material' => 'synthetic',
+    ];
+    $product->save();
+    ```
+
+* Getting the attribute is just as easy:
+
+    ```php
+    $product = Product::find(1);
+    echo $product->user_attributes->color; // 'red'
+    echo $product->user_attributes->customizations['material']; // 'synthetic'
+    ```
+
+* To display a single user attribute as a column use the `UserAttributeColumn` class:
+    ```php
+    use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
+
+    //...
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(Product::query())
+            ->columns([
+                UserAttributeColumn::make('color'),
+                UserAttributeColumn::make('stock.synthetic'),
+            ])
+            // ...
+    }
+    ```
 
 * Destroying all user attributes:
 
@@ -317,6 +313,8 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     unset($product->user_attributes);
     $product->save();
     ```
+
+> You'll find all the attributes in the `user_attributes` table of your database. However you don't have to worry about it's existence. The `HasUserAttributes` trait handles all the database interactions for you.
 
 ## ✨ Features
 
