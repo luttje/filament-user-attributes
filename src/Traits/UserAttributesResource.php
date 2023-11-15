@@ -96,4 +96,3 @@ class TablesCapturer extends Component implements HasTable
     use InteractsWithForms;
     use InteractsWithTable;
 }
-
