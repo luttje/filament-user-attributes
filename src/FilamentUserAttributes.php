@@ -87,16 +87,16 @@ class FilamentUserAttributes
         $paths = ['Filament', 'Livewire'];
         $resources = [];
 
-        foreach ($paths as $path) {
-            $path = app_path($path);
+        foreach ($paths as $targetPath) {
+            $path = app_path($targetPath);
 
             if (!File::exists($path)) {
                 continue;
             }
 
             $resourcesForPath = collect(File::allFiles($path))
-                ->map(function ($file) {
-                    $type = 'App\\' . str_replace('/', '\\', $file->getRelativePathname());
+                ->map(function ($file) use ($targetPath) {
+                    $type = 'App\\' . $targetPath . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
