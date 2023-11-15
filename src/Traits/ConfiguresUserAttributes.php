@@ -42,6 +42,11 @@ trait ConfiguresUserAttributes
         $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
+            if (isset($userAttribute['order_position_form'])
+                && $userAttribute['order_position_form'] === 'hidden') {
+                continue;
+            }
+
             $type = $userAttribute['type'];
             $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
 
@@ -105,6 +110,11 @@ trait ConfiguresUserAttributes
         $userAttributesConfig = $this->getUserAttributesConfigInstance($resource);
 
         foreach ($userAttributesConfig->config as $userAttribute) {
+            if (isset($userAttribute['order_position_table'])
+                && $userAttribute['order_position_table'] === 'hidden') {
+                continue;
+            }
+
             $type = $userAttribute['type'];
             $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
 

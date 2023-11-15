@@ -106,7 +106,9 @@ class UserAttributeComponentFactoryRegistry
                                 ->options([
                                     'before' => __('filament-user-attributes::attributes.order_position_before'),
                                     'after' => __('filament-user-attributes::attributes.order_position_after'),
+                                    'hidden' => __('filament-user-attributes::attributes.order_position_hidden'),
                                 ])
+                                ->live()
                                 ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
                                 ->required(function (Get $get) {
                                     $sibling = $get('order_sibling_form');
@@ -115,6 +117,9 @@ class UserAttributeComponentFactoryRegistry
                             Forms\Components\Select::make('order_sibling_form')
                                 ->selectablePlaceholder()
                                 ->live()
+                                ->disabled(function (Get $get) {
+                                    return $get('order_position_form') === 'hidden';
+                                })
                                 ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
                                 ->options(function () use ($configModel) {
                                     $fields = $configModel->resource_type::getFieldsForOrdering();
@@ -133,7 +138,9 @@ class UserAttributeComponentFactoryRegistry
                                 ->options([
                                     'before' => __('filament-user-attributes::attributes.order_position_before'),
                                     'after' => __('filament-user-attributes::attributes.order_position_after'),
+                                    'hidden' => __('filament-user-attributes::attributes.order_position_hidden'),
                                 ])
+                                ->live()
                                 ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
                                 ->required(function (Get $get) {
                                     $sibling = $get('order_sibling_table');
@@ -142,6 +149,9 @@ class UserAttributeComponentFactoryRegistry
                             Forms\Components\Select::make('order_sibling_table')
                                 ->selectablePlaceholder()
                                 ->live()
+                                ->disabled(function (Get $get) {
+                                    return $get('order_position_table') === 'hidden';
+                                })
                                 ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
                                 ->options(function () use ($configModel) {
                                     $columns = $configModel->resource_type::getColumnsForOrdering();

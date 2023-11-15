@@ -311,10 +311,9 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
 - [x] Allow users to specify order of attributes
     - [x] In the form
     - [x] In the table
-    - [ ] In table without hacky internal workaround
-- [ ] Allow users to hide attributes
-    - [ ] In the form
-    - [ ] In the table
+- [x] Allow users to hide attributes
+    - [x] In the form
+    - [x] In the table
 - [x] User interface for managing user attributes
 
 **Supported Input types:**
