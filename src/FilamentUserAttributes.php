@@ -161,7 +161,7 @@ class FilamentUserAttributes
 
                     return true;
                 })
-                ->mapWithKeys(function ($type) use ($nameTransformer){
+                ->mapWithKeys(function ($type) use ($nameTransformer) {
                     return [$type => $nameTransformer($type)];
                 })
                 ->toArray();
