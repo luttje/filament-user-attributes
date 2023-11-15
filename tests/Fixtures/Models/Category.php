@@ -4,8 +4,6 @@ namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Auth;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories\CategoryFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
@@ -22,14 +20,6 @@ class Category extends Model implements HasUserAttributesContract
      */
     protected $fillable = [
     ];
-
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
-    {
-        /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
-        $user = Auth::user();
-
-        return $user;
-    }
 
     /**
      * Create a new factory instance for the model.

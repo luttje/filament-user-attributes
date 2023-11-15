@@ -4,9 +4,7 @@ namespace Luttje\FilamentUserAttributes;
 
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
-use Livewire\Features\SupportTesting\Testable;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
-use Luttje\FilamentUserAttributes\Testing\TestsFilamentUserAttributes;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -19,18 +17,18 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
 
     public function configurePackage(Package $package): void
     {
-        /*
-         * This class is a Package Service Provider
-         *
-         * More info: https://github.com/spatie/laravel-package-tools
-         */
         $package->name(static::$name)
             ->hasInstallCommand(function (InstallCommand $command) {
                 $command
+                    ->publishConfigFile()
                     ->publishMigrations()
                     ->askToRunMigrations()
                     ->askToStarRepoOnGitHub('luttje/filament-user-attributes');
             });
+
+        if (file_exists($package->basePath("/../config/filament-user-attributes.php"))) {
+            $package->hasConfigFile('filament-user-attributes');
+        }
 
         if (file_exists($package->basePath('/../database/migrations'))) {
             $package->hasMigrations($this->getMigrations());
@@ -53,7 +51,6 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
     {
         FilamentUserAttributes::registerUserAttributeComponentFactories();
 
-        // Asset Registration
         FilamentAsset::register(
             $this->getAssets(),
             $this->getAssetPackageName()
@@ -63,9 +60,6 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
             $this->getScriptData(),
             $this->getAssetPackageName()
         );
-
-        // Testing
-        Testable::mixin(new TestsFilamentUserAttributes());
     }
 
     protected function getAssetPackageName(): ?string

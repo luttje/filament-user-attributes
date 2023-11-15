@@ -21,14 +21,20 @@ class TextareaComponentFactory implements UserAttributeComponentFactoryInterface
     {
         return Textarea::make($userAttribute['name'])
             ->label($userAttribute['label'])
-            ->placeholder($userAttribute['placeholder'] ?? null);
+            ->placeholder($userAttribute['placeholder'] ?? null)
+            ->maxLength(9000);
+    }
+
+    public function makeDefaultValue(array $userAttribute): mixed
+    {
+        return '';
     }
 
     public function makeConfigurationSchema(): array
     {
         return [
             TextInput::make('placeholder')
-                ->label(ucfirst(__('validation.attributes.placeholder')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.placeholder')))
                 ->maxLength(255),
         ];
     }

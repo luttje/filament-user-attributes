@@ -17,8 +17,8 @@ return new class () extends Migration {
             $table->string('owner_id');
             $table->string('owner_type');
 
-            // The model to which the configurations apply.
-            $table->string('model_type');
+            // The resource or component to which the configurations apply.
+            $table->string('resource_type');
             $table->json('config');
 
             // Ensure that each model can only have one set of configurations.

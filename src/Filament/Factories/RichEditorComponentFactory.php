@@ -19,7 +19,13 @@ class RichEditorComponentFactory implements UserAttributeComponentFactoryInterfa
     public function makeField(array $userAttribute): Field
     {
         return RichEditor::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+            ->label($userAttribute['label'])
+            ->maxLength(9000);
+    }
+
+    public function makeDefaultValue(array $userAttribute): mixed
+    {
+        return '';
     }
 
     public function makeConfigurationSchema(): array

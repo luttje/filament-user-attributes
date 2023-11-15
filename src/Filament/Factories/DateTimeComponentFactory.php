@@ -48,6 +48,11 @@ class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
         return $field->label($userAttribute['label']);
     }
 
+    public function makeDefaultValue(array $userAttribute): mixed
+    {
+        return now();
+    }
+
     public function makeConfigurationSchema(): array
     {
         return [
@@ -57,10 +62,10 @@ class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
                     'date' => 'Date',
                     'time' => 'Time',
                 ])
-                ->label(ucfirst(__('validation.attributes.format'))),
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.format'))),
 
             Checkbox::make('allow_before_now')
-                ->label(ucfirst(__('validation.attributes.allow_history')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.allow_history')))
                 ->default(false),
         ];
     }

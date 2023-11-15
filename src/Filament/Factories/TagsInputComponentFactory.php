@@ -19,13 +19,23 @@ class TagsInputComponentFactory implements UserAttributeComponentFactoryInterfac
     public function makeField(array $userAttribute): Field
     {
         return TagsInput::make($userAttribute['name'])
+            ->splitKeys(['Tab', ' '])
             ->label($userAttribute['label'])
             ->suggestions($userAttribute['suggestions'] ?? []);
+    }
+
+    public function makeDefaultValue(array $userAttribute): mixed
+    {
+        return [];
     }
 
     public function makeConfigurationSchema(): array
     {
         return [
+            TagsInput::make('suggestions')
+                ->splitKeys(['Tab', ' '])
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.suggestions')))
+                ->helperText(__('filament-user-attributes::user-attributes.suggestions_help')),
         ];
     }
 }

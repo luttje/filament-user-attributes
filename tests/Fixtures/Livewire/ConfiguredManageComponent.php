@@ -10,18 +10,17 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable
+class ConfiguredManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
-    use HasUserAttributesComponent {
-        HasUserAttributesComponent::form insteadof InteractsWithForms;
-        HasUserAttributesComponent::table insteadof InteractsWithTable;
-    }
-
+    use UserAttributesResource;
     use InteractsWithForms;
     use InteractsWithTable;
 
@@ -32,22 +31,34 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
         $this->form->fill();
     }
 
-    public function resourceTable(Table $table): Table
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
+    {
+        /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
+        $user = Auth::user();
+
+        return $user;
+    }
+
+    public function table(Table $table): Table
     {
         return $table
             ->query(Product::query())
-            ->columns([
-                TextColumn::make('slug'),
-                TextColumn::make('name'),
-            ]);
+            ->columns(
+                self::withUserAttributeColumns([
+                    TextColumn::make('slug'),
+                    TextColumn::make('name'),
+                ])
+            );
     }
 
-    public function resourceForm(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                TextInput::make('name'),
-            ])
+            ->schema(
+                self::withUserAttributeFields([
+                    TextInput::make('name'),
+                ])
+            )
             ->statePath('data')
             ->model(Product::class);
     }

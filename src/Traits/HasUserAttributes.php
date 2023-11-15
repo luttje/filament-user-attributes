@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
 
 /**
@@ -100,18 +99,11 @@ trait HasUserAttributes
     }
 
     /**
-     * Relationship to the user attributes model.
+     * Relationship to the user attributes resource.
      */
     public function userAttributes(): MorphOne
     {
-        return $this->morphOne(UserAttribute::class, 'model');
-    }
-
-    public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
-    {
-        // Override this method to return the model that should be used
-        // to store the user attribute configurations.
-        return null;
+        return $this->morphOne(UserAttribute::class, 'resource');
     }
 
     public function hasUserAttribute(string $key): bool
@@ -164,7 +156,7 @@ trait HasUserAttributes
     public static function getUserAttributeQuery(): Builder
     {
         return UserAttribute::query()
-            ->where('model_type', static::class);
+            ->where('resource_type', static::class);
     }
 
     public static function allUserAttributes(string $key)
@@ -180,7 +172,7 @@ trait HasUserAttributes
     public static function userAttributeSum(string $path): int
     {
         return UserAttribute::query()
-            ->where('model_type', static::class)
+            ->where('resource_type', static::class)
             ->sum('values->' . $path);
     }
 

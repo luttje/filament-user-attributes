@@ -2,8 +2,10 @@
 
 namespace Luttje\FilamentUserAttributes\Filament;
 
+use Closure;
 use Filament\Forms;
 use Filament\Forms\Get;
+use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
 class UserAttributeComponentFactoryRegistry
 {
@@ -28,38 +30,145 @@ class UserAttributeComponentFactoryRegistry
         return array_keys(static::$factories);
     }
 
-    public static function getConfigurationSchemas(): array
+    public static function getConfigurationSchemas(UserAttributeConfig $configModel): array
     {
         $schemas = [];
 
-        // TODO: Make configs for these
-        $schemas[] = Forms\Components\TextInput::make('name')
-            ->label(ucfirst(__('validation.attributes.name')))
-            ->required()
-            ->maxLength(255);
-        $schemas[] = Forms\Components\Checkbox::make('required')
-            ->label('Required');
-        $schemas[] = Forms\Components\TextInput::make('label')
-                ->label('Label')
-                ->required()
-                ->maxLength(255);
-        $schemas[] = Forms\Components\Select::make('type')
-            ->options(array_combine(static::getRegisteredTypes(), static::getRegisteredTypes()))
-            ->label(ucfirst(__('validation.attributes.type')))
-            ->required()
-            ->live();
+        $schemas[] = Forms\Components\Fieldset::make('common')
+            ->label(ucfirst(__('filament-user-attributes::user-attributes.common')))
+            ->schema(function () {
+                return [
+                    // TODO: Make configs for these
+                    Forms\Components\TextInput::make('name')
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.name')))
+                        ->required()
+                        ->rules([
+                            function (Get $get) {
+                                $otherNames = $get('../../config.*.name');
+
+                                return function (string $attribute, $value, Closure $fail) use ($otherNames) {
+                                    $userAttributeConfigs = collect($otherNames)->filter(function ($item) use ($value) {
+                                        return $item === $value;
+                                    });
+
+                                    if ($userAttributeConfigs->count() > 1) {
+                                        $fail(__('filament-user-attributes::user-attributes.name_already_exists'));
+                                    }
+                                };
+                            },
+                        ])
+                        // TODO:
+                        // ->readOnly(function (Get $get, ?string $state) use ($configModel) {
+                        //     if ($state === null) {
+                        //         return false;
+                        //     }
+
+                        //     // Check if the state occurs as a name in the original configModel
+                        //     $originalConfig = collect($configModel->getOriginal('config'))
+                        //         ->filter(fn ($item) => $item['__is_concept'] !== true)
+                        //         ->pluck('name');
+                        //     return $originalConfig->contains($state);
+                        // })
+                        ->maxLength(255),
+                    Forms\Components\Checkbox::make('required')
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.required'))),
+                    Forms\Components\TextInput::make('label')
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.label')))
+                        ->required()
+                        ->maxLength(255),
+                    Forms\Components\Select::make('type')
+                        ->options(array_combine(static::getRegisteredTypes(), static::getRegisteredTypes()))
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.type')))
+                        ->required()
+                        ->live(),
+                ];
+            });
 
         foreach (static::$factories as $type => $factoryClass) {
             /** @var UserAttributeComponentFactoryInterface */
             $factory = new $factoryClass();
             $factorySchema = $factory->makeConfigurationSchema();
 
-            foreach ($factorySchema as $field) {
-                $field->hidden(fn (Get $get) => $get('type') !== $type);
-            }
-
-            $schemas = array_merge($schemas, $factorySchema);
+            $schemas[] = Forms\Components\Fieldset::make('customizations_for_' . $type)
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.customizations_for', ['type' => $type])))
+                ->schema($factorySchema)
+                ->hidden(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0);
         }
+
+        $schemas[] = Forms\Components\Fieldset::make('ordering')
+            ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering')))
+            ->schema([
+                Forms\Components\Fieldset::make('ordering_form')
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering_form')))
+                    ->schema(function () use ($configModel) {
+                        return [
+                            Forms\Components\Select::make('order_position_form')
+                                ->options([
+                                    'before' => __('filament-user-attributes::user-attributes.attributes.order_position_before'),
+                                    'after' => __('filament-user-attributes::user-attributes.attributes.order_position_after'),
+                                    'hidden' => __('filament-user-attributes::user-attributes.attributes.order_position_hidden'),
+                                ])
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling_at_end')))
+                                ->selectablePlaceholder()
+                                ->live()
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_position')))
+                                ->required(function (Get $get) {
+                                    $sibling = $get('order_sibling_form');
+                                    return $sibling !== null && $sibling !== '';
+                                }),
+                            Forms\Components\Select::make('order_sibling_form')
+                                ->selectablePlaceholder()
+                                ->live()
+                                ->disabled(function (Get $get) {
+                                    return $get('order_position_form') === 'hidden'
+                                        || $get('order_position_form') == null;
+                                })
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
+                                ->options(function () use ($configModel) {
+                                    $fields = $configModel->resource_type::getFieldsForOrdering();
+                                    $fields = array_combine(array_column($fields, 'label'), array_column($fields, 'label'));
+                                    return $fields;
+                                })
+                                ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling'))),
+                        ];
+                    }),
+                Forms\Components\Fieldset::make('ordering_table')
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering_table')))
+                    ->schema(function () use ($configModel) {
+                        return [
+                            Forms\Components\Select::make('order_position_table')
+                                ->options([
+                                    'before' => __('filament-user-attributes::user-attributes.attributes.order_position_before'),
+                                    'after' => __('filament-user-attributes::user-attributes.attributes.order_position_after'),
+                                    'hidden' => __('filament-user-attributes::user-attributes.attributes.order_position_hidden'),
+                                ])
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling_at_end')))
+                                ->selectablePlaceholder()
+                                ->live()
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_position')))
+                                ->required(function (Get $get) {
+                                    $sibling = $get('order_sibling_table');
+                                    return $sibling !== null && $sibling !== '';
+                                }),
+                            Forms\Components\Select::make('order_sibling_table')
+                                ->selectablePlaceholder()
+                                ->live()
+                                ->disabled(function (Get $get) {
+                                    return $get('order_position_table') === 'hidden'
+                                        || $get('order_position_table') == null;
+                                })
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
+                                ->options(function () use ($configModel) {
+                                    $columns = $configModel->resource_type::getColumnsForOrdering();
+                                    $columns = array_combine(array_column($columns, 'label'), array_column($columns, 'label'));
+                                    return $columns;
+                                })
+                                ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling'))),
+                        ];
+                    }),
+            ]);
 
         return $schemas;
     }

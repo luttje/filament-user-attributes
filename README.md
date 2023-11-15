@@ -18,7 +18,7 @@
 
 # Filament User Attributes
 
-Let your users specify custom attributes for models in Filament. This package uses a polymorphic relationship to store the attributes in a JSON column.
+Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress.
 
 ## 🚀 Getting started
 
@@ -88,7 +88,7 @@ Let your users specify custom attributes for models in Filament. This package us
 
 ### 📎 Minimal usage
 
-In these examples we'll assume you're using user attributes yourself, to store variable JSON customizations for models.
+In these examples we'll assume you're using user attributes as a developer, to easily store variable customizations for models.
 
 * You can easily set custom attributes to your model like this:
 
@@ -132,90 +132,95 @@ In these examples we'll assume you're using user attributes yourself, to store v
 
 ### 🖇 User configured attributes for models
 
-You can let your users configure which attributes should be added to models.
+You can let your users configure which attributes (custom fields) should be added to your filament tables and forms.
 
-> Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes. The attributes will be automatically added to the resource form and table if you follow the steps below.
+> Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes.
+> ![](./.github/screenshot-management-form.png)
+> The attributes can then be added to the resource form and optionally the table:
+> ![](./.github/screenshot-resulting-form.png)
 
-1. Add the `HasUserAttributesConfigContract` interface and `HasUserAttributesConfig` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
+1. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
     ```php
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesConfig;
+    use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+    use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
-    class User extends Authenticatable implements HasUserAttributesConfigContract
+    class User extends Authenticatable implements ConfiguresUserAttributesContract
     {
-        // This trait will store the user attributes configuration in relation to this model.
-        // Later on we'll use this model to retrieve the configuration.
-        use HasUserAttributesConfig;
+        // This trait will store the user attributes configurations for each user. Meaning each user can specify different attributes to appear on forms and tables for them.
+        // In most cases you'll want this on a Tenant, Team or something similar.
+        use ConfiguresUserAttributes;
     }
     ```
 
-2. Have the models with the `HasUserAttributes` trait implement the `getUserAttributesConfig()` method to return the model with the `HasUserAttributesConfig` trait.
+Now it's time to setup a resource that should display the user attributes and allow editting them:
 
-    ```php
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesConfigContract;
-    use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
+2. Have the resource use the `UserAttributesResource` trait.
 
-    class Product extends Model implements HasUserAttributesContract
+3. In your resource wrap the array for your fields (in the `form` method) in `self::withUserAttributeFields()`.
+
+4. Similarly wrap the array for your columns (in the `table` method) in `self::withUserAttributeColumns()`.
+
+5. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user or tenant).
+
+**Your resource should now look something like this:**
+
+```php
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
+
+class ProductResource extends Resource implements UserAttributesConfigContract
+{
+    // This will add the user attributes to the form and table, based on the configuration for the Product model, specified by the User.
+    use UserAttributesResource;
+
+    protected static ?string $model = Product::class;
+
+    // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
-        use HasUserAttributes;
+        /** @var \App\Models\User */
+        $user = Auth::user();
 
-        // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
-        public static function getUserAttributesConfig(): ?HasUserAttributesConfigContract
-        {
-            /** @var \App\Models\User */
-            $user = Auth::user();
-
-            return $user;
-        }
+        return $user;
     }
-    ```
 
-3. Go to the resources of all models with user attributes and apply the `HasUserAttributesResource` trait to the resource.
-
-4. In your resources rename the static `form` and `table` methods to become `resourceForm` and `resourceTable` respectively:
-
-    ```php
-    use Luttje\FilamentUserAttributes\Traits\HasUserAttributesResource;
-
-    class ProductResource extends Resource
+    public static function form(Form $form): Form
     {
-        // This will add the user attributes to the form and table, based on the configuration for the Product model.
-        // It will only work if you rename the `form` and `table` methods to `resourceForm` and `resourceTable` respectively.
-        use HasUserAttributesResource;
-
-        protected static ?string $model = Product::class;
-
-        // Rename the `form` static method to `resourceForm`:
-        public static function resourceForm(Form $form): Form
-        {
-            return $form
-                ->schema([
-                    // You add non user attribute fields here as you normally would in the `form` method.
+        return $form
+            ->schema(
+                // Wrap your schema with:
+                self::withUserAttributeFields([
+                    // You add non user attribute fields here as you normally would in the `form` method, e.g:
+                    TextInput::make('name'),
                 ])
-                ->columns(3); // All form methods function without any changes.
-        }
-
-        // Rename the `table` static method to `resourceTable`:
-        public static function resourceTable(Table $table): Table
-        {
-            return $table
-                ->columns([
-                    // You add non user attribute columns here as you normally would in the `table` method.
-                ])
-                ->filters([
-                    // All table methods function without any changes.
-                ]);
-        }
+            )
+            ->columns(3);
     }
-    ```
 
-    *Renaming is required so the trait can have control over the form and table.*
+    public static function table(Table $table): Table
+    {
+        return $table
+            ->columns(
+                // Wrap your columns with:
+                self::withUserAttributeColumns([
+                    // You add non user attribute columns here as you normally would in the `table` method, e.g:
+                    Tables\Columns\TextColumn::make('name')
+                        ->sortable()
+                        ->searchable()
+                ])
+            )
+            ->filters([
+                // etc...
+            ]);
+    }
+}
+```
 
-Finally you need to show the user attributes configuration form somewhere.
+Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
-5. Create a resource and inherit from the `UserAttributeConfigResource` class:
+6. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
     ```php
     namespace App\Filament\Resources;
@@ -225,8 +230,6 @@ Finally you need to show the user attributes configuration form somewhere.
     class UserAttributeConfigResource extends BaseUserAttributeConfigResource
     {
         protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-        // ...
     }
     ```
 
@@ -236,19 +239,16 @@ Finally you need to show the user attributes configuration form somewhere.
 
 #### Filament Livewire Components
 
-For Filament Livewire components you need to specify the `HasUserAttributesComponent` trait. And we need to specify which model to get the configuration for:
+Filament Livewire components work roughly the same. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
 
 ```php
-use Luttje\FilamentUserAttributes\Traits\HasUserAttributesComponent;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable
+class ProductManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
 {
-    // 'insteadof' is required for components, so PHP knows to use the methods from the trait.
-    use HasUserAttributesComponent {
-        HasUserAttributesComponent::form insteadof InteractsWithForms;
-        HasUserAttributesComponent::table insteadof InteractsWithTable;
-    }
-
+    use UserAttributesResource;
     use InteractsWithForms;
     use InteractsWithTable;
 
@@ -259,25 +259,37 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
         $this->form->fill();
     }
 
-    public function resourceTable(Table $table): Table
+    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
-        return $table
-            // Specify a query so the trait knows which model to get the configuration for:
-            ->query(Product::query())
-            ->columns([
-                TextColumn::make('slug'),
-                TextColumn::make('name'),
-            ]);
+        /** @var \App\Models\User */
+        $user = Auth::user();
+
+        return $user;
     }
 
-    public function resourceForm(Form $form): Form
+    public function table(Table $table): Table
+    {
+        return $table
+            ->query(Product::query())
+            ->columns(
+                // Wrap your columns with:
+                self::withUserAttributeColumns([
+                    TextColumn::make('slug'),
+                    TextColumn::make('name'),
+                ])
+            );
+    }
+
+    public function form(Form $form): Form
     {
         return $form
-            ->schema([
-                TextInput::make('name'),
-            ])
+            ->schema(
+                // Wrap your schema with:
+                self::withUserAttributeFields([
+                    TextInput::make('name'),
+                ])
+            )
             ->statePath('data')
-            // Specify a model so the trait knows which model to get the configuration for:
             ->model(Product::class);
     }
 }
@@ -301,34 +313,45 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable
 - [x] Support for ULIDs
 - [x] Easily display the attributes in a Filament form
 - [x] Easily display the attributes in a Filament table
-- [ ] Supported Input types
-    - [x] Text
-    - [x] Textarea
-    - [ ] Number
-        - [ ] Integer
-        - [ ] Decimal
-        - [ ] Specific range
-        - [ ] Specific decimal places
-    - [ ] Select
-        - [ ] Specific options
-        - [ ] From a model
-    - [ ] Radio
-        - [ ] Specific options
-        - [ ] From a model
-    - [x] Date
-        - [x] Date
-        - [x] Time
-        - [x] Date and time
-    - [ ] Checkbox
-    - [ ] File
-        - [ ] Image
-        - [ ] PDF
-        - [ ] Other
-        - [ ] Preview
-    - [ ] Color
-- [ ] Sensible validations
-- [ ] Allow users to specify order of attributes
+- [x] Sensible validations for input types
+- [x] Allow users to specify order of attributes
+    - [x] In the form
+    - [x] In the table
+- [x] Allow users to hide attributes
+    - [x] In the form
+    - [x] In the table
 - [x] User interface for managing user attributes
+- [x] Support for Tabs and Sections in the form
+
+**Supported Input types:**
+
+- [x] Text
+- [x] Textarea
+- [x] Number
+    - [x] Integer
+    - [x] Decimal
+    - [x] Specific range
+    - [x] Specific decimal places
+- [x] Select
+    - [x] Specific options
+    - [ ] From an existing model property
+- [x] Radio
+    - [x] Specific options
+    - [ ] From an existing model property
+- [x] Tags
+    - [x] With suggestions
+- [x] Date
+    - [x] Date
+    - [x] Time
+    - [x] Date and time
+- [x] Checkbox
+    - [x] With default
+- [ ] File
+    - [ ] Image
+    - [ ] PDF
+    - [ ] Other
+    - [ ] Preview
+- [ ] Color
 
 ## ❤ Contributing
 
