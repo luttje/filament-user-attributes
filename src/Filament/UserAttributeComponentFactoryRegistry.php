@@ -38,7 +38,7 @@ class UserAttributeComponentFactoryRegistry
 
         $schemas[] = Forms\Components\Fieldset::make('common')
             ->label(ucfirst(__('filament-user-attributes::user-attributes.common')))
-            ->schema(function () use ($configModel) {
+            ->schema(function () {
                 return [
                     // TODO: Make configs for these
                     Forms\Components\TextInput::make('name')
