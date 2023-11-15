@@ -42,19 +42,19 @@ class NumberInputComponentFactory implements UserAttributeComponentFactoryInterf
         return [
             TextInput::make('decimal_places')
                 ->numeric()
-                ->label(ucfirst(__('filament-user-attributes::attributes.decimal_places')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.decimal_places')))
                 ->step(1)
                 ->required()
                 ->default(0),
             TextInput::make('minimum')
                 ->numeric()
-                ->label(ucfirst(__('filament-user-attributes::attributes.minimum')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.minimum')))
                 ->step(fn (Get $get) => $get('decimal_places') * 0.1)
                 ->minValue(static::DEFAULT_MINIMUM)
                 ->default(static::DEFAULT_MINIMUM),
             TextInput::make('maximum')
                 ->numeric()
-                ->label(ucfirst(__('filament-user-attributes::attributes.maximum')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.maximum')))
                 ->step(fn (Get $get) => $get('decimal_places') * 0.1)
                 ->maxValue(static::DEFAULT_MAXIMUM)
                 ->default(static::DEFAULT_MAXIMUM),

@@ -18,7 +18,7 @@
 
 # Filament User Attributes
 
-Let your users specify custom attributes for models in Filament. This package uses a polymorphic relationship to store the attributes in a JSON column.
+Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress.
 
 ## 🚀 Getting started
 
@@ -88,7 +88,7 @@ Let your users specify custom attributes for models in Filament. This package us
 
 ### 📎 Minimal usage
 
-In these examples we'll assume you're using user attributes yourself, to store variable JSON customizations for models.
+In these examples we'll assume you're using user attributes as a developer, to easily store variable customizations for models.
 
 * You can easily set custom attributes to your model like this:
 
@@ -132,9 +132,12 @@ In these examples we'll assume you're using user attributes yourself, to store v
 
 ### 🖇 User configured attributes for models
 
-You can let your users configure which attributes should be added to models.
+You can let your users configure which attributes (custom fields) should be added to your filament tables and forms.
 
-> Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes. The attributes will be automatically added to the resource form and table if you follow the steps below.
+> Through an attribute management form users can choose which model to edit and specify the name, type, order and other options for custom attributes.
+> ![](./.github/screenshot-management-form.png)
+> The attributes can then be added to the resource form and optionally the table:
+> ![](./.github/screenshot-resulting-form.png)
 
 1. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
@@ -144,12 +147,13 @@ You can let your users configure which attributes should be added to models.
 
     class User extends Authenticatable implements ConfiguresUserAttributesContract
     {
-        // This trait will store the user attributes configurations for each user. Meaning each user can specify different attributes unique to them.
+        // This trait will store the user attributes configurations for each user. Meaning each user can specify different attributes to appear on forms and tables for them.
+        // In most cases you'll want this on a Tenant, Team or something similar.
         use ConfiguresUserAttributes;
     }
     ```
 
-Now it's time to setup a resource that should display the user attributes:
+Now it's time to setup a resource that should display the user attributes and allow editting them:
 
 2. Have the resource use the `UserAttributesResource` trait.
 
@@ -157,7 +161,7 @@ Now it's time to setup a resource that should display the user attributes:
 
 4. Similarly wrap the array for your columns (in the `table` method) in `self::withUserAttributeColumns()`.
 
-5. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user).
+5. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user or tenant).
 
 **Your resource should now look something like this:**
 
@@ -186,6 +190,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
     {
         return $form
             ->schema(
+                // Wrap your schema with:
                 self::withUserAttributeFields([
                     // You add non user attribute fields here as you normally would in the `form` method, e.g:
                     TextInput::make('name'),
@@ -198,6 +203,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
     {
         return $table
             ->columns(
+                // Wrap your columns with:
                 self::withUserAttributeColumns([
                     // You add non user attribute columns here as you normally would in the `table` method, e.g:
                     Tables\Columns\TextColumn::make('name')
@@ -214,7 +220,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
 
 Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
-5. Create a resource and inherit from the `UserAttributeConfigResource` class:
+6. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
     ```php
     namespace App\Filament\Resources;
@@ -224,8 +230,6 @@ Finally you need to show the user attributes configuration form somewhere. That 
     class UserAttributeConfigResource extends BaseUserAttributeConfigResource
     {
         protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
-
-        // ...
     }
     ```
 
@@ -268,6 +272,7 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
         return $table
             ->query(Product::query())
             ->columns(
+                // Wrap your columns with:
                 self::withUserAttributeColumns([
                     TextColumn::make('slug'),
                     TextColumn::make('name'),
@@ -279,6 +284,7 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     {
         return $form
             ->schema(
+                // Wrap your schema with:
                 self::withUserAttributeFields([
                     TextInput::make('name'),
                 ])
@@ -315,6 +321,7 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     - [x] In the form
     - [x] In the table
 - [x] User interface for managing user attributes
+- [x] Support for Tabs and Sections in the form
 
 **Supported Input types:**
 

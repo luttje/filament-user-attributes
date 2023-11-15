@@ -14,19 +14,33 @@ use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 trait UserAttributesResource
 {
     /**
+     * Whether to block injecting user attributes (needed to only get other
+     * attributes when getting them for ordering)
+     */
+    private static bool $blockInjectUserAttributes = false;
+
+    /**
      * Inserts the user attributes into the given fields schema.
      */
     public static function withUserAttributeFields(array $schema): array
     {
+        if (self::$blockInjectUserAttributes) {
+            return $schema;
+        }
+
         return FilamentUserAttributes::mergeCustomFormFields($schema, self::class);
     }
 
     /**
      * Inserts the user attributes into the given columns schema.
      */
-    public static function withUserAttributeColumns(array $schema): array
+    public static function withUserAttributeColumns(array $columns): array
     {
-        return FilamentUserAttributes::mergeCustomTableColumns($schema, self::class);
+        if (self::$blockInjectUserAttributes) {
+            return $columns;
+        }
+
+        return FilamentUserAttributes::mergeCustomTableColumns($columns, self::class);
     }
 
     /**
@@ -55,7 +69,9 @@ trait UserAttributesResource
     public static function getFieldsForOrdering(): array
     {
         $form = Form::make(new FormsCapturer());
+        self::$blockInjectUserAttributes = true;
         $result = self::callInstanceOrStatic('form', $form);
+        self::$blockInjectUserAttributes = false;
 
         if (!$result) {
             return [];
@@ -72,7 +88,9 @@ trait UserAttributesResource
     public static function getColumnsForOrdering(): array
     {
         $table = Table::make(new TablesCapturer());
+        self::$blockInjectUserAttributes = true;
         $result = self::callInstanceOrStatic('table', $table);
+        self::$blockInjectUserAttributes = false;
 
         if (!$result) {
             return [];

@@ -32,7 +32,7 @@ class TextComponentFactory implements UserAttributeComponentFactoryInterface
     {
         return [
             TextInput::make('placeholder')
-                ->label(ucfirst(__('filament-user-attributes::attributes.placeholder')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.placeholder')))
                 ->maxLength(255),
         ];
     }

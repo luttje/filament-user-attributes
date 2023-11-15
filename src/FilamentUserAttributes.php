@@ -3,12 +3,9 @@
 namespace Luttje\FilamentUserAttributes;
 
 use Filament\Forms\Components\Component;
-use Filament\Forms\Form;
 use Filament\Tables\Columns\Column;
-use Filament\Tables\Table;
 use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
@@ -178,7 +175,7 @@ class FilamentUserAttributes
      * Search the components and child components until the component with the given name is found,
      * then add the given component after it.
      */
-    public static function addFieldBesidesField(array $components, string $siblingComponentName, bool $before, Component $componentToAdd, ?string $parentLabel = null): array
+    public static function addFieldBesidesField(array $components, string $siblingComponentName, string $position, Component $componentToAdd, ?string $parentLabel = null): array
     {
         $newComponents = [];
 
@@ -189,10 +186,12 @@ class FilamentUserAttributes
 
             if ($component instanceof \Filament\Forms\Components\Field
             && $label === $siblingComponentName) {
-                if (!$before) {
+                if ($position === 'before') {
+                    array_splice($newComponents, count($newComponents) - 1, 0, [$componentToAdd]);
+                } elseif($position === 'after') {
                     $newComponents[] = $componentToAdd;
                 } else {
-                    array_splice($newComponents, count($newComponents) - 1, 0, [$componentToAdd]);
+                    throw new \Exception("Invalid position '$position' given.");
                 }
             }
 
@@ -200,7 +199,7 @@ class FilamentUserAttributes
                 $childComponents = static::addFieldBesidesField(
                     $component->getChildComponents(),
                     $siblingComponentName,
-                    $before,
+                    $position,
                     $componentToAdd,
                     $label
                 );
@@ -216,7 +215,7 @@ class FilamentUserAttributes
      * Search the columns and child columns until the column with the given name is found,
      * unlike with forms, tables simply have columns in a flat array next to each other.
      */
-    public static function addColumnBesidesColumn(array $columns, string $siblingColumnName, bool $before, Column $columnToAdd): array
+    public static function addColumnBesidesColumn(array $columns, string $siblingColumnName, string $position, Column $columnToAdd): array
     {
         $newColumns = [];
 
@@ -225,10 +224,12 @@ class FilamentUserAttributes
             $newColumns[] = $column;
 
             if ($label === $siblingColumnName) {
-                if (!$before) {
+                if ($position === 'before') {
+                    array_splice($newColumns, count($newColumns) - 1, 0, [$columnToAdd]);
+                } elseif ($position === 'after') {
                     $newColumns[] = $columnToAdd;
                 } else {
-                    array_splice($newColumns, count($newColumns) - 1, 0, [$columnToAdd]);
+                    throw new \Exception("Invalid position '$position' given.");
                 }
             }
         }
@@ -237,54 +238,56 @@ class FilamentUserAttributes
     }
 
     /**
-     * Merges the custom fields into the form.
+     * Merges the custom fields into the given form schema.
      */
-    public static function mergeCustomFormFields(array $components, string $resource): array
+    public static function mergeCustomFormFields(array $fields, string $resource): array
     {
-        $customFields = FilamentUserAttributes::getUserAttributeFields($resource);
+        $customFields = collect(FilamentUserAttributes::getUserAttributeFields($resource));
 
-        $appendFields = [];
+        for ($i = 0; $i < $customFields->count(); $i++) {
+            $customField = $customFields->pop();
 
-        foreach ($customFields as $customField) {
-            if ($customField['ordering']['sibling'] === null) {
-                $appendFields[] = $customField['field'];
+            if (!isset($customField['ordering'])
+                || $customField['ordering']['sibling'] === null) {
+                $customFields->prepend($customField);
                 continue;
             }
-            $components = self::addFieldBesidesField(
-                $components,
+
+            $fields = self::addFieldBesidesField(
+                $fields,
                 $customField['ordering']['sibling'],
-                $customField['ordering']['before'],
+                $customField['ordering']['position'],
                 $customField['field']
             );
         }
 
-        return array_merge($components, $appendFields);
+        return array_merge($fields, $customFields->pluck('field')->toArray());
     }
 
     /**
-     * Merges the custom columns into the table.
-     * Note that Filament has already set the columns (unlike with forms where they get reset).
-     * Because of this we should not re-insert the existing columns, but instead append the new ones and then
-     * re-order them within the column layout.
+     * Merges the custom columns into the given table schema.
      */
     public static function mergeCustomTableColumns(array $columns, $resource): array
     {
-        $customColumns = FilamentUserAttributes::getUserAttributeColumns($resource);
-        $appendColumns = [];
+        $customColumns = collect(FilamentUserAttributes::getUserAttributeColumns($resource));
 
-        foreach ($customColumns as $customColumn) {
-            if ($customColumn['ordering']['sibling'] === null) {
-                $appendColumns[] = $customColumn['column'];
+        for ($i = 0; $i < $customColumns->count(); $i++) {
+            $customColumn = $customColumns->pop();
+
+            if (!isset($customColumn['ordering'])
+                || $customColumn['ordering']['sibling'] === null) {
+                $customColumns->prepend($customColumn);
                 continue;
             }
+
             $columns = self::addColumnBesidesColumn(
                 $columns,
                 $customColumn['ordering']['sibling'],
-                $customColumn['ordering']['before'],
+                $customColumn['ordering']['position'],
                 $customColumn['column']
             );
         }
 
-        return array_merge($columns, $appendColumns);
+        return array_merge($columns, $customColumns->pluck('column')->toArray());
     }
 }

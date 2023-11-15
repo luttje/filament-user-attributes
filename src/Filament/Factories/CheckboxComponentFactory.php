@@ -32,7 +32,7 @@ class CheckboxComponentFactory implements UserAttributeComponentFactoryInterface
     {
         return [
             Checkbox::make('default')
-                ->label(ucfirst(__('filament-user-attributes::attributes.default'))),
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.default'))),
         ];
     }
 }

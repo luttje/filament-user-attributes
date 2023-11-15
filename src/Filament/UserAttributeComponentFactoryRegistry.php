@@ -40,7 +40,7 @@ class UserAttributeComponentFactoryRegistry
                 return [
                     // TODO: Make configs for these
                     Forms\Components\TextInput::make('name')
-                        ->label(ucfirst(__('filament-user-attributes::attributes.name')))
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.name')))
                         ->required()
                         ->rules([
                             function (Get $get) {
@@ -71,14 +71,14 @@ class UserAttributeComponentFactoryRegistry
                         // })
                         ->maxLength(255),
                     Forms\Components\Checkbox::make('required')
-                        ->label(ucfirst(__('filament-user-attributes::attributes.required'))),
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.required'))),
                     Forms\Components\TextInput::make('label')
-                        ->label(ucfirst(__('filament-user-attributes::attributes.label')))
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.label')))
                         ->required()
                         ->maxLength(255),
                     Forms\Components\Select::make('type')
                         ->options(array_combine(static::getRegisteredTypes(), static::getRegisteredTypes()))
-                        ->label(ucfirst(__('filament-user-attributes::attributes.type')))
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.type')))
                         ->required()
                         ->live(),
                 ];
@@ -104,12 +104,14 @@ class UserAttributeComponentFactoryRegistry
                         return [
                             Forms\Components\Select::make('order_position_form')
                                 ->options([
-                                    'before' => __('filament-user-attributes::attributes.order_position_before'),
-                                    'after' => __('filament-user-attributes::attributes.order_position_after'),
-                                    'hidden' => __('filament-user-attributes::attributes.order_position_hidden'),
+                                    'before' => __('filament-user-attributes::user-attributes.attributes.order_position_before'),
+                                    'after' => __('filament-user-attributes::user-attributes.attributes.order_position_after'),
+                                    'hidden' => __('filament-user-attributes::user-attributes.attributes.order_position_hidden'),
                                 ])
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling_at_end')))
+                                ->selectablePlaceholder()
                                 ->live()
-                                ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_position')))
                                 ->required(function (Get $get) {
                                     $sibling = $get('order_sibling_form');
                                     return $sibling !== null && $sibling !== '';
@@ -118,7 +120,8 @@ class UserAttributeComponentFactoryRegistry
                                 ->selectablePlaceholder()
                                 ->live()
                                 ->disabled(function (Get $get) {
-                                    return $get('order_position_form') === 'hidden';
+                                    return $get('order_position_form') === 'hidden'
+                                        || $get('order_position_form') == null;
                                 })
                                 ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
                                 ->options(function () use ($configModel) {
@@ -127,7 +130,7 @@ class UserAttributeComponentFactoryRegistry
                                     return $fields;
                                 })
                                 ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
-                                ->label(ucfirst(__('filament-user-attributes::attributes.order_sibling'))),
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling'))),
                         ];
                     }),
                 Forms\Components\Fieldset::make('ordering_table')
@@ -136,12 +139,14 @@ class UserAttributeComponentFactoryRegistry
                         return [
                             Forms\Components\Select::make('order_position_table')
                                 ->options([
-                                    'before' => __('filament-user-attributes::attributes.order_position_before'),
-                                    'after' => __('filament-user-attributes::attributes.order_position_after'),
-                                    'hidden' => __('filament-user-attributes::attributes.order_position_hidden'),
+                                    'before' => __('filament-user-attributes::user-attributes.attributes.order_position_before'),
+                                    'after' => __('filament-user-attributes::user-attributes.attributes.order_position_after'),
+                                    'hidden' => __('filament-user-attributes::user-attributes.attributes.order_position_hidden'),
                                 ])
+                                ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling_at_end')))
+                                ->selectablePlaceholder()
                                 ->live()
-                                ->label(ucfirst(__('filament-user-attributes::attributes.order_position')))
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_position')))
                                 ->required(function (Get $get) {
                                     $sibling = $get('order_sibling_table');
                                     return $sibling !== null && $sibling !== '';
@@ -150,7 +155,8 @@ class UserAttributeComponentFactoryRegistry
                                 ->selectablePlaceholder()
                                 ->live()
                                 ->disabled(function (Get $get) {
-                                    return $get('order_position_table') === 'hidden';
+                                    return $get('order_position_table') === 'hidden'
+                                        || $get('order_position_table') == null;
                                 })
                                 ->placeholder(ucfirst(__('filament-user-attributes::user-attributes.select_sibling')))
                                 ->options(function () use ($configModel) {
@@ -159,7 +165,7 @@ class UserAttributeComponentFactoryRegistry
                                     return $columns;
                                 })
                                 ->helperText(ucfirst(__('filament-user-attributes::user-attributes.order_sibling_help')))
-                                ->label(ucfirst(__('filament-user-attributes::attributes.order_sibling'))),
+                                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling'))),
                         ];
                     }),
             ]);

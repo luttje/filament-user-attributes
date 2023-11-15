@@ -24,7 +24,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                 ->form([
                     Forms\Components\Select::make('resource_type')
                         ->options(array_combine($resources, $resources))
-                        ->label(ucfirst(__('filament-user-attributes::attributes.resource_type')))
+                        ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.resource_type')))
                         ->required(),
                 ])
                 ->action(function (array $data) {

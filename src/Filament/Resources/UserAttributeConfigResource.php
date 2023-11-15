@@ -80,7 +80,7 @@ class UserAttributeConfigResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('resource_type')
-                    ->label(ucfirst(__('filament-user-attributes::attributes.resource_type'))),
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.resource_type'))),
                 Tables\Columns\TextColumn::make('config')
                     ->formatStateUsing(function (ArrayObject $state) {
                         return __(':count custom attributes', ['count' => count($state)]);

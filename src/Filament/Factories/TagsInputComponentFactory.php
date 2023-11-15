@@ -34,7 +34,7 @@ class TagsInputComponentFactory implements UserAttributeComponentFactoryInterfac
         return [
             TagsInput::make('suggestions')
                 ->splitKeys(['Tab', ' '])
-                ->label(ucfirst(__('filament-user-attributes::attributes.suggestions')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.suggestions')))
                 ->helperText(__('filament-user-attributes::user-attributes.suggestions_help')),
         ];
     }

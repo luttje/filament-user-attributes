@@ -87,7 +87,7 @@ trait ConfiguresUserAttributes
             $fields[] = [
                 'field' => $field,
                 'ordering' => [
-                    'before' => isset($userAttribute['order_position_form']) && $userAttribute['order_position_form'] === 'before',
+                    'position' => $userAttribute['order_position_form'] ?? null,
                     'sibling' => $userAttribute['order_sibling_form'] ?? null,
                 ]
             ];
@@ -132,7 +132,7 @@ trait ConfiguresUserAttributes
             $columns[] = [
                 'column' => $column,
                 'ordering' => [
-                    'before' => isset($userAttribute['order_position_table']) && $userAttribute['order_position_table'] === 'before',
+                    'position' => $userAttribute['order_position_table'] ?? null,
                     'sibling' => $userAttribute['order_sibling_table'] ?? null,
                 ]
             ];

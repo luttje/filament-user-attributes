@@ -62,10 +62,10 @@ class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
                     'date' => 'Date',
                     'time' => 'Time',
                 ])
-                ->label(ucfirst(__('filament-user-attributes::attributes.format'))),
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.format'))),
 
             Checkbox::make('allow_before_now')
-                ->label(ucfirst(__('filament-user-attributes::attributes.allow_history')))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.allow_history')))
                 ->default(false),
         ];
     }
