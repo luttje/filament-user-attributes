@@ -7,5 +7,10 @@ use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource
 
 class EditUserAttributeConfig extends EditRecord
 {
-    protected static string $resource = UserAttributeConfigResource::class;
+    public static string $injectedResource = UserAttributeConfigResource::class;
+
+    public static function getResource(): string
+    {
+        return static::$injectedResource;
+    }
 }

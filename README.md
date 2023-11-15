@@ -223,6 +223,7 @@ Finally you need to show the user attributes configuration form somewhere. That 
 6. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
     ```php
+    // app/Filament/Resources/UserAttributeConfigResource.php
     namespace App\Filament\Resources;
 
     use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource as BaseUserAttributeConfigResource;

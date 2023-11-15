@@ -21,6 +21,8 @@ class UserAttributeConfigResource extends Resource
 {
     protected static ?string $model = UserAttributeConfig::class;
 
+    protected static ?string $tenantOwnershipRelationshipName = 'owner';
+
     public static function getEloquentQuery(): Builder
     {
         $resources = FilamentUserAttributes::getResourcesImplementingHasUserAttributesResourceContract();
@@ -98,14 +100,15 @@ class UserAttributeConfigResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->emptyStateActions([
-                Tables\Actions\CreateAction::make(),
             ]);
     }
 
     public static function getPages(): array
     {
+        $callerClass = get_called_class();
+        ManageUserAttributeConfigs::$injectedResource = $callerClass;
+        EditUserAttributeConfig::$injectedResource = $callerClass;
+
         return [
             'index' => ManageUserAttributeConfigs::route('/'),
             'edit' => EditUserAttributeConfig::route('/{record}/edit'),

@@ -10,7 +10,12 @@ use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 
 class ManageUserAttributeConfigs extends ManageRecords
 {
-    protected static string $resource = UserAttributeConfigResource::class;
+    public static string $injectedResource = UserAttributeConfigResource::class;
+
+    public static function getResource(): string
+    {
+        return static::$injectedResource;
+    }
 
     protected $listeners = ['managedUserAttributes' => '$refresh'];
 
