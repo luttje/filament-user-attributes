@@ -5,7 +5,7 @@
 
 </div>
 
-> **Warning**
+> [!Warning]
 > This package is still in development. It is not yet ready for production use and the API may change at any time.
 
 <div align="center">
@@ -45,12 +45,12 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     composer require luttje/filament-user-attributes
     ```
 
-    > **Note** 
-    > This package is currently only available on Packagist with the `dev-main` stability flag. To require this package in your project you need to add the following to your `composer.json` file:
-    > ```json
-    > "minimum-stability": "dev",
-    > "prefer-stable": true,
-    > ```
+> [!Note]
+> This package is currently only available on Packagist with the `dev-main` stability flag. To require this package in your project you need to add the following to your `composer.json` file:
+> ```json
+> "minimum-stability": "dev",
+> "prefer-stable": true,
+> ```
 
 3. Run the following command to fully install the package:
 
@@ -90,7 +90,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 
 ### 📎 User configured attributes for models
 
-> **Note**
+> [!Note]
 > The steps described below can also be done automatically by running the [🚀 Getting Started](#-getting-started) wizard (`php artisan filament-user-attributes:wizard`) command.
 
 You can let your users configure which custom attributes should be added to your filament tables and forms.
@@ -100,7 +100,7 @@ You can let your users configure which custom attributes should be added to your
 > The attributes can then be added to the resource form and optionally the table:
 > ![](./.github/screenshot-resulting-form.png)
 
-> **Note**
+> [!Note]
 > Before you proceed, make sure you've completed the [🚀 Getting Started](#-getting-started) and implemented `HasUserAttributesContract` with the `HasUserAttributes` trait on the model you want to let your users specify custom attributes for.
 
 1. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
@@ -204,7 +204,7 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 #### 🎈 Filament Livewire Components
 
-> **Note**
+> [!Note]
 > The steps described below can also be done automatically by running the [🚀 Getting Started](#-getting-started) wizard (`php artisan filament-user-attributes:wizard`) command.
 
 Filament Livewire components work roughly the same. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
