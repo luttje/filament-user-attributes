@@ -5,14 +5,20 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class InterfaceModifier extends NodeVisitorAbstract {
+class InterfaceModifier extends NodeVisitorAbstract
+{
     private $interfaceToAdd;
 
-    public function __construct(string $interfaceToAdd, array $builder = null) {
+    private $interfaceBuilder;
+
+    public function __construct(string $interfaceToAdd, array $builder = null)
+    {
         $this->interfaceToAdd = new Node\Name\FullyQualified($interfaceToAdd);
+        $this->interfaceBuilder = $builder;
     }
 
-    public function enterNode(Node $node) {
+    public function enterNode(Node $node)
+    {
         if (!($node instanceof Node\Stmt\Class_)) {
             return null;
         }
@@ -27,7 +33,8 @@ class InterfaceModifier extends NodeVisitorAbstract {
         }
 
         if (!$found) {
-            $node->implements[] = new Node\Name($this->interfaceToAdd);
+            $builder = $this->interfaceBuilder;
+            $node->implements[] = $builder ? $builder() : new Node\Name($this->interfaceToAdd);
         }
 
         return null;

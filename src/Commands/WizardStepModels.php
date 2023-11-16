@@ -45,12 +45,12 @@ class WizardStepModels extends Command
         );
 
         return array_map(
-            fn($choice) => $models[$choice],
-                array_filter(
-                    $chosenModels,
-                    fn($choice) => $choice !== '0'
-                )
-            );
+            fn ($choice) => $models[$choice],
+            array_filter(
+                $chosenModels,
+                fn ($choice) => $choice !== '0'
+            )
+        );
     }
 
     protected function displaySelectedModels(array $chosenModels): void

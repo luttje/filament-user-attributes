@@ -130,6 +130,9 @@ class WizardStepResources extends Command
             return $method;
         });
 
+        // TODO: Add the `self::withUserAttributeFields()` method call to the `fields()` method.
+        // TODO: Add the `self::withUserAttributeColumns()` method call to the `columns()` method.
+
         file_put_contents($file, $contents);
     }
 

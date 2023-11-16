@@ -5,16 +5,20 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class MethodModifier extends NodeVisitorAbstract {
+class MethodModifier extends NodeVisitorAbstract
+{
     private $methodNameToAdd;
+
     private $methodBuilder;
 
-    public function __construct(string $methodNameToAdd, ?\Closure $builder = null) {
+    public function __construct(string $methodNameToAdd, ?\Closure $builder = null)
+    {
         $this->methodNameToAdd = $methodNameToAdd;
         $this->methodBuilder = $builder;
     }
 
-    public function enterNode(Node $node) {
+    public function enterNode(Node $node)
+    {
         if (!($node instanceof Node\Stmt\Class_)) {
             return null;
         }

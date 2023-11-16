@@ -5,14 +5,20 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class TraitModifier extends NodeVisitorAbstract {
+class TraitModifier extends NodeVisitorAbstract
+{
     private $traitToAdd;
 
-    public function __construct(string $traitToAdd, ?\Closure $builder = null) {
+    private $traitBuilder;
+
+    public function __construct(string $traitToAdd, ?\Closure $builder = null)
+    {
         $this->traitToAdd = new Node\Name\FullyQualified($traitToAdd);
+        $this->traitBuilder = $builder;
     }
 
-    public function enterNode(Node $node) {
+    public function enterNode(Node $node)
+    {
         if (!($node instanceof Node\Stmt\Class_)) {
             return null;
         }
@@ -31,7 +37,9 @@ class TraitModifier extends NodeVisitorAbstract {
 
         if (!$found) {
             // Add the trait to the beginning of the class
-            array_unshift($node->stmts, new Node\Stmt\TraitUse([new Node\Name($this->traitToAdd)]));
+            $builder = $this->traitBuilder;
+            array_unshift($node->stmts, new Node\Stmt\Nop()); // Whitespace after the trait
+            array_unshift($node->stmts, $builder ? $builder() : new Node\Stmt\TraitUse([new Node\Name($this->traitToAdd)]));
         }
 
         return null;

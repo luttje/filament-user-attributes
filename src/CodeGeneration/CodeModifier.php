@@ -91,7 +91,7 @@ class CodeModifier
         $modifiedAst = $traverser->traverse($modifiedAst);
 
         // Preserve most formatting
-        $prettyPrinter = new PrettyPrinter\Standard;
+        $prettyPrinter = new PrettyPrinter\Standard();
         return $prettyPrinter->printFormatPreserving($modifiedAst, $ast, $origTokens);
     }
 }
