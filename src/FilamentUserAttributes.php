@@ -410,7 +410,7 @@ class FilamentUserAttributes
      */
     public function classNameToLabel(string $className): string
     {
-        $className = basename($className);
+        $className = class_basename($className);
         $className = preg_replace('/(?<!^)[A-Z]/', ' $0', $className);
         $className = preg_replace('/Resource$/', 'Page', $className);
 

@@ -65,7 +65,7 @@ it('can transform names of discovered resources to labels', function () {
     ));
 
     config::set('filament-user-attributes.discovery_resource_name_transformer', function ($name) {
-        $name = basename($name);
+        $name = class_basename($name);
         return "xyz$name|abc";
     });
 

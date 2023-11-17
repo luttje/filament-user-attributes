@@ -52,7 +52,7 @@ class WizardStepResources extends Command
         return collect(glob(app_path('Filament/Resources/*')))
             ->mapWithKeys(function ($file) {
                 $resource = app()->getNamespace() . 'Filament\\Resources\\' . basename($file, '.php');
-                return [basename($resource, '.php') => $resource];
+                return [class_basename($resource) => $resource];
             })->toArray();
     }
 

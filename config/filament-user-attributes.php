@@ -21,7 +21,7 @@ return [
      * discovering resources.
      *
      * For example:
-     * - 'basename' will transform 'App\Filament\Resources\ProductResource'
+     * - 'class_basename' will transform 'App\Filament\Resources\ProductResource'
      *   to 'ProductResource'
      *
      * The default config will transform 'App\Filament\Resources\ProductResource'
