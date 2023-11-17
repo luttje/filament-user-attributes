@@ -7,7 +7,7 @@ use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 it('can add a method to a class', function () {
     $code = file_get_contents(__DIR__ . '/../../src/Commands/WizardCommand.php');
 
-    $code = \Luttje\FilamentUserAttributes\CodeGeneration\CodeModifier::addMethod($code, 'testMethod', function () {
+    $code = \Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser::addMethod($code, 'testMethod', function () {
         $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesConfig', [
             'flags' => \PhpParser\Node\Stmt\Class_::MODIFIER_PUBLIC | \PhpParser\Node\Stmt\Class_::MODIFIER_STATIC,
             'returnType' => new \PhpParser\Node\NullableType(

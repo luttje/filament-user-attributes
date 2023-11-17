@@ -4,7 +4,7 @@ namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Luttje\FilamentUserAttributes\CodeGeneration\CodeModifier;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
@@ -81,30 +81,6 @@ class WizardStepResources extends Command
         return;
     }
 
-    public static function isResourceSetup(string $resource): bool
-    {
-        if (!class_exists($resource)) {
-            return false;
-        }
-
-        $traits = class_uses_recursive($resource);
-        if (!in_array(UserAttributesResource::class, $traits)) {
-            return false;
-        }
-
-        $interfaces = class_implements($resource);
-        if (!in_array(UserAttributesConfigContract::class, $interfaces)) {
-            return false;
-        }
-
-        if (!method_exists($resource, 'getUserAttributesConfig')
-        || !(new \ReflectionMethod($resource, 'getUserAttributesConfig'))->isPublic()) {
-            return false;
-        }
-
-        return true;
-    }
-
     protected function setupResources(array $resources)
     {
         foreach ($resources as $resource) {
@@ -117,9 +93,9 @@ class WizardStepResources extends Command
         $file = app_path(str_replace('\\', '/', substr($resource, strlen(app()->getNamespace()))) . '.php');
         $contents = file_get_contents($file);
 
-        $contents = CodeModifier::addTrait($contents, UserAttributesResource::class);
-        $contents = CodeModifier::addInterface($contents, UserAttributesConfigContract::class);
-        $contents = CodeModifier::addMethod($contents, 'getUserAttributesConfig', function () use ($resource) {
+        $contents = CodeTraverser::addTrait($contents, UserAttributesResource::class);
+        $contents = CodeTraverser::addInterface($contents, UserAttributesConfigContract::class);
+        $contents = CodeTraverser::addMethod($contents, 'getUserAttributesConfig', function () use ($resource) {
             $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesConfig', [
                 'flags' => \PhpParser\Node\Stmt\Class_::MODIFIER_PUBLIC | \PhpParser\Node\Stmt\Class_::MODIFIER_STATIC,
                 'returnType' => new \PhpParser\Node\NullableType(
@@ -140,18 +116,25 @@ class WizardStepResources extends Command
 
     private static function applyWrapperMethod($contents, $parentMethodName, $methodNameToWrapInside, $methodNameToCall)
     {
-        return CodeModifier::modifyMethod(
+        return CodeTraverser::modifyMethod(
             $contents,
             $parentMethodName,
             function ($method) use ($methodNameToWrapInside, $methodNameToCall) {
                 /** @var \PhpParser\Node\Stmt\ClassMethod */
                 $method = $method;
                 $firstParameter = $method->params[0];
-                $schema = CodeModifier::findCall(
+                $schema = CodeTraverser::findCall(
                     $method->stmts,
                     $firstParameter->var->name,
                     $methodNameToWrapInside
                 );
+
+                if (
+                    $schema->args[0]->value instanceof \PhpParser\Node\Expr\StaticCall
+                    && $schema->args[0]->value->name->name === $methodNameToCall
+                ) {
+                    return $method;
+                }
 
                 $schema->args = [
                     new \PhpParser\Node\Arg(

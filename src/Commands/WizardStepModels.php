@@ -3,7 +3,7 @@
 namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
-use Luttje\FilamentUserAttributes\CodeGeneration\CodeModifier;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
@@ -87,8 +87,8 @@ class WizardStepModels extends Command
         }
 
         $code = file_get_contents($filePath);
-        return CodeModifier::usesTrait($code, HasUserAttributes::class) &&
-               CodeModifier::implementsInterface($code, HasUserAttributesContract::class);
+        return CodeTraverser::usesTrait($code, HasUserAttributes::class) &&
+               CodeTraverser::implementsInterface($code, HasUserAttributesContract::class);
     }
 
     protected function setupModels(array $models): void
@@ -105,8 +105,8 @@ class WizardStepModels extends Command
         $file = self::getModelFilePath($model);
         $contents = file_get_contents($file);
 
-        $contents = CodeModifier::addTrait($contents, HasUserAttributes::class);
-        $contents = CodeModifier::addInterface($contents, HasUserAttributesContract::class);
+        $contents = CodeTraverser::addTrait($contents, HasUserAttributes::class);
+        $contents = CodeTraverser::addInterface($contents, HasUserAttributesContract::class);
 
         file_put_contents($file, $contents);
     }

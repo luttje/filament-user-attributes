@@ -3,7 +3,7 @@
 namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
-use Luttje\FilamentUserAttributes\CodeGeneration\CodeModifier;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
@@ -63,8 +63,8 @@ class WizardStepConfig extends Command
         $file = $this->getModelFilePath($model);
         $contents = file_get_contents($file);
 
-        $contents = CodeModifier::addTrait($contents, ConfiguresUserAttributes::class);
-        $contents = CodeModifier::addInterface($contents, ConfiguresUserAttributesContract::class);
+        $contents = CodeTraverser::addTrait($contents, ConfiguresUserAttributes::class);
+        $contents = CodeTraverser::addInterface($contents, ConfiguresUserAttributesContract::class);
 
         file_put_contents($file, $contents);
     }

@@ -5,7 +5,7 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class InterfaceModifier extends NodeVisitorAbstract
+class InterfaceInserter extends NodeVisitorAbstract
 {
     private $interfaceToAdd;
 

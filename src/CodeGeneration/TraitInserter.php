@@ -5,7 +5,7 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class TraitModifier extends NodeVisitorAbstract
+class TraitInserter extends NodeVisitorAbstract
 {
     private $traitToAdd;
 

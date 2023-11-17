@@ -7,14 +7,14 @@ use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter;
 use PhpParser\NodeVisitor;
 
-class CodeModifier
+class CodeTraverser
 {
     public static function addTrait($code, $trait)
     {
         return self::modifyCode(
             $code,
             self::fullyQualifyClass($trait),
-            TraitModifier::class
+            TraitInserter::class
         );
     }
 
@@ -23,7 +23,7 @@ class CodeModifier
         return self::modifyCode(
             $code,
             self::fullyQualifyClass($interface),
-            InterfaceModifier::class
+            InterfaceInserter::class
         );
     }
 
