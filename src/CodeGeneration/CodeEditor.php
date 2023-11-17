@@ -7,9 +7,38 @@ use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter;
 use PhpParser\NodeVisitor;
 
-class CodeTraverser
+/**
+ * @internal
+ */
+final class CodeEditor
 {
-    public static function addTrait($code, $trait)
+    protected static $recentBackupPaths = [];
+
+    public static function make()
+    {
+        return new static();
+    }
+
+    public static function getRecentBackupPaths()
+    {
+        return static::$recentBackupPaths;
+    }
+
+    public function editFileWithBackup($path, $callback)
+    {
+        $transaction = new CodeEditTransaction($path);
+        $transaction->edit($callback);
+
+        $backupPath = $transaction->getBackupFilePath();
+
+        if ($backupPath) {
+            self::$recentBackupPaths[$path] = $backupPath;
+        }
+
+        return $transaction;
+    }
+
+    public function addTrait($code, $trait)
     {
         return self::modifyCode(
             $code,
@@ -18,7 +47,7 @@ class CodeTraverser
         );
     }
 
-    public static function addInterface($code, $interface)
+    public function addInterface($code, $interface)
     {
         return self::modifyCode(
             $code,
@@ -27,7 +56,7 @@ class CodeTraverser
         );
     }
 
-    public static function addMethod($code, $methodName, ?\Closure $builder = null)
+    public function addMethod($code, $methodName, ?\Closure $builder = null)
     {
         return self::modifyCode(
             $code,
@@ -37,7 +66,7 @@ class CodeTraverser
         );
     }
 
-    public static function modifyMethod($code, $methodName, ?\Closure $builder = null)
+    public function modifyMethod($code, $methodName, ?\Closure $builder = null)
     {
         return self::modifyCode(
             $code,

@@ -3,7 +3,7 @@
 namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
-use Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
@@ -61,12 +61,13 @@ class WizardStepConfig extends Command
     protected function setupConfigModel(string $model): void
     {
         $file = $this->getModelFilePath($model);
-        $contents = file_get_contents($file);
 
-        $contents = CodeTraverser::addTrait($contents, ConfiguresUserAttributes::class);
-        $contents = CodeTraverser::addInterface($contents, ConfiguresUserAttributesContract::class);
-
-        file_put_contents($file, $contents);
+        $editor = CodeEditor::make();
+        $editor->editFileWithBackup($file, function ($code) use ($editor) {
+            $code = $editor->addTrait($code, ConfiguresUserAttributes::class);
+            $code = $editor->addInterface($code, ConfiguresUserAttributesContract::class);
+            return $code;
+        });
     }
 
     private function getModelFilePath(string $model): string

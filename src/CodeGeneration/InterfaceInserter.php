@@ -5,6 +5,9 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @internal
+ */
 class InterfaceInserter extends NodeVisitorAbstract
 {
     use UsingCollectorTrait;

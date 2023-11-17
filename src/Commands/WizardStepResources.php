@@ -4,7 +4,7 @@ namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
@@ -91,39 +91,37 @@ class WizardStepResources extends Command
     protected function setupResource(string $resource)
     {
         $file = app_path(str_replace('\\', '/', substr($resource, strlen(app()->getNamespace()))) . '.php');
-        $contents = file_get_contents($file);
 
-        $contents = CodeTraverser::addTrait($contents, UserAttributesResource::class);
-        $contents = CodeTraverser::addInterface($contents, UserAttributesConfigContract::class);
-        $contents = CodeTraverser::addMethod($contents, 'getUserAttributesConfig', function () use ($resource) {
-            $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesConfig', [
-                'flags' => \PhpParser\Node\Stmt\Class_::MODIFIER_PUBLIC | \PhpParser\Node\Stmt\Class_::MODIFIER_STATIC,
-                'returnType' => new \PhpParser\Node\NullableType(
-                    new \PhpParser\Node\Name\FullyQualified(ConfiguresUserAttributesContract::class)
-                ),
-            ]);
-            $method->stmts = $this->guessTemplate($resource, $this->getModelsImplementingConfiguresUserAttributesContract());
-            return $method;
+        $editor = CodeEditor::make();
+        $editor->editFileWithBackup($file, function ($code) use ($editor, $resource) {
+            $code = $editor->addTrait($code, UserAttributesResource::class);
+            $code = $editor->addInterface($code, UserAttributesConfigContract::class);
+            $code = $editor->addMethod($code, 'getUserAttributesConfig', function () use ($resource) {
+                $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesConfig', [
+                    'flags' => \PhpParser\Node\Stmt\Class_::MODIFIER_PUBLIC | \PhpParser\Node\Stmt\Class_::MODIFIER_STATIC,
+                    'returnType' => new \PhpParser\Node\NullableType(
+                        new \PhpParser\Node\Name\FullyQualified(ConfiguresUserAttributesContract::class)
+                    ),
+                ]);
+                $method->stmts = $this->guessTemplate($resource, $this->getModelsImplementingConfiguresUserAttributesContract());
+                return $method;
+            });
+            $code = self::applyWrapperMethod($editor, $code, 'form', 'schema', 'withUserAttributeFields');
+            $code = self::applyWrapperMethod($editor, $code, 'table', 'columns', 'withUserAttributeColumns');
+            return $code;
         });
-
-        // Wraps the args in the schema call in the `self::withUserAttributeFields()` method call
-        // and adds the `self::withUserAttributeColumns()` method call to the `columns()` method.
-        $contents = self::applyWrapperMethod($contents, 'form', 'schema', 'withUserAttributeFields');
-        $contents = self::applyWrapperMethod($contents, 'table', 'columns', 'withUserAttributeColumns');
-
-        file_put_contents($file, $contents);
     }
 
-    private static function applyWrapperMethod($contents, $parentMethodName, $methodNameToWrapInside, $methodNameToCall)
+    private static function applyWrapperMethod($editor, $contents, $parentMethodName, $methodNameToWrapInside, $methodNameToCall)
     {
-        return CodeTraverser::modifyMethod(
+        return $editor->modifyMethod(
             $contents,
             $parentMethodName,
-            function ($method) use ($methodNameToWrapInside, $methodNameToCall) {
+            function ($method) use ($editor, $methodNameToWrapInside, $methodNameToCall) {
                 /** @var \PhpParser\Node\Stmt\ClassMethod */
                 $method = $method;
                 $firstParameter = $method->params[0];
-                $schema = CodeTraverser::findCall(
+                $schema = $editor->findCall(
                     $method->stmts,
                     $firstParameter->var->name,
                     $methodNameToWrapInside

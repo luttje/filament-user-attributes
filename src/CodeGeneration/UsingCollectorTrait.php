@@ -4,6 +4,9 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 
 use PhpParser\Node;
 
+/**
+ * @internal
+ */
 trait UsingCollectorTrait
 {
     protected $collectedUsing = null;

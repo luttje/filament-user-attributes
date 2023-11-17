@@ -3,7 +3,7 @@
 namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
-use Luttje\FilamentUserAttributes\CodeGeneration\CodeTraverser;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
@@ -93,14 +93,14 @@ class WizardStepModels extends Command
 
     public static function isModelSetup(string $model): bool
     {
-        $filePath = self::getModelFilePath($model);
-        if (!file_exists($filePath)) {
+        $file = self::getModelFilePath($model);
+        if (!file_exists($file)) {
             return false;
         }
 
-        $code = file_get_contents($filePath);
-        return CodeTraverser::usesTrait($code, HasUserAttributes::class) &&
-               CodeTraverser::implementsInterface($code, HasUserAttributesContract::class);
+        $code = file_get_contents($file);
+        return CodeEditor::usesTrait($code, HasUserAttributes::class) &&
+               CodeEditor::implementsInterface($code, HasUserAttributesContract::class);
     }
 
     protected function setupModels(array $models): void
@@ -115,12 +115,13 @@ class WizardStepModels extends Command
     protected function setupModel(string $model): void
     {
         $file = self::getModelFilePath($model);
-        $contents = file_get_contents($file);
 
-        $contents = CodeTraverser::addTrait($contents, HasUserAttributes::class);
-        $contents = CodeTraverser::addInterface($contents, HasUserAttributesContract::class);
-
-        file_put_contents($file, $contents);
+        $editor = CodeEditor::make();
+        $editor->editFileWithBackup($file, function ($code) use ($editor) {
+            $code = $editor->addTrait($code, HasUserAttributes::class);
+            $code = $editor->addInterface($code, HasUserAttributesContract::class);
+            return $code;
+        });
     }
 
     private static function getModelFilePath(string $model): string

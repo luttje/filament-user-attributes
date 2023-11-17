@@ -3,6 +3,7 @@
 namespace Luttje\FilamentUserAttributes\Commands;
 
 use Illuminate\Console\Command;
+use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 
 class WizardCommand extends Command
 {
@@ -26,6 +27,18 @@ class WizardCommand extends Command
 
         foreach ($commands as $command) {
             $this->call($command);
+        }
+
+        $recentBackups = CodeEditor::getRecentBackupPaths();
+
+        if (count($recentBackups) > 0) {
+            $this->info('<fg=gray>The following files were modified by Filament User Attributes. We have created a back-up of each file.</>');
+
+            foreach ($recentBackups as $file => $backup) {
+                $this->info("<fg=gray>$file (back-up $backup)</>");
+            }
+        } else {
+            $this->info('<fg=gray>None of your files were modified by Filament User Attributes.</>');
         }
 
         $this->info("\nFilament User Attributes has finished setting up your project!");

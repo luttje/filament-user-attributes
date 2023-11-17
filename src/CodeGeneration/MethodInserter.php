@@ -5,6 +5,9 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+/**
+ * @internal
+ */
 class MethodInserter extends NodeVisitorAbstract
 {
     private $methodNameToAdd;
