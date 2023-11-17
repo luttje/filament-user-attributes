@@ -81,12 +81,18 @@ class WizardStepModels extends Command
 
     public static function isModelSetup(string $model): bool
     {
-        if (!class_exists($model)) {
+        $filePath = self::getModelFilePath($model);
+        if (!file_exists($filePath)) {
             return false;
         }
 
-        return in_array(HasUserAttributes::class, class_uses_recursive($model)) &&
-               in_array(HasUserAttributesContract::class, class_implements($model));
+        // Loads the class, meaning we'd run into issues if the class is autoloaded without these traits and interfaces
+        // return in_array(HasUserAttributes::class, class_uses_recursive($model)) &&
+        //        in_array(HasUserAttributesContract::class, class_implements($model));
+        // Use the AST instead, so the class isn't loaded
+        $code = file_get_contents($filePath);
+        return CodeModifier::usesTrait($code, HasUserAttributes::class) &&
+               CodeModifier::implementsInterface($code, HasUserAttributesContract::class);
     }
 
     protected function setupModels(array $models): void
@@ -100,7 +106,7 @@ class WizardStepModels extends Command
 
     protected function setupModel(string $model): void
     {
-        $file = $this->getModelFilePath($model);
+        $file = self::getModelFilePath($model);
         $contents = file_get_contents($file);
 
         $contents = CodeModifier::addTrait($contents, HasUserAttributes::class);
@@ -109,7 +115,7 @@ class WizardStepModels extends Command
         file_put_contents($file, $contents);
     }
 
-    private function getModelFilePath(string $model): string
+    private static function getModelFilePath(string $model): string
     {
         return app_path(str_replace('\\', '/', substr($model, strlen(app()->getNamespace()))) . '.php');
     }

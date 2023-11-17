@@ -37,6 +37,60 @@ class CodeModifier
         );
     }
 
+    public static function usesTrait($code, $trait)
+    {
+        $trait = self::fullyQualifyClass($trait);
+
+        [$parser, $lexer] = self::makeParserWithLexer();
+
+        try {
+            $ast = $parser->parse($code);
+        } catch (Error $error) {
+            echo "Parse error: {$error->getMessage()}\n";
+            return false;
+        }
+
+        $traverser = new NodeTraverser();
+        $visitor = new NodeVisitor\NameResolver();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        foreach ($visitor->getNameContext() as $node) {
+            if ($node->toString() === $trait) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static function implementsInterface($code, $interface)
+    {
+        $interface = self::fullyQualifyClass($interface);
+
+        [$parser, $lexer] = self::makeParserWithLexer();
+
+        try {
+            $ast = $parser->parse($code);
+        } catch (Error $error) {
+            echo "Parse error: {$error->getMessage()}\n";
+            return false;
+        }
+
+        $traverser = new NodeTraverser();
+        $visitor = new NodeVisitor\NameResolver();
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        foreach ($visitor->getNameContext() as $node) {
+            if ($node->toString() === $interface) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public static function fullyQualifyClass($class)
     {
         if (strpos($class, '\\') === 0) {
