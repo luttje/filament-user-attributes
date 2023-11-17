@@ -3,10 +3,13 @@
 namespace Luttje\FilamentUserAttributes\CodeGeneration;
 
 use PhpParser\Node;
+use PhpParser\Node\Name\FullyQualified;
 use PhpParser\NodeVisitorAbstract;
 
 class InterfaceInserter extends NodeVisitorAbstract
 {
+    use UsingCollectorTrait;
+
     private $interfaceToAdd;
 
     private $interfaceBuilder;
@@ -19,6 +22,8 @@ class InterfaceInserter extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
+        $this->tryCollectUsings($node, $this->interfaceToAdd);
+
         if (!($node instanceof Node\Stmt\Class_)) {
             return null;
         }
@@ -26,7 +31,10 @@ class InterfaceInserter extends NodeVisitorAbstract
         $found = false;
 
         foreach ($node->implements as $implement) {
-            if ($implement->toCodeString() === $this->interfaceToAdd->toString()) {
+            if (
+                $implement->toCodeString() === $this->interfaceToAdd->toString()
+                || $this->foundInUsings($implement->toCodeString())
+            ) {
                 $found = true;
                 break;
             }

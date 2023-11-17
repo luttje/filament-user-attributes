@@ -7,6 +7,8 @@ use PhpParser\NodeVisitorAbstract;
 
 class TraitInserter extends NodeVisitorAbstract
 {
+    use UsingCollectorTrait;
+
     private $traitToAdd;
 
     private $traitBuilder;
@@ -19,6 +21,8 @@ class TraitInserter extends NodeVisitorAbstract
 
     public function enterNode(Node $node)
     {
+        $this->tryCollectUsings($node, $this->traitToAdd);
+
         if (!($node instanceof Node\Stmt\Class_)) {
             return null;
         }
@@ -28,7 +32,10 @@ class TraitInserter extends NodeVisitorAbstract
         $found = false;
         foreach ($traitUses as $traitUse) {
             foreach ($traitUse->traits as $trait) {
-                if ($trait->toCodeString() === $this->traitToAdd->toString()) {
+                if (
+                    $trait->toCodeString() === $this->traitToAdd->toString()
+                    || $this->foundInUsings($trait->toCodeString())
+                ) {
                     $found = true;
                     break;
                 }
