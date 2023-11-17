@@ -5,7 +5,6 @@ namespace Luttje\FilamentUserAttributes\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeModifier;
-use Luttje\FilamentUserAttributes\CodeGeneration\MethodModifier;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
@@ -144,7 +143,7 @@ class WizardStepResources extends Command
         return CodeModifier::modifyMethod(
             $contents,
             $parentMethodName,
-            function ($method) use($methodNameToWrapInside, $methodNameToCall) {
+            function ($method) use ($methodNameToWrapInside, $methodNameToCall) {
                 /** @var \PhpParser\Node\Stmt\ClassMethod */
                 $method = $method;
                 $firstParameter = $method->params[0];

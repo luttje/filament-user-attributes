@@ -47,10 +47,8 @@ class CodeModifier
         );
     }
 
-    public static function usesTrait($code, $trait)
+    public static function parseAndTraverse($code, $callback)
     {
-        $trait = self::fullyQualifyClass($trait);
-
         [$parser, $lexer] = self::makeParserWithLexer();
 
         try {
@@ -61,44 +59,46 @@ class CodeModifier
         }
 
         $traverser = new NodeTraverser();
-        $visitor = new NodeVisitor\NameResolver();
+        $visitor = new NodeVisitor\FirstFindingVisitor($callback);
+
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
-        foreach ($visitor->getNameContext() as $node) {
-            if ($node->toString() === $trait) {
-                return true;
-            }
-        }
+        return $visitor->getFoundNode() !== null;
+    }
 
-        return false;
+    public static function usesTrait($code, $trait)
+    {
+        $trait = self::fullyQualifyClass($trait);
+
+        return self::parseAndTraverse($code, function ($node) use ($trait) {
+            if ($node instanceof \PhpParser\Node\Stmt\TraitUse) {
+                foreach ($node->traits as $traitNode) {
+                    if ($traitNode->toCodeString() === $trait) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        });
     }
 
     public static function implementsInterface($code, $interface)
     {
         $interface = self::fullyQualifyClass($interface);
 
-        [$parser, $lexer] = self::makeParserWithLexer();
-
-        try {
-            $ast = $parser->parse($code);
-        } catch (Error $error) {
-            echo "Parse error: {$error->getMessage()}\n";
-            return false;
-        }
-
-        $traverser = new NodeTraverser();
-        $visitor = new NodeVisitor\NameResolver();
-        $traverser->addVisitor($visitor);
-        $traverser->traverse($ast);
-
-        foreach ($visitor->getNameContext() as $node) {
-            if ($node->toString() === $interface) {
-                return true;
+        return self::parseAndTraverse($code, function ($node) use ($interface) {
+            if ($node instanceof \PhpParser\Node\Stmt\Class_) {
+                foreach ($node->implements as $interfaceNode) {
+                    if ($interfaceNode->toCodeString() === $interface) {
+                        return true;
+                    }
+                }
             }
-        }
 
-        return false;
+            return false;
+        });
     }
 
     public static function fullyQualifyClass($class)
@@ -200,5 +200,4 @@ class CodeModifier
 
         return null;
     }
-
 }
