@@ -11,11 +11,50 @@ use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
+/**
+ * Class FilamentUserAttributes
+ *
+ * This class provides functionality for managing user attributes in Filament admin
+ * panels. It handles the registration and discovery of resources, user attribute
+ * components, and facilitates the integration of custom fields and columns in
+ * Filament resources.
+ */
 class FilamentUserAttributes
 {
-    protected static array | Closure $registeredResources = [];
+    /**
+     * @var array|Closure List of registered resources or a closure that returns resources.
+     */
+    protected array | Closure $registeredResources = [];
 
-    protected static ?array $cachedDiscoveredResources = null;
+    /**
+     * @var array|null Cached list of discovered resources.
+     */
+    protected ?array $cachedDiscoveredResources = null;
+
+    /**
+     * @var string Path to the application directory.
+     */
+    protected string $appPath;
+
+    /**
+     * @var string Namespace of the application.
+     */
+    protected string $appNamespace;
+
+    /**
+     * Constructor for FilamentUserAttributes.
+     *
+     * @param string|null $appPath       Optional path to the application directory.
+     * @param string|null $appNamespace  Optional namespace of the application.
+     */
+    public function __construct(string $appPath = null, string $appNamespace = null)
+    {
+        $this->appNamespace = $appNamespace ?? app()->getNamespace();
+        $this->appPath = $appPath ?? app_path();
+
+        $this->appNamespace = rtrim($this->appNamespace, '\\') . '\\';
+        $this->appPath = rtrim($this->appPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    }
 
     /**
      * Register resources that can be configured with user attributes.
@@ -28,19 +67,23 @@ class FilamentUserAttributes
      *
      * Call this in your AppServiceProvider's boot function.
      */
-    public static function registerResources(array | Closure $resources): void
+    public function registerResources(array | Closure $resources): void
     {
+        if (config('filament-user-attributes.discover_resources') !== false) {
+            throw new \Exception("You cannot register resources when the 'filament-user-attributes.discover_resources' config option is enabled. Set it to false.");
+        }
+
         if (is_array($resources)) {
-            self::$registeredResources = array_merge(self::$registeredResources, $resources);
+            $this->registeredResources = array_merge($this->registeredResources, $resources);
         } elseif ($resources instanceof Closure) {
-            self::$registeredResources = $resources;
+            $this->registeredResources = $resources;
         }
     }
 
     /**
      * Registers all types of user attribute field factories.
      */
-    public static function registerUserAttributeComponentFactories(): void
+    public function registerDefaultUserAttributeComponentFactories(): void
     {
         UserAttributeComponentFactoryRegistry::register('text', \Luttje\FilamentUserAttributes\Filament\Factories\TextComponentFactory::class);
         UserAttributeComponentFactoryRegistry::register('number', \Luttje\FilamentUserAttributes\Filament\Factories\NumberInputComponentFactory::class);
@@ -58,9 +101,9 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute columns.
      */
-    public static function getUserAttributeColumns(string $resource): array
+    public function getUserAttributeColumns(string $resource): array
     {
-        $config = static::getUserAttributeConfig($resource);
+        $config = $this->getUserAttributeConfig($resource);
 
         if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
             throw new \Exception("The resource '$resource' does not correctly use the ConfiguresUserAttributes trait");
@@ -72,9 +115,9 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute fields.
      */
-    public static function getUserAttributeFields(string $resource): array
+    public function getUserAttributeFields(string $resource): array
     {
-        $config = static::getUserAttributeConfig($resource);
+        $config = $this->getUserAttributeConfig($resource);
 
         if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
             throw new \Exception("The resource '$resource' does not use the ConfiguresUserAttributes trait");
@@ -86,7 +129,7 @@ class FilamentUserAttributes
     /**
      * Returns the user attribute configuration model.
      */
-    public static function getUserAttributeConfig(string $resource): ConfiguresUserAttributesContract
+    public function getUserAttributeConfig(string $resource): ConfiguresUserAttributesContract
     {
         if (!in_array(UserAttributesConfigContract::class, class_implements($resource))) {
             throw new \Exception("The resource '$resource' does not implement the UserAttributesConfigContract interface.");
@@ -106,12 +149,12 @@ class FilamentUserAttributes
     /**
      * Finds all resources that have the HasUserAttributesContract interface
      */
-    public static function getConfigurableResources()
+    public function getConfigurableResources()
     {
         $discoverPaths = config('filament-user-attributes.discover_resources');
 
         if ($discoverPaths === false) {
-            $resources = self::$registeredResources;
+            $resources = $this->registeredResources;
 
             if ($resources instanceof Closure) {
                 return $resources();
@@ -120,22 +163,22 @@ class FilamentUserAttributes
             return $resources;
         }
 
-        if (self::$cachedDiscoveredResources === null) {
-            self::$cachedDiscoveredResources = self::discoverConfigurableResources($discoverPaths);
+        if ($this->cachedDiscoveredResources === null) {
+            $this->cachedDiscoveredResources = $this->discoverConfigurableResources($discoverPaths);
         }
 
-        return self::$cachedDiscoveredResources;
+        return $this->cachedDiscoveredResources;
     }
 
     /**
      * Discovers all resources that have the HasUserAttributesContract interface
      */
-    public static function discoverConfigurableResources(array $paths): array
+    public function discoverConfigurableResources(array $paths): array
     {
         $resources = [];
 
         foreach ($paths as $targetPath) {
-            $path = app_path($targetPath);
+            $path = $this->appPath . $targetPath;
 
             if (!File::exists($path)) {
                 continue;
@@ -145,7 +188,7 @@ class FilamentUserAttributes
 
             $resourcesForPath = collect(File::allFiles($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = app()->getNamespace() . $targetPath . '\\' . $file->getRelativePathName();
+                    $type = $this->appNamespace . $targetPath . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
@@ -175,7 +218,7 @@ class FilamentUserAttributes
     /**
      * Helper function to get label for a component.
      */
-    private static function getComponentLabel($component, ?string $parentLabel = null): string
+    private function getComponentLabel($component, ?string $parentLabel = null): string
     {
         $label = $component->getLabel();
 
@@ -189,12 +232,12 @@ class FilamentUserAttributes
     /**
      * Gets all components and child components as a flat array of names with labels
      */
-    public static function getAllFieldComponents(array $components, ?string $parentLabel = null): array
+    public function getAllFieldComponents(array $components, ?string $parentLabel = null): array
     {
         $namesWithLabels = [];
 
         foreach ($components as $component) {
-            $label = self::getComponentLabel($component, $parentLabel);
+            $label = $this->getComponentLabel($component, $parentLabel);
 
             if ($component instanceof \Filament\Forms\Components\Field) {
                 $namesWithLabels[] = [
@@ -206,7 +249,7 @@ class FilamentUserAttributes
             if ($component instanceof Component) {
                 $namesWithLabels = array_merge(
                     $namesWithLabels,
-                    static::getAllFieldComponents(
+                    $this->getAllFieldComponents(
                         $component->getChildComponents(),
                         $label
                     )
@@ -220,12 +263,12 @@ class FilamentUserAttributes
     /**
      * Gets all columns as a flat array of names with labels
      */
-    public static function getAllTableColumns(array $columns): array
+    public function getAllTableColumns(array $columns): array
     {
         $namesWithLabels = [];
 
         foreach ($columns as $column) {
-            $label = self::getComponentLabel($column);
+            $label = $this->getComponentLabel($column);
             $namesWithLabels[] = [
                 'name' => $column->getName(),
                 'label' => $label,
@@ -239,17 +282,19 @@ class FilamentUserAttributes
      * Search the components and child components until the component with the given name is found,
      * then add the given component after it.
      */
-    public static function addFieldBesidesField(array $components, string $siblingComponentName, string $position, Component $componentToAdd, ?string $parentLabel = null): array
+    public function addFieldBesidesField(array $components, string $siblingComponentName, string $position, Component $componentToAdd, ?string $parentLabel = null): array
     {
         $newComponents = [];
+        $siblingFound = false;
 
         foreach ($components as $component) {
-            $label = self::getComponentLabel($component, $parentLabel);
+            $label = $this->getComponentLabel($component, $parentLabel);
 
             $newComponents[] = $component;
 
             if ($component instanceof \Filament\Forms\Components\Field
             && $label === $siblingComponentName) {
+                $siblingFound = true;
                 if ($position === 'before') {
                     array_splice($newComponents, count($newComponents) - 1, 0, [$componentToAdd]);
                 } elseif($position === 'after') {
@@ -260,7 +305,7 @@ class FilamentUserAttributes
             }
 
             if ($component instanceof Component) {
-                $childComponents = static::addFieldBesidesField(
+                $childComponents = $this->addFieldBesidesField(
                     $component->getChildComponents(),
                     $siblingComponentName,
                     $position,
@@ -272,6 +317,10 @@ class FilamentUserAttributes
             }
         }
 
+        if (!$siblingFound) {
+            $newComponents[] = $componentToAdd;
+        }
+
         return $newComponents;
     }
 
@@ -279,12 +328,12 @@ class FilamentUserAttributes
      * Search the columns and child columns until the column with the given name is found,
      * unlike with forms, tables simply have columns in a flat array next to each other.
      */
-    public static function addColumnBesidesColumn(array $columns, string $siblingColumnName, string $position, Column $columnToAdd): array
+    public function addColumnBesidesColumn(array $columns, string $siblingColumnName, string $position, Column $columnToAdd): array
     {
         $newColumns = [];
 
         foreach ($columns as $column) {
-            $label = self::getComponentLabel($column);
+            $label = $this->getComponentLabel($column);
             $newColumns[] = $column;
 
             if ($label === $siblingColumnName) {
@@ -304,7 +353,7 @@ class FilamentUserAttributes
     /**
      * Merges the custom fields into the given form schema.
      */
-    public static function mergeCustomFormFields(array $fields, string $resource): array
+    public function mergeCustomFormFields(array $fields, string $resource): array
     {
         $customFields = collect(FilamentUserAttributes::getUserAttributeFields($resource));
 
@@ -317,7 +366,7 @@ class FilamentUserAttributes
                 continue;
             }
 
-            $fields = self::addFieldBesidesField(
+            $fields = $this->addFieldBesidesField(
                 $fields,
                 $customField['ordering']['sibling'],
                 $customField['ordering']['position'],
@@ -331,7 +380,7 @@ class FilamentUserAttributes
     /**
      * Merges the custom columns into the given table schema.
      */
-    public static function mergeCustomTableColumns(array $columns, $resource): array
+    public function mergeCustomTableColumns(array $columns, $resource): array
     {
         $customColumns = collect(FilamentUserAttributes::getUserAttributeColumns($resource));
 
@@ -344,7 +393,7 @@ class FilamentUserAttributes
                 continue;
             }
 
-            $columns = self::addColumnBesidesColumn(
+            $columns = $this->addColumnBesidesColumn(
                 $columns,
                 $customColumn['ordering']['sibling'],
                 $customColumn['ordering']['position'],
@@ -359,7 +408,7 @@ class FilamentUserAttributes
      * Converts a class name to a human readable label by getting
      * the last part of the name and adding spaces between words.
      */
-    public static function classNameToLabel(string $className): string
+    public function classNameToLabel(string $className): string
     {
         $className = basename($className);
         $className = preg_replace('/(?<!^)[A-Z]/', ' $0', $className);

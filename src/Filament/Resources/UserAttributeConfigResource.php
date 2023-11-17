@@ -11,10 +11,10 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
-use Luttje\FilamentUserAttributes\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
 class UserAttributeConfigResource extends Resource
@@ -28,6 +28,7 @@ class UserAttributeConfigResource extends Resource
         $resources = FilamentUserAttributes::getConfigurableResources();
         $query = parent::getEloquentQuery();
 
+        /** @var \Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract $resource */
         foreach ($resources as $resource => $_) {
             $config = $resource::getUserAttributesConfig();
 
@@ -39,7 +40,7 @@ class UserAttributeConfigResource extends Resource
             $query->orWhere(function ($query) use ($resource, $config) {
                 $query->where('resource_type', $resource)
                     ->where('owner_type', get_class($config))
-                    ->where('owner_id', $config->id);
+                    ->where('owner_id', $config->getKey());
             });
         }
 

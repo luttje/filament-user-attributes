@@ -7,7 +7,7 @@ return [
      * and livewire components that can have user attributes configured.
      *
      * Set to false if you want to manually register resources using:
-     * FilamentUserAttributes::registerResources([
+     * \Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::registerResources([
      *   App\Filament\Resources\ProductResource::class => 'Product Page',
      * ])
      */
@@ -27,7 +27,7 @@ return [
      * The default config will transform 'App\Filament\Resources\ProductResource'
      * to 'Product Page'
      */
-    'discovery_resource_name_transformer' => Luttje\FilamentUserAttributes\FilamentUserAttributes::class . '::classNameToLabel',
+    'discovery_resource_name_transformer' => Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::class . '::classNameToLabel',
 
     /**
      * Whether to eager load the user attributes relationship on models that

@@ -5,7 +5,6 @@ namespace Luttje\FilamentUserAttributes;
 use Filament\Support\Assets\Asset;
 use Filament\Support\Facades\FilamentAsset;
 use Luttje\FilamentUserAttributes\Commands\WizardCommand;
-use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Spatie\LaravelPackageTools\Commands\InstallCommand;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
@@ -47,11 +46,14 @@ class FilamentUserAttributesServiceProvider extends PackageServiceProvider
 
     public function packageRegistered(): void
     {
+        $this->app->singleton('filamentUserAttributes', function ($app) {
+            return new FilamentUserAttributes();
+        });
     }
 
     public function packageBooted(): void
     {
-        FilamentUserAttributes::registerUserAttributeComponentFactories();
+        \Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::registerDefaultUserAttributeComponentFactories();
 
         FilamentAsset::register(
             $this->getAssets(),

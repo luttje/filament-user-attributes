@@ -9,7 +9,7 @@ use Filament\Forms\Form;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Luttje\FilamentUserAttributes\FilamentUserAttributes;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 
 trait UserAttributesResource
 {

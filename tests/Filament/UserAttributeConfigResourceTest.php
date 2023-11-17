@@ -84,4 +84,5 @@ it('can configure user attributes for a resource xxxx', function () {
             'placeholder' => 'Enter your promotional text here',
         ],
     ]);
+    expect($config->owner)->toBeObject($user);
 });

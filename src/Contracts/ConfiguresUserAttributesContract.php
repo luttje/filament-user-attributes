@@ -8,6 +8,11 @@ use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 interface ConfiguresUserAttributesContract
 {
     /**
+     * @see https://laravel.com/api/10.x/Illuminate/Database/Eloquent/Model.html#method_getKey
+     */
+    public function getKey();
+
+    /**
      * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
     public function userAttributesConfigs(): HasMany;

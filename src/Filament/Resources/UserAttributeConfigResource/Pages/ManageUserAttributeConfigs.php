@@ -6,7 +6,7 @@ use Filament\Actions;
 use Filament\Forms;
 use Filament\Resources\Pages\ManageRecords;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
-use Luttje\FilamentUserAttributes\FilamentUserAttributes;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 
 class ManageUserAttributeConfigs extends ManageRecords
 {
