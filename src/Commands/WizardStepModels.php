@@ -17,7 +17,25 @@ class WizardStepModels extends Command
         parent::__construct();
     }
 
+
     public function handle()
+    {
+        if (!$this->promptForModelSetup()) {
+            return;
+        }
+
+        $this->finalizeModelSetup();
+    }
+
+    protected function promptForModelSetup(): bool
+    {
+        return $this->confirm(
+            "Do add support for user attributes to your models?",
+            true
+        );
+    }
+
+    public function finalizeModelSetup()
     {
         $models = self::scanForModels();
         $chosenModels = $this->getChosenModels($models);
@@ -35,22 +53,17 @@ class WizardStepModels extends Command
 
     protected function getChosenModels(array $models): array
     {
-        $models['0'] = 'No models';
+        $choices = array_values($models);
+
         $chosenModels = $this->choice(
             "Which of your models should be able to have user attributes? (comma separated)",
-            $models,
+            $choices,
             null,
             null,
             true
         );
 
-        return array_map(
-            fn ($choice) => $models[$choice],
-            array_filter(
-                $chosenModels,
-                fn ($choice) => $choice !== '0'
-            )
-        );
+        return $chosenModels;
     }
 
     protected function displaySelectedModels(array $chosenModels): void
@@ -73,7 +86,7 @@ class WizardStepModels extends Command
 
         foreach ($modelFiles as $file) {
             $modelName = basename($file, '.php');
-            $models[$modelName] = app()->getNamespace() . 'Models\\' . $modelName;
+            $models[] = app()->getNamespace() . 'Models\\' . $modelName;
         }
 
         return $models;

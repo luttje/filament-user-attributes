@@ -55,7 +55,7 @@ class WizardStepConfig extends Command
     {
         $models = WizardStepModels::scanForModels();
         $choice = $this->choice($prompt, $models);
-        return $models[$choice];
+        return $choice;
     }
 
     protected function setupConfigModel(string $model): void
