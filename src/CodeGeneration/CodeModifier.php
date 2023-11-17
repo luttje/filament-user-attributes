@@ -47,7 +47,18 @@ class CodeModifier
         );
     }
 
-    public static function parseAndTraverse($code, $callback)
+    private static function traverseUntil($ast, $callback)
+    {
+        $traverser = new NodeTraverser();
+        $visitor = new NodeVisitor\FirstFindingVisitor($callback);
+
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        return $visitor->getFoundNode();
+    }
+
+    private static function parseAndTraverse($code, $callback)
     {
         [$parser, $lexer] = self::makeParserWithLexer();
 
@@ -58,13 +69,7 @@ class CodeModifier
             return false;
         }
 
-        $traverser = new NodeTraverser();
-        $visitor = new NodeVisitor\FirstFindingVisitor($callback);
-
-        $traverser->addVisitor($visitor);
-        $traverser->traverse($ast);
-
-        return $visitor->getFoundNode() !== null;
+        return self::traverseUntil($ast, $callback);
     }
 
     public static function usesTrait($code, $trait)
@@ -81,7 +86,7 @@ class CodeModifier
             }
 
             return false;
-        });
+        }) !== null;
     }
 
     public static function implementsInterface($code, $interface)
@@ -98,7 +103,7 @@ class CodeModifier
             }
 
             return false;
-        });
+        }) !== null;
     }
 
     public static function fullyQualifyClass($class)
@@ -160,44 +165,22 @@ class CodeModifier
     }
 
     /**
-     * Traverse the statements and find the variable which the given method is called.
-     * TODO: Find the variable by type instead of name
+     * Traverse the statements and find the variable on which the given method is called.
      */
-    public static function findCall($stmts, $variable, $methodName)
+    public static function findCall($stmts, $variableName, $methodName)
     {
-        foreach ($stmts as $stmt) {
-            $subNodeNames = $stmt->getSubNodeNames();
-
-            foreach ($subNodeNames as $subNodeName) {
-                $subNode = $stmt->{$subNodeName};
-
-                if (is_array($subNode)) {
-                    $found = self::findCall($subNode, $variable, $methodName);
-
-                    if ($found) {
-                        return $found;
-                    }
-                } elseif ($subNode instanceof \PhpParser\Node\Expr\MethodCall) {
-                    if ($subNode->var instanceof \PhpParser\Node\Expr\Variable) {
-                        if ($subNode->var->name === $variable) {
-                            if ($subNode->name->name === $methodName) {
-                                return $subNode;
-                            }
+        return self::traverseUntil($stmts, function ($node) use ($variableName, $methodName) {
+            if ($node instanceof \PhpParser\Node\Expr\MethodCall) {
+                if ($node->var instanceof \PhpParser\Node\Expr\Variable) {
+                    if ($node->var->name === $variableName) {
+                        if ($node->name->name === $methodName) {
+                            return true;
                         }
-                    }
-
-                    // Check for nested method calls
-                    while ($subNode instanceof \PhpParser\Node\Expr\MethodCall) {
-                        if ($subNode->name instanceof \PhpParser\Node\Identifier && $subNode->name->name === $methodName) {
-                            return $subNode;
-                        }
-
-                        $subNode = $subNode->var;
                     }
                 }
             }
-        }
 
-        return null;
+            return false;
+        });
     }
 }
