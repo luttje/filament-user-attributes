@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeModifier;
+use Luttje\FilamentUserAttributes\CodeGeneration\MethodModifier;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
@@ -130,10 +131,42 @@ class WizardStepResources extends Command
             return $method;
         });
 
-        // TODO: Add the `self::withUserAttributeFields()` method call to the `fields()` method.
-        // TODO: Add the `self::withUserAttributeColumns()` method call to the `columns()` method.
+        // Wraps the args in the schema call in the `self::withUserAttributeFields()` method call
+        // and adds the `self::withUserAttributeColumns()` method call to the `columns()` method.
+        $contents = self::applyWrapperMethod($contents, 'form', 'schema', 'withUserAttributeFields');
+        $contents = self::applyWrapperMethod($contents, 'table', 'columns', 'withUserAttributeColumns');
 
         file_put_contents($file, $contents);
+    }
+
+    private static function applyWrapperMethod($contents, $parentMethodName, $methodNameToWrapInside, $methodNameToCall)
+    {
+        return CodeModifier::modifyMethod(
+            $contents,
+            $parentMethodName,
+            function ($method) use($methodNameToWrapInside, $methodNameToCall) {
+                /** @var \PhpParser\Node\Stmt\ClassMethod */
+                $method = $method;
+                $firstParameter = $method->params[0];
+                $schema = CodeModifier::findCall(
+                    $method->stmts,
+                    $firstParameter->var->name,
+                    $methodNameToWrapInside
+                );
+
+                $schema->args = [
+                    new \PhpParser\Node\Arg(
+                        new \PhpParser\Node\Expr\StaticCall(
+                            new \PhpParser\Node\Name('self'),
+                            $methodNameToCall,
+                            $schema->args
+                        )
+                    ),
+                ];
+
+                return $method;
+            }
+        );
     }
 
     protected function guessTemplate(string $resource, Collection $models)

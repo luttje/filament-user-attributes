@@ -32,6 +32,16 @@ class CodeModifier
         return self::modifyCode(
             $code,
             $methodName,
+            MethodInserter::class,
+            $builder
+        );
+    }
+
+    public static function modifyMethod($code, $methodName, ?\Closure $builder = null)
+    {
+        return self::modifyCode(
+            $code,
+            $methodName,
             MethodModifier::class,
             $builder
         );
@@ -148,4 +158,47 @@ class CodeModifier
         $prettyPrinter = new PrettyPrinter\Standard();
         return $prettyPrinter->printFormatPreserving($modifiedAst, $ast, $origTokens);
     }
+
+    /**
+     * Traverse the statements and find the variable which the given method is called.
+     * TODO: Find the variable by type instead of name
+     */
+    public static function findCall($stmts, $variable, $methodName)
+    {
+        foreach ($stmts as $stmt) {
+            $subNodeNames = $stmt->getSubNodeNames();
+
+            foreach ($subNodeNames as $subNodeName) {
+                $subNode = $stmt->{$subNodeName};
+
+                if (is_array($subNode)) {
+                    $found = self::findCall($subNode, $variable, $methodName);
+
+                    if ($found) {
+                        return $found;
+                    }
+                } elseif ($subNode instanceof \PhpParser\Node\Expr\MethodCall) {
+                    if ($subNode->var instanceof \PhpParser\Node\Expr\Variable) {
+                        if ($subNode->var->name === $variable) {
+                            if ($subNode->name->name === $methodName) {
+                                return $subNode;
+                            }
+                        }
+                    }
+
+                    // Check for nested method calls
+                    while ($subNode instanceof \PhpParser\Node\Expr\MethodCall) {
+                        if ($subNode->name instanceof \PhpParser\Node\Identifier && $subNode->name->name === $methodName) {
+                            return $subNode;
+                        }
+
+                        $subNode = $subNode->var;
+                    }
+                }
+            }
+        }
+
+        return null;
+    }
+
 }

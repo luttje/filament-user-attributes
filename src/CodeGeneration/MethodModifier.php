@@ -7,14 +7,14 @@ use PhpParser\NodeVisitorAbstract;
 
 class MethodModifier extends NodeVisitorAbstract
 {
-    private $methodNameToAdd;
+    private $methodNameToModify;
 
-    private $methodBuilder;
+    private $methodModifier;
 
     public function __construct(string $methodNameToAdd, ?\Closure $builder = null)
     {
-        $this->methodNameToAdd = $methodNameToAdd;
-        $this->methodBuilder = $builder;
+        $this->methodNameToModify = $methodNameToAdd;
+        $this->methodModifier = $builder;
     }
 
     public function enterNode(Node $node)
@@ -23,21 +23,20 @@ class MethodModifier extends NodeVisitorAbstract
             return null;
         }
 
-        $found = false;
+        $methodKey = null;
 
-        foreach ($node->stmts as $stmt) {
+        foreach ($node->stmts as $key => $stmt) {
             if ($stmt instanceof Node\Stmt\ClassMethod) {
-                if ($stmt->name->toString() === $this->methodNameToAdd) {
-                    $found = true;
+                if ($stmt->name->toString() === $this->methodNameToModify) {
+                    $methodKey = $key;
                     break;
                 }
             }
         }
 
-        if (!$found) {
-            $builder = $this->methodBuilder;
-            $node->stmts[] = new Node\Stmt\Nop();
-            $node->stmts[] = $builder();
+        if ($methodKey !== null) {
+            $builder = $this->methodModifier;
+            $node->stmts[$methodKey] = $builder($node->stmts[$methodKey]);
         }
 
         return null;
