@@ -3,7 +3,6 @@
 namespace Luttje\FilamentUserAttributes\CodeGeneration;
 
 use PhpParser\Node;
-use PhpParser\Node\Name\FullyQualified;
 use PhpParser\NodeVisitorAbstract;
 
 class InterfaceInserter extends NodeVisitorAbstract
