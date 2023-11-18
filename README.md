@@ -45,13 +45,6 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     composer require luttje/filament-user-attributes
     ```
 
-> [!Note]
-> This package is currently only available on Packagist with the `dev-main` stability flag. To require this package in your project you need to add the following to your `composer.json` file:
-> ```json
-> "minimum-stability": "dev",
-> "prefer-stable": true,
-> ```
-
 3. Run the following command to fully install the package:
 
     ```bash
@@ -71,7 +64,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     - Setup a model that can configure the user attributes for each user (e.g. a user or tenant model)
     - Setup resources that the configuration model can configure custom attributes for
 
-**🎉 That's it!**
+**🎉 That was all, you and your users can now configure custom attributes!**
 
 > Your users (or tenants) can now configure custom attribute fields:
 >

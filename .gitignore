@@ -6,7 +6,6 @@ phpunit.xml.dist
 build
 composer.lock
 coverage
-docs
 node_modules
 phpunit.xml
 phpstan.neon
