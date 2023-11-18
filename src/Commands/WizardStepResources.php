@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
 class WizardStepResources extends Command
@@ -30,8 +31,7 @@ class WizardStepResources extends Command
 
     protected function promptForResourcesSetup(): bool
     {
-        $models = collect(WizardStepModels::scanForModels())
-            ->filter(fn ($model) => in_array(ConfiguresUserAttributesContract::class, class_implements($model)));
+        $models = $this->getModelsImplementingConfiguresUserAttributesContract();
 
         if ($models->isEmpty()) {
             $this->info('(Failing) No models found to have been setup to configure user attributes.');
@@ -43,7 +43,7 @@ class WizardStepResources extends Command
 
     protected function getModelsImplementingConfiguresUserAttributesContract(): Collection
     {
-        return collect(WizardStepModels::scanForModels())
+        return collect(FilamentUserAttributes::getConfigurableModels(configured: false))
             ->filter(fn ($model) => in_array(ConfiguresUserAttributesContract::class, class_implements($model)));
     }
 

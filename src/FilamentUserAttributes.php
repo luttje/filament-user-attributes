@@ -152,7 +152,7 @@ class FilamentUserAttributes
     /**
      * Finds all resources that have the HasUserAttributesContract interface
      */
-    public function getConfigurableResources()
+    public function getConfigurableResources($configured = true)
     {
         $discoverPaths = config('filament-user-attributes.discover_resources');
 
@@ -167,7 +167,7 @@ class FilamentUserAttributes
         }
 
         if ($this->cachedDiscoveredResources === null) {
-            $this->cachedDiscoveredResources = $this->discoverConfigurableResources($discoverPaths);
+            $this->cachedDiscoveredResources = $this->discoverConfigurableResources($discoverPaths, $configured);
         }
 
         return $this->cachedDiscoveredResources;
@@ -176,7 +176,7 @@ class FilamentUserAttributes
     /**
      * Discovers all resources that have the HasUserAttributesContract interface
      */
-    public function discoverConfigurableResources(array $paths): array
+    public function discoverConfigurableResources(array $paths, bool $configured): array
     {
         $resources = [];
 
@@ -195,8 +195,11 @@ class FilamentUserAttributes
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
-                })
-                ->filter(function ($type) {
+                });
+
+            // Note: this will autoload the models if $configured = true
+            if ($configured) {
+                $resourcesForPath = $resourcesForPath->filter(function ($type) {
                     if (!class_exists($type)) {
                         return false;
                     }
@@ -206,8 +209,10 @@ class FilamentUserAttributes
                     }
 
                     return true;
-                })
-                ->mapWithKeys(function ($type) use ($nameTransformer) {
+                });
+            }
+
+            $resourcesForPath = $resourcesForPath->mapWithKeys(function ($type) use ($nameTransformer) {
                     return [$type => $nameTransformer($type)];
                 })
                 ->toArray();
@@ -216,6 +221,88 @@ class FilamentUserAttributes
         }
 
         return $resources;
+    }
+
+    /**
+     * Discovers all models that could possibly be configured with user attributes.
+     */
+    public function getConfigurableModels($configured = true)
+    {
+        $discoverPaths = config('filament-user-attributes.discover_models');
+
+        if ($discoverPaths === false) {
+            return [];
+        }
+
+        return $this->discoverConfigurableModels($discoverPaths, $configured);
+    }
+
+    /**
+     * Discovers all models that could possibly be configured with user attributes.
+     */
+    public function discoverConfigurableModels(array $paths, bool $configured): array
+    {
+        $models = [];
+
+        foreach ($paths as $targetPath) {
+            $path = $this->appPath . $targetPath;
+
+            if (!File::exists($path)) {
+                continue;
+            }
+
+            $modelsForPath = collect(File::allFiles($path))
+                ->map(function ($file) use ($targetPath) {
+                    $type = $this->appNamespace . $targetPath . '\\' . $file->getRelativePathName();
+                    $type = substr($type, 0, -strlen('.php'));
+
+                    return $type;
+                });
+
+            // Note: this will autoload the models if $configured = true
+            if ($configured) {
+                $modelsForPath = $modelsForPath->filter(function ($type) {
+                    if (!class_exists($type)) {
+                        return false;
+                    }
+
+                    if (!in_array(\Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract::class, class_implements($type))) {
+                        return false;
+                    }
+
+                    return true;
+                });
+            }
+
+            $models = array_merge($models, $modelsForPath->toArray());
+        }
+
+        return $models;
+    }
+
+    /**
+     * Uses configured path discovery information to find the path for the given
+     * model class
+     */
+    public function findModelFilePath(string $model): string
+    {
+        $discoverPaths = config('filament-user-attributes.discover_models');
+
+        foreach ($discoverPaths as $targetPath) {
+            $path = $this->appPath . $targetPath;
+
+            if (!File::exists($path)) {
+                continue;
+            }
+
+            $file = $path . DIRECTORY_SEPARATOR . class_basename($model) . '.php';
+
+            if (File::exists($file)) {
+                return $file;
+            }
+        }
+
+        throw new \Exception("Could not find the file for model '$model'.");
     }
 
     /**

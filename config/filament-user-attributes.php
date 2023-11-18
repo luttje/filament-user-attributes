@@ -31,6 +31,14 @@ return [
     'discovery_resource_name_transformer' => Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::class . '::classNameToLabel',
 
     /**
+     * Which directories in App to iterate over to discover models when running
+     * the wizard.
+     */
+    'discover_models' => [
+        'Models',
+    ],
+
+    /**
      * Whether to eager load the user attributes relationship on models that
      * use the HasUserAttributes trait.
      */

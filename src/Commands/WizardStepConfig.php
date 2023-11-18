@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes\Commands;
 use Illuminate\Console\Command;
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
 class WizardStepConfig extends Command
@@ -46,21 +47,22 @@ class WizardStepConfig extends Command
     {
         $this->line('The following models are setup to support user attributes:');
 
-        collect(WizardStepModels::scanForModels())
+        // Disable auto loading the models by setting configured to false
+        collect(FilamentUserAttributes::getConfigurableModels(configured: false))
             ->filter(fn ($model) => WizardStepModels::isModelSetup($model))
             ->each(fn ($model) => $this->line("- $model"));
     }
 
     private function selectModelForConfig(string $prompt): string
     {
-        $models = WizardStepModels::scanForModels();
+        $models = FilamentUserAttributes::getConfigurableModels(configured: false);
         $choice = $this->choice($prompt, $models);
         return $choice;
     }
 
     protected function setupConfigModel(string $model): void
     {
-        $file = $this->getModelFilePath($model);
+        $file = FilamentUserAttributes::findModelFilePath($model);
 
         $editor = CodeEditor::make();
         $editor->editFileWithBackup($file, function ($code) use ($editor) {
@@ -68,10 +70,5 @@ class WizardStepConfig extends Command
             $code = $editor->addInterface($code, ConfiguresUserAttributesContract::class);
             return $code;
         });
-    }
-
-    private function getModelFilePath(string $model): string
-    {
-        return app_path(str_replace('\\', '/', substr($model, strlen(app()->getNamespace()))) . '.php');
     }
 }

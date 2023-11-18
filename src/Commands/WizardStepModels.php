@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes\Commands;
 use Illuminate\Console\Command;
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
 class WizardStepModels extends Command
@@ -36,7 +37,7 @@ class WizardStepModels extends Command
 
     public function finalizeModelSetup()
     {
-        $models = self::scanForModels();
+        $models = FilamentUserAttributes::getConfigurableModels(configured: false);
         $chosenModels = $this->getChosenModels($models);
 
         $this->displaySelectedModels($chosenModels);
@@ -78,22 +79,9 @@ class WizardStepModels extends Command
         }
     }
 
-    public static function scanForModels(): array
-    {
-        $models = [];
-        $modelFiles = glob(app_path('Models/*.php'));
-
-        foreach ($modelFiles as $file) {
-            $modelName = basename($file, '.php');
-            $models[] = app()->getNamespace() . 'Models\\' . $modelName;
-        }
-
-        return $models;
-    }
-
     public static function isModelSetup(string $model): bool
     {
-        $file = self::getModelFilePath($model);
+        $file = FilamentUserAttributes::findModelFilePath($model);
         if (!file_exists($file)) {
             return false;
         }
@@ -114,7 +102,7 @@ class WizardStepModels extends Command
 
     protected function setupModel(string $model): void
     {
-        $file = self::getModelFilePath($model);
+        $file = FilamentUserAttributes::findModelFilePath($model);
 
         $editor = CodeEditor::make();
         $editor->editFileWithBackup($file, function ($code) use ($editor) {
@@ -122,10 +110,5 @@ class WizardStepModels extends Command
             $code = $editor->addInterface($code, HasUserAttributesContract::class);
             return $code;
         });
-    }
-
-    private static function getModelFilePath(string $model): string
-    {
-        return app_path(str_replace('\\', '/', substr($model, strlen(app()->getNamespace()))) . '.php');
     }
 }
