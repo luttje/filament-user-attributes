@@ -144,6 +144,7 @@ it('can add the desired traits to setup a config model', function () {
 });
 
 it('can add the desired traits to setup a resource', function () {
+    copyFixturesToTemp('Models');
     copyFixturesToTemp('Filament');
 
     Config::set('filament-user-attributes.discover_resources', [
