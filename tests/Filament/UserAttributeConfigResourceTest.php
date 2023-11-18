@@ -2,12 +2,16 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Filament;
 
+use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
+use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
+use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 
 // Quick hack to find the id for a user attribute config item
 // TODO: Make a test mixin for this
@@ -57,7 +61,7 @@ function configureUserAttributes($test, $user, $resource, $attributeBuilders)
         ->assertHasNoErrors();
 }
 
-it('can configure user attributes for a resource', function () {
+it('can configure a text input user attribute for a resource', function () {
     $user = User::factory()
         ->create();
 
@@ -85,4 +89,25 @@ it('can configure user attributes for a resource', function () {
         ],
     ]);
     expect($config->owner)->toBeObject($user);
+});
+
+it('can manage user attributes through the action', function () {
+    $user = User::factory()
+        ->create();
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__.'/../Fixtures'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures',
+    ));
+    Config::set('filament-user-attributes.discover_resources', [
+        'Resources',
+    ]);
+
+    Livewire::actingAs($user)
+        ->test(ManageUserAttributeConfigs::class)
+        ->callAction('Manage user attributes', data: [
+            'resource_type' => CategoryResource::class,
+        ])
+        ->assertSee('Resource type')
+        ->assertHasNoActionErrors();
 });

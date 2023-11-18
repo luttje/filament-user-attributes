@@ -3,7 +3,6 @@
 namespace Luttje\FilamentUserAttributes\Tests\Commands;
 
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Storage;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 
@@ -39,6 +38,24 @@ function copyFixturesToTemp($fixtureDirectory)
     copyDirectory($fixtures, $temp);
 }
 
+// Helper to copy directories recursively
+function rrmdir($dir)
+{
+    if (is_dir($dir)) {
+        $objects = scandir($dir);
+        foreach ($objects as $object) {
+            if ($object != "." && $object != "..") {
+                if (is_dir($dir. DIRECTORY_SEPARATOR .$object) && !is_link($dir."/".$object)) {
+                    rrmdir($dir. DIRECTORY_SEPARATOR .$object);
+                } else {
+                    unlink($dir. DIRECTORY_SEPARATOR .$object);
+                }
+            }
+        }
+        rmdir($dir);
+    }
+}
+
 // Clean up temp after all tests
 afterAll(function () {
     $temp = realpath(__DIR__.'/temp');
@@ -55,7 +72,7 @@ afterAll(function () {
         $path = "$temp/$file";
 
         if (is_dir($path)) {
-            Storage::deleteDirectory($path);
+            rrmdir($path);
         } else {
             unlink($path);
         }

@@ -93,6 +93,7 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
     {
         return [
             'index' => Pages\ListCategories::route('/'),
+            'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
 }
