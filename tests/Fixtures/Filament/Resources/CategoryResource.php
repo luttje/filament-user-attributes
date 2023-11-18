@@ -27,6 +27,10 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
 
     protected static ?string $navigationLabel = 'Categories';
 
+    protected static ?string $modelLabel = 'Category';
+
+    protected static ?string $pluralModelLabel = 'Categories';
+
     public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
