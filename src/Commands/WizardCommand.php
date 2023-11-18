@@ -32,15 +32,15 @@ class WizardCommand extends Command
         $recentBackups = CodeEditor::getRecentBackupPaths();
 
         if (count($recentBackups) > 0) {
-            $this->info('<fg=gray>The following files were modified by Filament User Attributes. We have created a back-up of each file.</>');
+            $this->info("\n<fg=gray>The following files in this project were modified by Filament User Attributes. We have created a back-up of each file.</>");
 
             foreach ($recentBackups as $file => $backup) {
                 $this->info("<fg=gray>$file (back-up $backup)</>");
             }
         } else {
-            $this->info('<fg=gray>None of your files were modified by Filament User Attributes.</>');
+            $this->info("\n<fg=gray>No project files were modified by Filament User Attributes.</>");
         }
 
-        $this->info("\nFilament User Attributes has finished setting up your project!");
+        $this->info("\nFilament User Attributes has successfully finished setting up your project!");
     }
 }

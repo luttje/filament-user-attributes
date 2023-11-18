@@ -57,7 +57,7 @@ function configureUserAttributes($test, $user, $resource, $attributeBuilders)
         ->assertHasNoErrors();
 }
 
-it('can configure user attributes for a resource xxxx', function () {
+it('can configure user attributes for a resource', function () {
     $user = User::factory()
         ->create();
 

@@ -172,7 +172,7 @@ class WizardStepResources extends Command
 
     protected function guessTemplateAuthUser()
     {
-        $this->warn("\nGuessing that your configurer model may be the Auth user model...");
+        $this->line("\nGuessing that your configuration model may be a user model...");
 
         return [
             new \PhpParser\Node\Stmt\Expression(
@@ -204,7 +204,7 @@ PHPDOC
 
     protected function guessTemplateTenant()
     {
-        $this->warn("\nGuessing that your configurer model may be the Tenant model...");
+        $this->line("\nGuessing that your configuration model may be a multi-tenancy model...");
 
         return [
             new \PhpParser\Node\Stmt\Expression(
@@ -233,6 +233,8 @@ PHPDOC
 
     protected function guessTemplateNoModels(string $resource)
     {
+        $this->warn("\nWe didn't find any models that implement the correct interface, so you'll have to do this yourself.");
+
         return [
             new \PhpParser\Node\Stmt\Throw_(
                 new \PhpParser\Node\Expr\New_(
@@ -259,6 +261,8 @@ PHPDOC
 
     protected function guessTemplateNoKnownModels(string $resource, Collection $models)
     {
+        $this->warn("\nWe didn't recognize any of the models that implement the correct interface, so you'll have to finish this implementation yourself.");
+
         return [
             new \PhpParser\Node\Stmt\Throw_(
                 new \PhpParser\Node\Expr\New_(

@@ -19,6 +19,11 @@ final class CodeEditor
         return new static();
     }
 
+    public static function clearRecentBackupPaths()
+    {
+        static::$recentBackupPaths = [];
+    }
+
     public static function getRecentBackupPaths()
     {
         return static::$recentBackupPaths;
@@ -80,59 +85,44 @@ final class CodeEditor
     {
         $traverser = new NodeTraverser();
         $visitor = new NodeVisitor\FirstFindingVisitor($callback);
-
         $traverser->addVisitor($visitor);
         $traverser->traverse($ast);
 
         return $visitor->getFoundNode();
     }
 
-    private static function parseAndTraverse($code, $callback)
+    private static function traverseUntilUsing($ast, $symbolFilter)
+    {
+        $traverser = new NodeTraverser();
+        $visitor = new UsingCollector($symbolFilter);
+        $traverser->addVisitor($visitor);
+        $traverser->traverse($ast);
+
+        return $visitor->getFoundNode();
+    }
+
+    private static function parseAndTraverseUntilUsing($code, $symbolFilter)
     {
         [$parser, $lexer] = self::makeParserWithLexer();
+        $ast = $parser->parse($code);
 
-        try {
-            $ast = $parser->parse($code);
-        } catch (Error $error) {
-            echo "Parse error: {$error->getMessage()}\n";
-            return false;
-        }
-
-        return self::traverseUntil($ast, $callback);
+        return self::traverseUntilUsing($ast, $symbolFilter);
     }
 
     public static function usesTrait($code, $trait)
     {
         $trait = self::fullyQualifyClass($trait);
+        $node = self::parseAndTraverseUntilUsing($code, $trait);
 
-        return self::parseAndTraverse($code, function ($node) use ($trait) {
-            if ($node instanceof \PhpParser\Node\Stmt\TraitUse) {
-                foreach ($node->traits as $traitNode) {
-                    if ($traitNode->toCodeString() === $trait) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }) !== null;
+        return $node !== null;
     }
 
     public static function implementsInterface($code, $interface)
     {
         $interface = self::fullyQualifyClass($interface);
+        $node = self::parseAndTraverseUntilUsing($code, $interface);
 
-        return self::parseAndTraverse($code, function ($node) use ($interface) {
-            if ($node instanceof \PhpParser\Node\Stmt\Class_) {
-                foreach ($node->implements as $interfaceNode) {
-                    if ($interfaceNode->toCodeString() === $interface) {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }) !== null;
+        return $node !== null;
     }
 
     public static function fullyQualifyClass($class)
@@ -172,13 +162,8 @@ final class CodeEditor
         $traverser = new NodeTraverser();
         $traverser->addVisitor(new NodeVisitor\CloningVisitor());
 
-        try {
-            $ast = $parser->parse($code);
-            $origTokens = $lexer->getTokens();
-        } catch (Error $error) {
-            echo "Parse error: {$error->getMessage()}\n";
-            return $code;
-        }
+        $ast = $parser->parse($code);
+        $origTokens = $lexer->getTokens();
 
         $modifiedAst = $traverser->traverse($ast);
 
@@ -194,22 +179,35 @@ final class CodeEditor
     }
 
     /**
+     * Recrusively traverse the statements and find the variable on this method is called.
+     *
+     * @param \PhpParser\Node $node A method or variable
+     */
+    private static function getOriginalVariableName($node)
+    {
+        if ($node instanceof \PhpParser\Node\Expr\MethodCall) {
+            return self::getOriginalVariableName($node->var);
+        } else if ($node instanceof \PhpParser\Node\Expr\Variable) {
+            return $node->name;
+        }
+
+        return false;
+    }
+
+    /**
      * Traverse the statements and find the variable on which the given method is called.
      */
     public static function findCall($stmts, $variableName, $methodName)
     {
         return self::traverseUntil($stmts, function ($node) use ($variableName, $methodName) {
-            if ($node instanceof \PhpParser\Node\Expr\MethodCall) {
-                if ($node->var instanceof \PhpParser\Node\Expr\Variable) {
-                    if ($node->var->name === $variableName) {
-                        if ($node->name->name === $methodName) {
-                            return true;
-                        }
-                    }
-                }
+            if (!($node instanceof \PhpParser\Node\Expr\MethodCall)) {
+                return false;
             }
 
-            return false;
+            $varName = self::getOriginalVariableName($node->var);
+
+            return $varName === $variableName
+                && $node->name->name === $methodName;
         });
     }
 }

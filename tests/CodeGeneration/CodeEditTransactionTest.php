@@ -23,6 +23,8 @@ PHP;
     $file = tempnam(sys_get_temp_dir(), 'filament-user-attributes');
     file_put_contents($file, $original);
 
+    CodeEditor::clearRecentBackupPaths();
+
     $editor = CodeEditor::make();
     $edit = $editor->editFileWithBackup($file, function ($code) use ($editor) {
         return $editor->modifyMethod($code, 'handle', function ($method) {
@@ -32,9 +34,11 @@ PHP;
     });
 
     $backupContents = file_get_contents($edit->getBackupFilePath());
+    $recentBackups = CodeEditor::getRecentBackupPaths();
 
     expect($edit->getCode())->toContain('public function handle()');
     expect($original)->toContain('return \'original\'');
     expect($edit->getCode())->not->toContain('return \'original\'');
     expect($backupContents)->toEqual($original);
+    expect($recentBackups)->toHaveCount(1);
 });
