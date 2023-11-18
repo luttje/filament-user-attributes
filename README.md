@@ -64,6 +64,24 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     - Setup a model that can configure the user attributes for each user (e.g. a user or tenant model)
     - Setup resources that the configuration model can configure custom attributes for
 
+Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
+
+5. Create a resource and inherit from the `UserAttributeConfigResource` class:
+
+    ```php
+    // app/Filament/Resources/UserAttributeConfigResource.php
+    namespace App\Filament\Resources;
+
+    use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource as BaseUserAttributeConfigResource;
+
+    class UserAttributeConfigResource extends BaseUserAttributeConfigResource
+    {
+        protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    }
+    ```
+
+    *Or you can create your own resource from scratch. See the [source code](./src/Filament/Resources/) for inspiration.*
+
 **🎉 That was all, you and your users can now configure custom attributes!**
 
 > Your users (or tenants) can now configure custom attribute fields:
