@@ -4,6 +4,9 @@ namespace Luttje\FilamentUserAttributes;
 
 use Closure;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Section;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Tables\Columns\Column;
 use Illuminate\Support\Facades\File;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
@@ -246,7 +249,10 @@ class FilamentUserAttributes
                 ];
             }
 
-            if ($component instanceof Component) {
+            if ($component instanceof Tabs
+                || $component instanceof Tab
+                || $component instanceof Section
+            ) {
                 $namesWithLabels = array_merge(
                     $namesWithLabels,
                     $this->getAllFieldComponents(
@@ -282,10 +288,15 @@ class FilamentUserAttributes
      * Search the components and child components until the component with the given name is found,
      * then add the given component after it.
      */
-    public function addFieldBesidesField(array $components, string $siblingComponentName, string $position, Component $componentToAdd, ?string $parentLabel = null): array
-    {
+    public function addFieldBesidesField(
+        array $components,
+        string $siblingComponentName,
+        string $position,
+        Component $componentToAdd,
+        ?string $parentLabel = null,
+        &$siblingFound = false
+    ): array {
         $newComponents = [];
-        $siblingFound = false;
 
         foreach ($components as $component) {
             $label = $this->getComponentLabel($component, $parentLabel);
@@ -299,18 +310,21 @@ class FilamentUserAttributes
                     array_splice($newComponents, count($newComponents) - 1, 0, [$componentToAdd]);
                 } elseif($position === 'after') {
                     $newComponents[] = $componentToAdd;
-                } else {
-                    throw new \Exception("Invalid position '$position' given.");
                 }
             }
 
-            if ($component instanceof Component) {
+            if ($component instanceof Tabs
+                || $component instanceof Tab
+                || $component instanceof Section
+            ) {
+                $containerChildComponents = $component->getChildComponents();
                 $childComponents = $this->addFieldBesidesField(
-                    $component->getChildComponents(),
+                    $containerChildComponents,
                     $siblingComponentName,
                     $position,
                     $componentToAdd,
-                    $label
+                    $label,
+                    $siblingFound
                 );
 
                 $component->childComponents($childComponents);
