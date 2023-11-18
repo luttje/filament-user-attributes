@@ -28,6 +28,9 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 > 1. A checkbox is added and it's order in the table and form is specified.
 > 2. The checkbox is displayed in the table and form. Users can now toggle the checkbox and view the value in the table.
 
+> [!Note]
+> This is a third-party package and is not affiliated with Filament or Laravel.
+
 ## 🚀 Getting started
 
 1. Make sure your project meets these requirements:

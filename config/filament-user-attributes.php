@@ -12,7 +12,7 @@ return [
      * ])
      */
     'discover_resources' => [
-        'Filament',
+        'Filament/Resources',
         'Livewire',
     ],
 

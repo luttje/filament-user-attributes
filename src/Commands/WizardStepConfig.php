@@ -48,14 +48,14 @@ class WizardStepConfig extends Command
         $this->line('The following models are setup to support user attributes:');
 
         // Disable auto loading the models by setting configured to false
-        collect(FilamentUserAttributes::getConfigurableModels(configured: false))
+        collect(FilamentUserAttributes::getConfigurableModels(configuredOnly: false))
             ->filter(fn ($model) => WizardStepModels::isModelSetup($model))
             ->each(fn ($model) => $this->line("- $model"));
     }
 
     private function selectModelForConfig(string $prompt): string
     {
-        $models = FilamentUserAttributes::getConfigurableModels(configured: false);
+        $models = FilamentUserAttributes::getConfigurableModels(configuredOnly: false);
         $choice = $this->choice($prompt, $models);
         return $choice;
     }

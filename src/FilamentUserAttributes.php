@@ -150,11 +150,27 @@ class FilamentUserAttributes
     }
 
     /**
-     * Finds all resources that have the HasUserAttributesContract interface
+     * Returns all Resource discover paths, normalized
      */
-    public function getConfigurableResources($configured = true)
+    public function getResourceDiscoverPaths(): array|false
     {
         $discoverPaths = config('filament-user-attributes.discover_resources');
+
+        if ($discoverPaths === false) {
+            return false;
+        }
+
+        return array_map(function ($path) {
+            return str_replace('/', DIRECTORY_SEPARATOR, $path);
+        }, $discoverPaths);
+    }
+
+    /**
+     * Finds all resources that have the HasUserAttributesContract interface
+     */
+    public function getConfigurableResources($configuredOnly = true)
+    {
+        $discoverPaths = $this->getResourceDiscoverPaths();
 
         if ($discoverPaths === false) {
             $resources = $this->registeredResources;
@@ -167,7 +183,7 @@ class FilamentUserAttributes
         }
 
         if ($this->cachedDiscoveredResources === null) {
-            $this->cachedDiscoveredResources = $this->discoverConfigurableResources($discoverPaths, $configured);
+            $this->cachedDiscoveredResources = $this->discoverConfigurableResources($discoverPaths, $configuredOnly);
         }
 
         return $this->cachedDiscoveredResources;
@@ -176,7 +192,7 @@ class FilamentUserAttributes
     /**
      * Discovers all resources that have the HasUserAttributesContract interface
      */
-    public function discoverConfigurableResources(array $paths, bool $configured): array
+    public function discoverConfigurableResources(array $paths, bool $configuredOnly): array
     {
         $resources = [];
 
@@ -189,7 +205,7 @@ class FilamentUserAttributes
 
             $nameTransformer = config('filament-user-attributes.discovery_resource_name_transformer');
 
-            $resourcesForPath = collect(File::allFiles($path))
+            $resourcesForPath = collect(File::files($path))
                 ->map(function ($file) use ($targetPath) {
                     $type = $this->appNamespace . $targetPath . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
@@ -198,7 +214,7 @@ class FilamentUserAttributes
                 });
 
             // Note: this will autoload the models if $configured = true
-            if ($configured) {
+            if ($configuredOnly) {
                 $resourcesForPath = $resourcesForPath->filter(function ($type) {
                     if (!class_exists($type)) {
                         return false;
@@ -226,7 +242,7 @@ class FilamentUserAttributes
     /**
      * Discovers all models that could possibly be configured with user attributes.
      */
-    public function getConfigurableModels($configured = true)
+    public function getConfigurableModels($configuredOnly = true)
     {
         $discoverPaths = config('filament-user-attributes.discover_models');
 
@@ -234,13 +250,13 @@ class FilamentUserAttributes
             return [];
         }
 
-        return $this->discoverConfigurableModels($discoverPaths, $configured);
+        return $this->discoverConfigurableModels($discoverPaths, $configuredOnly);
     }
 
     /**
      * Discovers all models that could possibly be configured with user attributes.
      */
-    public function discoverConfigurableModels(array $paths, bool $configured): array
+    public function discoverConfigurableModels(array $paths, bool $configuredOnly): array
     {
         $models = [];
 
@@ -260,7 +276,7 @@ class FilamentUserAttributes
                 });
 
             // Note: this will autoload the models if $configured = true
-            if ($configured) {
+            if ($configuredOnly) {
                 $modelsForPath = $modelsForPath->filter(function ($type) {
                     if (!class_exists($type)) {
                         return false;
@@ -278,6 +294,31 @@ class FilamentUserAttributes
         }
 
         return $models;
+    }
+
+    /**
+     * Uses configured path discovery information to find the path for the given
+     * resource class
+     */
+    public function findResourceFilePath(string $resource): string
+    {
+        $discoverPaths = $this->getResourceDiscoverPaths();
+
+        foreach ($discoverPaths as $targetPath) {
+            $path = $this->appPath . $targetPath;
+
+            if (!File::exists($path)) {
+                continue;
+            }
+
+            $file = $path . DIRECTORY_SEPARATOR . class_basename($resource) . '.php';
+
+            if (File::exists($file)) {
+                return $file;
+            }
+        }
+
+        throw new \Exception("Could not find the file for resource '$resource'.");
     }
 
     /**

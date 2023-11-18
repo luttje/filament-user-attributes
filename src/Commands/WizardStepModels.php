@@ -37,7 +37,7 @@ class WizardStepModels extends Command
 
     public function finalizeModelSetup()
     {
-        $models = FilamentUserAttributes::getConfigurableModels(configured: false);
+        $models = FilamentUserAttributes::getConfigurableModels(configuredOnly: false);
         $chosenModels = $this->getChosenModels($models);
 
         $this->displaySelectedModels($chosenModels);

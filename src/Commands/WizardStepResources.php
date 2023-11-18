@@ -43,24 +43,15 @@ class WizardStepResources extends Command
 
     protected function getModelsImplementingConfiguresUserAttributesContract(): Collection
     {
-        return collect(FilamentUserAttributes::getConfigurableModels(configured: false))
+        return collect(FilamentUserAttributes::getConfigurableModels(configuredOnly: false))
             ->filter(fn ($model) => in_array(ConfiguresUserAttributesContract::class, class_implements($model)));
-    }
-
-    protected static function scanForResources(): array
-    {
-        return collect(glob(app_path('Filament/Resources/*')))
-            ->mapWithKeys(function ($file) {
-                $resource = app()->getNamespace() . 'Filament\\Resources\\' . basename($file, '.php');
-                return [class_basename($resource) => $resource];
-            })->toArray();
     }
 
     protected function getChosenResources(array $resources): array
     {
         return $this->choice(
             'Which resources should display and edit user attributes?',
-            array_keys($resources),
+            $resources,
             null,
             null,
             true
@@ -69,14 +60,15 @@ class WizardStepResources extends Command
 
     protected function finalizeResourcesSetup()
     {
-        $resources = self::scanForResources();
+        $resources = FilamentUserAttributes::getConfigurableResources(configuredOnly: false);
+        $resources = array_keys($resources);
         $chosenResources = $this->getChosenResources($resources);
 
         if (empty($chosenResources)) {
             return;
         }
 
-        $this->setupResources(array_map(fn ($resource) => $resources[$resource], $chosenResources));
+        $this->setupResources($chosenResources);
 
         return;
     }
@@ -90,7 +82,7 @@ class WizardStepResources extends Command
 
     protected function setupResource(string $resource)
     {
-        $file = app_path(str_replace('\\', '/', substr($resource, strlen(app()->getNamespace()))) . '.php');
+        $file = FilamentUserAttributes::findResourceFilePath($resource);
 
         $editor = CodeEditor::make();
         $editor->editFileWithBackup($file, function ($code) use ($editor, $resource) {
