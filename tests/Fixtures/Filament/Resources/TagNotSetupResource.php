@@ -10,7 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\TagNotSetupResource\Pages;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\TagNotSetup;
 

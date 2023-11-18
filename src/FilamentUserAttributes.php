@@ -229,8 +229,8 @@ class FilamentUserAttributes
             }
 
             $resourcesForPath = $resourcesForPath->mapWithKeys(function ($type) use ($nameTransformer) {
-                    return [$type => $nameTransformer($type)];
-                })
+                return [$type => $nameTransformer($type)];
+            })
                 ->toArray();
 
             $resources = array_merge($resources, $resourcesForPath);

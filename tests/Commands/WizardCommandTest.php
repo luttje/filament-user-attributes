@@ -77,7 +77,7 @@ it('can render a resource with configured user attributes', function () {
         ->assertExitCode(0);
 });
 
-it('can add the desired traits for user attributes to models', function() {
+it('can add the desired traits for user attributes to models', function () {
     copyFixturesToTemp('Models');
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
@@ -105,7 +105,7 @@ it('can add the desired traits for user attributes to models', function() {
     expect($countTag)->toBe(1);
 });
 
-it('can add the desired traits to setup a config model', function() {
+it('can add the desired traits to setup a config model', function () {
     copyFixturesToTemp('Models');
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
@@ -126,7 +126,7 @@ it('can add the desired traits to setup a config model', function() {
     expect($contentsTeam)->toContain('use \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;');
 });
 
-it('can add the desired traits to setup a resource', function() {
+it('can add the desired traits to setup a resource', function () {
     copyFixturesToTemp('Filament');
 
     Config::set('filament-user-attributes.discover_resources', [
