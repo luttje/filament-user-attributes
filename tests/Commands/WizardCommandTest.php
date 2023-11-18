@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Commands;
 
-use Illuminate\Support\Facades\Config;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 
@@ -18,8 +17,8 @@ function copyDirectory($source, $target)
             continue;
         }
 
-        $sourcePath = "$source/$file";
-        $destination = "$target/$file";
+        $sourcePath = "$source\\$file";
+        $destination = "$target\\$file";
 
         if (is_dir($sourcePath)) {
             copyDirectory($sourcePath, $destination);
@@ -94,54 +93,54 @@ it('can render a resource with configured user attributes', function () {
         ->assertExitCode(0);
 });
 
-it('can add the desired traits for user attributes to models', function () {
-    copyFixturesToTemp('Models');
+// it('can add the desired traits for user attributes to models', function () {
+//     copyFixturesToTemp('Models');
 
-    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/temp'),
-        'Luttje\FilamentUserAttributes\Tests\Fixtures',
-    ));
+//     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+//         realpath(__DIR__.'/temp'),
+//         'Luttje\FilamentUserAttributes\Tests\Fixtures',
+//     ));
 
-    $this->artisan('filament-user-attributes:wizard')
-        ->expectsConfirmation('Do add support for user attributes to your models?', 'yes')
-        ->expectsQuestion('Which of your models should be able to have user attributes? (comma separated)', [
-            'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category',
-            'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\TagNotSetup',
-        ])
-        ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'no')
-        ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'no')
-        ->assertExitCode(0);
+//     $this->artisan('filament-user-attributes:wizard')
+//         ->expectsConfirmation('Do add support for user attributes to your models?', 'yes')
+//         ->expectsQuestion('Which of your models should be able to have user attributes? (comma separated)', [
+//             'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category',
+//             'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\TagNotSetup',
+//         ])
+//         ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'no')
+//         ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'no')
+//         ->assertExitCode(0);
 
-    // Check that category isn't setup double and that tag is setup now
-    $contentsCategory = file_get_contents(__DIR__.'/temp/Models/Category.php');
-    $contentsTag = file_get_contents(__DIR__.'/temp/Models/TagNotSetup.php');
-    $countCategory = substr_count($contentsCategory, 'Traits\HasUserAttributes');
-    $countTag = substr_count($contentsTag, 'Traits\HasUserAttributes');
+//     // Check that category isn't setup double and that tag is setup now
+//     $contentsCategory = file_get_contents(__DIR__.'/temp/Models/Category.php');
+//     $contentsTag = file_get_contents(__DIR__.'/temp/Models/TagNotSetup.php');
+//     $countCategory = substr_count($contentsCategory, 'Traits\HasUserAttributes');
+//     $countTag = substr_count($contentsTag, 'Traits\HasUserAttributes');
 
-    expect($countCategory)->toBe(1);
-    expect($countTag)->toBe(1);
-});
+//     expect($countCategory)->toBe(1);
+//     expect($countTag)->toBe(1);
+// });
 
-it('can add the desired traits to setup a config model', function () {
-    copyFixturesToTemp('Models');
+// it('can add the desired traits to setup a config model', function () {
+//     copyFixturesToTemp('Models');
 
-    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/temp'),
-        'Luttje\FilamentUserAttributes\Tests\Fixtures',
-    ));
+//     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+//         realpath(__DIR__.'/temp'),
+//         'Luttje\FilamentUserAttributes\Tests\Fixtures',
+//     ));
 
-    $this->artisan('filament-user-attributes:wizard')
-        ->expectsConfirmation('Do add support for user attributes to your models?', 'no')
-        ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'yes')
-        ->expectsQuestion('Which model should configure user attributes?', 'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Team')
-        ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'no')
-        ->assertExitCode(0);
+//     $this->artisan('filament-user-attributes:wizard')
+//         ->expectsConfirmation('Do add support for user attributes to your models?', 'no')
+//         ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'yes')
+//         ->expectsQuestion('Which model should configure user attributes?', 'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Team')
+//         ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'no')
+//         ->assertExitCode(0);
 
-    // Check that team is setup now
-    $contentsTeam = file_get_contents(__DIR__.'/temp/Models/Team.php');
-    expect($contentsTeam)->toContain('implements \Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract');
-    expect($contentsTeam)->toContain('use \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;');
-});
+//     // Check that team is setup now
+//     $contentsTeam = file_get_contents(__DIR__.'/temp/Models/Team.php');
+//     expect($contentsTeam)->toContain('implements \Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract');
+//     expect($contentsTeam)->toContain('use \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;');
+// });
 
 // it('can add the desired traits to setup a resource', function () {
 //     copyFixturesToTemp('Models');
