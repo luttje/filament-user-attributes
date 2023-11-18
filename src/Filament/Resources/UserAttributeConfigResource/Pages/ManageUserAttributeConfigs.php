@@ -24,7 +24,7 @@ class ManageUserAttributeConfigs extends ManageRecords
         $resources = FilamentUserAttributes::getConfigurableResources();
 
         return [
-            Actions\Action::make('Manage user attributes')
+            Actions\Action::make(ucfirst(__('filament-user-attributes::user-attributes.manage_user_attributes')))
                 ->form([
                     Forms\Components\Select::make('resource_type')
                         ->options($resources)

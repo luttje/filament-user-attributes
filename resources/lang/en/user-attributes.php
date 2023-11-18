@@ -6,6 +6,7 @@ return [
     'checkbox_display_yes' => 'Yes',
     'common' => 'Common',
     'customizations_for' => 'Customizations for :type',
+    'manage_user_attributes' => 'Manage user attributes',
     'name_already_exists' => 'This name already exists, attributes cannot have the same name.',
     'order_sibling_help' => 'Choose the existing attribute to order this one before or after.',
     'ordering_form' => 'In Form',
@@ -18,6 +19,7 @@ return [
      * Names of the attributes that occur in fields.
      */
     'attributes' => [
+        'config' => 'config',
         'decimal_places' => 'decimal places',
         'default' => 'default',
         'format' => 'format',

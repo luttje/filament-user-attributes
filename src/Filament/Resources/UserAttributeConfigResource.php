@@ -79,6 +79,7 @@ class UserAttributeConfigResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Repeater::make('config')
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.config')))
                     ->reorderable(false)
                     ->schema([
                         ...UserAttributeComponentFactoryRegistry::getConfigurationSchemas($model),
