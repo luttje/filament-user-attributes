@@ -112,6 +112,20 @@ Finally you need to show the user attributes configuration form somewhere. That 
 </tr>
 </table>
 
+## ✏ Customizing
+
+* To modify translations, publish the translations file:
+
+    ```bash
+    php artisan vendor:publish --tag=filament-user-attributes-translations
+    ```
+
+* To modify the configuration, publish the configuration file:
+
+    ```bash
+    php artisan vendor:publish --tag=filament-user-attributes-config
+    ```
+
 ## ✨ Features
 
 - [x] Add custom attributes to any model
