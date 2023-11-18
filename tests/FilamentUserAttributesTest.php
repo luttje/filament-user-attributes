@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Config;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire\SimpleTable;
 
 it('can get resources by registering them, and then getting them', function () {
     Config::set('filament-user-attributes.discover_resources', false);
@@ -73,6 +74,12 @@ it('can transform names of discovered resources to labels', function () {
 
     expect($label)->toBe('Category Page');
     expect($resources[CategoryResource::class])->toBe('xyzCategoryResource|abc');
+});
+
+it('can transform names of discovered resources to labels even if it is not a resource', function () {
+    $label = FilamentUserAttributes::classNameToLabel(SimpleTable::class);
+
+    expect($label)->toBe('Simple Table');
 });
 
 it('can insert a text input before another in a form schema', function () {

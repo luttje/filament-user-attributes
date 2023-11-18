@@ -158,22 +158,26 @@ trait ConfiguresUserAttributes
         string $name,
         string $label,
         string $type = 'text',
-        array $options = []
+        array $customizations = []
     ): UserAttributeConfig {
         $config = $this->userAttributesConfigs()
             ->where('resource_type', $resource)
-            ->where('name', $name)
             ->first();
 
         if (!$config) {
             $config = new UserAttributeConfig();
+            $config->owner_type = get_class($this);
             $config->resource_type = $resource;
-            $config->name = $name;
         }
 
-        $config->label = $label;
-        $config->type = $type;
-        $config->options = $options;
+        $config->config = array_merge($config->config ?? [], [
+            [
+                'name' => $name,
+                'type' => $type,
+                'label' => $label,
+                'customizations' => $customizations,
+            ]
+        ]);
 
         $this->userAttributesConfigs()->save($config);
 

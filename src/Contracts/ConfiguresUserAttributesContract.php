@@ -35,6 +35,6 @@ interface ConfiguresUserAttributesContract
         string $name,
         string $label,
         string $type = 'text',
-        array $options = []
+        array $customizations = []
     ): UserAttributeConfig;
 }
