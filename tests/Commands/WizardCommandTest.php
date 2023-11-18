@@ -18,8 +18,8 @@ function copyDirectory($source, $target)
             continue;
         }
 
-        $sourcePath = "$source/$file";
-        $destination = "$target/$file";
+        $sourcePath = "$source\\$file";
+        $destination = "$target\\$file";
 
         if (is_dir($sourcePath)) {
             copyDirectory($sourcePath, $destination);
