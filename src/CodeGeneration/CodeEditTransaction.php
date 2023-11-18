@@ -30,12 +30,20 @@ class CodeEditTransaction
     private function writeBackup($originalCode)
     {
         $path = basename($this->path);
-        $this->backupPath = storage_path('filament-user-attributes/backups/' . $this->timestamp . '/' . $path);
+
+        $storagePath = storage_path('filament-user-attributes/');
+
+        $this->backupPath = $storagePath . 'backups/' . $this->timestamp . '/' . $path;
+
+        if (!is_dir($storagePath)) {
+            mkdir($storagePath, 0777, true);
+            file_put_contents($storagePath . '/.gitignore', "*\n!.gitignore");
+        }
+
         $backupDir = dirname($this->backupPath);
 
         if (!is_dir($backupDir)) {
             mkdir($backupDir, 0777, true);
-            file_put_contents($backupDir . '/.gitignore', "*\n!.gitignore");
         }
 
         file_put_contents($this->backupPath, $originalCode);
