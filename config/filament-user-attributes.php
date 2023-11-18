@@ -25,7 +25,8 @@ return [
      *   to 'ProductResource'
      *
      * The default config will transform 'App\Filament\Resources\ProductResource'
-     * to 'Product Page'
+     * to the result of Resource::getModelLabel() + Page or fall back to using
+     * the class name to end up with to 'Product Page'.
      */
     'discovery_resource_name_transformer' => Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::class . '::classNameToLabel',
 

@@ -79,6 +79,7 @@ class UserAttributeConfigResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Repeater::make('config')
+                    ->addActionLabel(__('filament-user-attributes::user-attributes.add_attribute'))
                     ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.config')))
                     ->reorderable(false)
                     ->schema([
@@ -93,8 +94,13 @@ class UserAttributeConfigResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('resource_type')
-                    ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.resource_type'))),
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.resource_type')))
+                    ->formatStateUsing(function (string $state) {
+                        $nameTransformer = config('filament-user-attributes.discovery_resource_name_transformer');
+                        return $nameTransformer($state);
+                    }),
                 Tables\Columns\TextColumn::make('config')
+                    ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.config')))
                     ->formatStateUsing(function (ArrayObject $state) {
                         return __(':count custom attributes', ['count' => count($state)]);
                     }),

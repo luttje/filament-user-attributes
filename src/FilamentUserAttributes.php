@@ -424,9 +424,17 @@ class FilamentUserAttributes
      */
     public function classNameToLabel(string $className): string
     {
+        if (method_exists($className, 'getModelLabel')) {
+            $label = $className::getModelLabel();
+
+            if (!empty($label)) {
+                return $label . ucfirst(__('filament-user-attributes::user-attributes.suffix_page'));
+            }
+        }
+
         $className = class_basename($className);
         $className = preg_replace('/(?<!^)[A-Z]/', ' $0', $className);
-        $className = preg_replace('/Resource$/', 'Page', $className);
+        $className = preg_replace('/Resource$/', ucfirst(__('filament-user-attributes::user-attributes.suffix_page')), $className);
 
         return $className;
     }
