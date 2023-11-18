@@ -21,8 +21,8 @@ return new class () extends Migration {
             $table->string('resource_type');
             $table->json('config');
 
-            // Ensure that each model can only have one set of configurations.
-            $table->unique(['owner_id', 'owner_type']);
+            // Ensure that each model can only have one set of configurations per resource.
+            $table->unique(['owner_id', 'owner_type', 'resource_type']);
 
             $table->timestamps();
         });

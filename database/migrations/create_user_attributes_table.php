@@ -8,8 +8,8 @@ return new class () extends Migration {
     public function up()
     {
         /**
-         * Contains the values for all user attributes on a resource
-         * to which a polymorphic relationship is attached.
+         * Contains the values for all user attributes on a resource to which
+         * a polymorphic relationship is attached.
          */
         Schema::create('user_attributes', function (Blueprint $table) {
             $table->id();
