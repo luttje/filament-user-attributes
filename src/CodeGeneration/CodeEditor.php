@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\CodeGeneration;
 
-use PhpParser\Error;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter;
 use PhpParser\NodeVisitor;
@@ -187,7 +186,7 @@ final class CodeEditor
     {
         if ($node instanceof \PhpParser\Node\Expr\MethodCall) {
             return self::getOriginalVariableName($node->var);
-        } else if ($node instanceof \PhpParser\Node\Expr\Variable) {
+        } elseif ($node instanceof \PhpParser\Node\Expr\Variable) {
             return $node->name;
         }
 

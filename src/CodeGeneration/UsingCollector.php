@@ -38,7 +38,7 @@ class UsingCollector extends FirstFindingVisitor
                     return true;
                 }
             }
-        } else if ($node instanceof Node\Name) {
+        } elseif ($node instanceof Node\Name) {
             if ($this->isNameEqualToFilter($node)) {
                 return true;
             }

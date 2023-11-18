@@ -144,7 +144,6 @@ it('can detect if a class does not use a trait and does not implement an interfa
     expect(CodeEditor::implementsInterface($codeWithoutTraitOrInterface, HasUserAttributesContract::class))->toBeFalse();
 });
 
-
 it('can detect if a class does not use a trait and does not implement an interface with possibly mismatched aliasing', function () use ($codeWithoutTraitOrInterface) {
     $code = <<<PHP
 <?php
@@ -214,7 +213,8 @@ it('can find a call in a deeply nested method chain', function () use ($codeWith
             }
 
             return $method;
-        });
+        }
+    );
 
     expect($found)->toBeTrue();
 });
@@ -237,7 +237,8 @@ it('can find a call in a deeply nested method chain without false positive', fun
             }
 
             return $method;
-        });
+        }
+    );
 
     expect($foundNotExisting)->toBeFalse();
 });
@@ -260,7 +261,8 @@ it('can find a call in a deeply nested method chain on $this instance after a fe
             }
 
             return $method;
-        });
+        }
+    );
 
     expect($foundThis)->toBeTrue();
 });
