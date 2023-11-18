@@ -5,7 +5,7 @@ return [
     'add_attribute' => 'Voeg attribuut toe',
     'checkbox_display_no' => 'Nee',
     'checkbox_display_yes' => 'Ja',
-    'common' => 'Gemeenschappelijk',
+    'common' => 'Algemeen',
     'customizations_for' => 'Aanpassingen voor :type',
     'manage_user_attributes' => 'Beheer attributen',
     'name_already_exists' => 'Deze naam bestaat al, attributen kunnen niet dezelfde naam hebben.',
