@@ -35,6 +35,7 @@ class CodeEditTransaction
 
         if (!is_dir($backupDir)) {
             mkdir($backupDir, 0777, true);
+            file_put_contents($backupDir . '/.gitignore', "*\n!.gitignore");
         }
 
         file_put_contents($this->backupPath, $originalCode);
