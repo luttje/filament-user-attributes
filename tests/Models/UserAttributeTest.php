@@ -4,10 +4,13 @@ namespace Luttje\FilamentUserAttributes\Tests\Models;
 
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\ProductButGuarded;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 
 it('can add a custom attribute to a new model', function () {
-    $model = Product::factory()->make();
+    $model = Product::factory()->make([
+        'name' => 'Test Product',
+    ]);
     $attributes = UserAttribute::make(['color' => 'red']);
 
     $model->user_attributes = $attributes;
@@ -20,10 +23,13 @@ it('can add a custom attribute to a new model', function () {
     expect($model->userAttributes()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
     expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->name)->toBe('Test Product');
 });
 
 it('can add arrays to a new model', function () {
-    $model = Product::factory()->make();
+    $model = Product::factory()->make([
+        'name' => 'Test Product',
+    ]);
 
     $model->user_attributes->color = 'red';
     $model->user_attributes->sizes = ['small', 'medium', 'large'];
@@ -47,6 +53,7 @@ it('can add arrays to a new model', function () {
     expect($model->getUserAttributeValue('materials'))->toMatchArray(['cotton', 'polyester']);
     expect($model->getUserAttributeValue('stock.small.cotton'))->toBe(10);
     expect($model->getUserAttributeValue('stock.medium.polyester'))->toBe(15);
+    expect($model->name)->toBe('Test Product');
 });
 
 it('can add a custom attribute to an existing model', function () {
@@ -222,4 +229,22 @@ it('can create a model with user attributes through mass assignment', function (
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
     expect($model->userAttributes->resource->id)->toBe($model->id);
     expect($model->user_attributes->key)->toBe('value');
+});
+
+it('can add a custom attribute when mass assignable filter is guarded', function () {
+    $model = new ProductButGuarded([
+        'name' => 'Test Product',
+        'slug' => 'test-product',
+        'description' => 'A cool product',
+        'price' => 10.22,
+    ]);
+
+    $model->user_attributes->key = 'value';
+    $model->save();
+
+    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
+    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->user_attributes->key)->toBe('value');
+    expect($model->name)->toBe('Test Product');
 });

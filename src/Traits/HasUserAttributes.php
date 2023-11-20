@@ -39,7 +39,9 @@ trait HasUserAttributes
             $this->with[] = 'userAttributes';
         }
 
-        $this->mergeFillable(['user_attributes']);
+        if (!empty($this->fillable)) {
+            $this->mergeFillable(['user_attributes']);
+        }
     }
 
     /**
