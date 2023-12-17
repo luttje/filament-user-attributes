@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\Config;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\SomeSubFolder\ProductResource;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire\SimpleTable;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\ProductButGuarded;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\SomeSubFolder\PriceRange;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 
 it('can get resources by registering them, and then getting them', function () {
     Config::set('filament-user-attributes.discover_resources', false);
@@ -51,6 +57,25 @@ it('can discover resources from specified app directories', function () {
 
     expect($resources)->toMatchArray([
         CategoryResource::class => 'Category Page',
+    ]);
+});
+
+it('can discover resources from specified app directories even sub folders', function () {
+    Config::set('filament-user-attributes.discover_resources', [
+        'Resources',
+        'Resources/SomeSubFolder',
+    ]);
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__.'/Fixtures/Filament'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures\Filament',
+    ));
+
+    $resources = FilamentUserAttributes::getConfigurableResources();
+
+    expect($resources)->toMatchArray([
+        CategoryResource::class => 'Category Page',
+        ProductResource::class => 'Product Page',
     ]);
 });
 
@@ -192,5 +217,47 @@ it('can insert a text column before another in a table', function () {
         $componentAge,
         $componentName,
         $componentEmail,
+    ]);
+});
+
+it('can discover models from specified app directories', function () {
+    Config::set('filament-user-attributes.discover_models', [
+        'Models',
+    ]);
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__.'/Fixtures'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures',
+    ));
+
+    $models = FilamentUserAttributes::getConfigurableModels();
+
+    expect($models)->toEqualCanonicalizing([
+        Category::class,
+        Product::class,
+        ProductButGuarded::class,
+        User::class,
+    ]);
+});
+
+it('can discover models from specified app directories even sub folders', function () {
+    Config::set('filament-user-attributes.discover_models', [
+        'Models',
+        'Models/SomeSubFolder',
+    ]);
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__.'/Fixtures'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures',
+    ));
+
+    $models = FilamentUserAttributes::getConfigurableModels();
+
+    expect($models)->toEqualCanonicalizing([
+        Category::class,
+        Product::class,
+        ProductButGuarded::class,
+        User::class,
+        PriceRange::class,
     ]);
 });

@@ -150,6 +150,25 @@ class FilamentUserAttributes
         return $config;
     }
 
+    public static function normalizePath(string $path): string
+    {
+        return str_replace('/', DIRECTORY_SEPARATOR, $path);
+    }
+
+    public static function normalizePaths(array $paths): array
+    {
+        return array_map(function ($path) {
+            return self::normalizePath($path);
+        }, $paths);
+    }
+
+    public static function normalizeClassNames(array $classNames): array
+    {
+        return array_map(function ($className) {
+            return str_replace('/', '\\', $className);
+        }, $classNames);
+    }
+
     /**
      * Returns all Resource discover paths, normalized
      */
@@ -161,9 +180,7 @@ class FilamentUserAttributes
             return false;
         }
 
-        return array_map(function ($path) {
-            return str_replace('/', DIRECTORY_SEPARATOR, $path);
-        }, $discoverPaths);
+        return self::normalizePaths($discoverPaths);
     }
 
     /**
@@ -237,7 +254,7 @@ class FilamentUserAttributes
             $resources = array_merge($resources, $resourcesForPath);
         }
 
-        return $resources;
+        return static::normalizeClassNames($resources);
     }
 
     /**
@@ -268,9 +285,9 @@ class FilamentUserAttributes
                 continue;
             }
 
-            $modelsForPath = collect(File::allFiles($path))
+            $modelsForPath = collect(File::files($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = $this->appNamespace . $targetPath . '\\' . $file->getRelativePathName();
+                    $type = $this->appNamespace . static::normalizePath($targetPath) . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
@@ -294,7 +311,7 @@ class FilamentUserAttributes
             $models = array_merge($models, $modelsForPath->toArray());
         }
 
-        return $models;
+        return self::normalizeClassNames($models);
     }
 
     /**
