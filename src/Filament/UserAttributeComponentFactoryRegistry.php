@@ -57,18 +57,8 @@ class UserAttributeComponentFactoryRegistry
                                 };
                             },
                         ])
-                        // TODO:
-                        // ->readOnly(function (Get $get, ?string $state) use ($configModel) {
-                        //     if ($state === null) {
-                        //         return false;
-                        //     }
-
-                        //     // Check if the state occurs as a name in the original configModel
-                        //     $originalConfig = collect($configModel->getOriginal('config'))
-                        //         ->filter(fn ($item) => $item['__is_concept'] !== true)
-                        //         ->pluck('name');
-                        //     return $originalConfig->contains($state);
-                        // })
+                        ->readOnlyOn('edit')
+                        ->helperText(ucfirst(__('filament-user-attributes::user-attributes.name_help')))
                         ->maxLength(255),
                     Forms\Components\Checkbox::make('required')
                         ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.required'))),

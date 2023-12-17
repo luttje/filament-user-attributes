@@ -3,6 +3,7 @@
 // translations for luttje/filament-user-attributes
 return [
     'add_attribute' => 'Attribut hinzufügen',
+    'amount' => ':amount Attribute|:amount Attribute',
     'checkbox_display_no' => 'Nein',
     'checkbox_display_yes' => 'Ja',
     'toggle_display_no' => 'Nein',
@@ -11,6 +12,7 @@ return [
     'customizations_for' => 'Anpassungen für :type',
     'manage_user_attributes' => 'Attribute verwalten',
     'name_already_exists' => 'Dieser Name existiert bereits, Attribute können nicht denselben Namen haben.',
+    'name_help' => 'Dieser Name kann nach der Erstellung nicht mehr geändert werden.',
     'order_sibling_help' => 'Wählen Sie das bestehende Attribut, um dieses davor oder danach zu ordnen.',
     'ordering_form' => 'Im Formular',
     'ordering_table' => 'In Tabelle',
