@@ -162,10 +162,15 @@ class FilamentUserAttributes
         }, $paths);
     }
 
+    public static function normalizeClassName(string $className): string
+    {
+        return str_replace('/', '\\', $className);
+    }
+
     public static function normalizeClassNames(array $classNames): array
     {
         return array_map(function ($className) {
-            return str_replace('/', '\\', $className);
+            return self::normalizeClassName($className);
         }, $classNames);
     }
 
@@ -225,7 +230,7 @@ class FilamentUserAttributes
 
             $resourcesForPath = collect(File::files($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = $this->appNamespace . $targetPath . '\\' . $file->getRelativePathName();
+                    $type = $this->appNamespace . static::normalizeClassName($targetPath) . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
@@ -254,7 +259,7 @@ class FilamentUserAttributes
             $resources = array_merge($resources, $resourcesForPath);
         }
 
-        return static::normalizeClassNames($resources);
+        return $resources;
     }
 
     /**
@@ -287,7 +292,7 @@ class FilamentUserAttributes
 
             $modelsForPath = collect(File::files($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = $this->appNamespace . static::normalizePath($targetPath) . '\\' . $file->getRelativePathName();
+                    $type = $this->appNamespace . static::normalizeClassName($targetPath) . '\\' . $file->getRelativePathName();
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
@@ -311,7 +316,7 @@ class FilamentUserAttributes
             $models = array_merge($models, $modelsForPath->toArray());
         }
 
-        return self::normalizeClassNames($models);
+        return $models;
     }
 
     /**
