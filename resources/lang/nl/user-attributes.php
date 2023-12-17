@@ -3,15 +3,15 @@
 // translations for luttje/filament-user-attributes
 return [
     'add_attribute' => 'Voeg aangepast veld toe',
-    'amount' => ':amount aangepast veld|:amount aangepast velden',
+    'amount' => ':amount aangepast veld|:amount aangepaste velden',
     'checkbox_display_no' => 'Nee',
     'checkbox_display_yes' => 'Ja',
     'toggle_display_no' => 'Nee',
     'toggle_display_yes' => 'Ja',
     'common' => 'Algemeen',
     'customizations_for' => 'Aanpassingen voor :type',
-    'manage_user_attributes' => 'Beheer aangepast velden',
-    'name_already_exists' => 'Deze naam bestaat al, aangepast velden kunnen niet dezelfde naam hebben.',
+    'manage_user_attributes' => 'Beheer aangepaste velden',
+    'name_already_exists' => 'Deze naam bestaat al, aangepaste velden kunnen niet dezelfde naam hebben.',
     'name_help' => 'Deze naam kan niet meer worden gewijzigd na aanmaak.',
     'order_sibling_help' => 'Kies het bestaande veld om dit veld ervoor of erna te ordenen.',
     'ordering_form' => 'In Formulier',
