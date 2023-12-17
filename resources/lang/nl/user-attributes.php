@@ -5,6 +5,8 @@ return [
     'add_attribute' => 'Voeg attribuut toe',
     'checkbox_display_no' => 'Nee',
     'checkbox_display_yes' => 'Ja',
+    'toggle_display_no' => 'Nee',
+    'toggle_display_yes' => 'Ja',
     'common' => 'Algemeen',
     'customizations_for' => 'Aanpassingen voor :type',
     'manage_user_attributes' => 'Beheer attributen',

@@ -5,6 +5,8 @@ return [
     'add_attribute' => 'Attribut hinzufügen',
     'checkbox_display_no' => 'Nein',
     'checkbox_display_yes' => 'Ja',
+    'toggle_display_no' => 'Nein',
+    'toggle_display_yes' => 'Ja',
     'common' => 'Allgemein',
     'customizations_for' => 'Anpassungen für :type',
     'manage_user_attributes' => 'Attribute verwalten',

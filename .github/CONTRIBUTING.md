@@ -60,13 +60,14 @@ If the project maintainer has any additional requirements, you will find them li
 2. Inside the root of this repository run composer install
 3. Create a test project in which you will use this package (Follow Usage instructions above)
 4. Add the package locally using the following additions to your composer.
+
 ```json
-	"repositories": [
-		{
-			"type": "path",
-			"url": "../filament-user-attributes"
-		}
-	],
+ "repositories": [
+  {
+   "type": "path",
+   "url": "../filament-user-attributes"
+  }
+ ],
 ```
 
 In place of `../filament-user-attributes` you should specify the path to where you cloned this package.
@@ -84,6 +85,7 @@ You can now test and modify this package. Changes will immediately be reflected 
 3. Add the credentials to the `phpunit.xml` file.
 
 4. Run the tests
+
 ```bash
 composer test
 ```
@@ -91,6 +93,7 @@ composer test
 ### Code coverage
 
 To enable code coverage install [Xdebug](https://xdebug.org/wizard) and configure it in your `php.ini` file:
+
 ```ini
 [xdebug]
 ; enables the extension:
@@ -99,7 +102,9 @@ zend_extension=xdebug
 xdebug.mode=develop,debug,coverage
 xdebug.start_with_request = yes
 ```
+
 Finally run the following command:
+
 ```bash
 composer test-coverage
 ```

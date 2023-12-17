@@ -1,4 +1,3 @@
-
 <div align="center">
 
 ![Filament User Attributes](./.github/banner.jpeg)
@@ -21,10 +20,11 @@
 Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress.
 
 > **Demonstration:** showing the creation of a custom user attribute for the 'Locations' resource of this app:
-> 
-> https://github.com/luttje/filament-user-attributes/assets/2738114/f0c070a7-2845-4e54-973d-e9d661fa55a0
-> 
+>
+> <https://github.com/luttje/filament-user-attributes/assets/2738114/f0c070a7-2845-4e54-973d-e9d661fa55a0>
+>
 > In this demonstration:
+>
 > 1. A checkbox is added and it's order in the table and form is specified.
 > 2. The checkbox is displayed in the table and form. Users can now toggle the checkbox and view the value in the table.
 
@@ -43,7 +43,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
         - SQLite 3.38 or higher
 
 2. Install the [package via composer](https://packagist.org/packages/luttje/filament-user-attributes):
-    
+
     ```bash
     composer require luttje/filament-user-attributes
     ```
@@ -67,7 +67,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     - Setup a model that can configure the user attributes for each user (e.g. a user or tenant model)
     - Setup resources that the configuration model can configure custom attributes for
 
-Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
+    Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
 5. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
@@ -92,7 +92,7 @@ Finally you need to show the user attributes configuration form somewhere. That 
 > ![](./.github/screenshot-management-form.png)
 >
 > The configured custom attributes are (optionally) added to the resource form and table:
-> 
+>
 > ![](./.github/screenshot-resulting-form.png)
 
 <table align="center">
@@ -117,13 +117,13 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 ## ✏ Customizing
 
-* To modify translations, publish the translations file:
+- To modify translations, publish the translations file:
 
     ```bash
     php artisan vendor:publish --tag=filament-user-attributes-translations
     ```
 
-* To modify the configuration, publish the configuration file:
+- To modify the configuration, publish the configuration file:
 
     ```bash
     php artisan vendor:publish --tag=filament-user-attributes-config
@@ -138,11 +138,11 @@ Finally you need to show the user attributes configuration form somewhere. That 
 - [x] Easily display the attributes in a Filament table
 - [x] Sensible validations for input types
 - [x] Allow users to specify order of attributes
-    - [x] In the form
-    - [x] In the table
+  - [x] In the form
+  - [x] In the table
 - [x] Allow users to hide attributes
-    - [x] In the form
-    - [x] In the table
+  - [x] In the form
+  - [x] In the table
 - [x] User interface for managing user attributes
 - [x] Support for Tabs and Sections in the form
 - [x] Wizard command to help you setup your project code
@@ -152,29 +152,31 @@ Finally you need to show the user attributes configuration form somewhere. That 
 - [x] Text
 - [x] Textarea
 - [x] Number
-    - [x] Integer
-    - [x] Decimal
-    - [x] Specific range
-    - [x] Specific decimal places
+  - [x] Integer
+  - [x] Decimal
+  - [x] Specific range
+  - [x] Specific decimal places
 - [x] Select
-    - [x] Specific options
-    - [ ] From an existing model property
+  - [x] Specific options
+  - [ ] From an existing model property
 - [x] Radio
-    - [x] Specific options
-    - [ ] From an existing model property
+  - [x] Specific options
+  - [ ] From an existing model property
 - [x] Tags
-    - [x] With suggestions
+  - [x] With suggestions
 - [x] Date
-    - [x] Date
-    - [x] Time
-    - [x] Date and time
+  - [x] Date
+  - [x] Time
+  - [x] Date and time
 - [x] Checkbox
-    - [x] With default
+  - [x] With default
+- [x] Toggle
+  - [x] With default
 - [ ] File
-    - [ ] Image
-    - [ ] PDF
-    - [ ] Other
-    - [ ] Preview
+  - [ ] Image
+  - [ ] PDF
+  - [ ] Other
+  - [ ] Preview
 - [ ] Color
 
 ## ❤ Contributing

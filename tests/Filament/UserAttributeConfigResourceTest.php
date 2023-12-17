@@ -163,16 +163,16 @@ it('can configure a number input with min, max and decimal places', function () 
     ], $user);
 });
 
-it('can configure a checkbox input user attribute for a resource', function () {
+it('can configure a binary input user attribute for a resource', function ($inputType) {
     $user = User::factory()
         ->create();
 
     $config = createUserAttributeConfig($this, $user, CategoryResource::class, [
-        function ($id, $component) {
+        function ($id, $component) use ($inputType) {
             $component->fillForm([
                 "config.$id.name" => 'custom_attribute_1',
                 "config.$id.label" => 'Terms and Service',
-                "config.$id.type" => 'checkbox',
+                "config.$id.type" => $inputType,
                 "config.$id.customizations.default" => true,
             ]);
         },
@@ -181,12 +181,12 @@ it('can configure a checkbox input user attribute for a resource', function () {
     assertUserAttributeConfig($config, [
         'name' => 'custom_attribute_1',
         'label' => 'Terms and Service',
-        'type' => 'checkbox',
+        'type' => $inputType,
         'customizations' => [
             'default' => true,
         ],
     ], $user);
-});
+})->with(['checkbox', 'toggle']);
 
 it('can configure a select/radio input user attribute for a resource', function (string $inputType) {
     $user = User::factory()

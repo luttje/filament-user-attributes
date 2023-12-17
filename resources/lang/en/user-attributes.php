@@ -5,6 +5,8 @@ return [
     'add_attribute' => 'Add attribute',
     'checkbox_display_no' => 'No',
     'checkbox_display_yes' => 'Yes',
+    'toggle_display_no' => 'No',
+    'toggle_display_yes' => 'Yes',
     'common' => 'Common',
     'customizations_for' => 'Customizations for :type',
     'manage_user_attributes' => 'Manage user attributes',

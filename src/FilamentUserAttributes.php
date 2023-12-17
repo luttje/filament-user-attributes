@@ -96,6 +96,7 @@ class FilamentUserAttributes
 
         UserAttributeComponentFactoryRegistry::register('select', \Luttje\FilamentUserAttributes\Filament\Factories\SelectComponentFactory::class);
         UserAttributeComponentFactoryRegistry::register('checkbox', \Luttje\FilamentUserAttributes\Filament\Factories\CheckboxComponentFactory::class);
+        UserAttributeComponentFactoryRegistry::register('toggle', \Luttje\FilamentUserAttributes\Filament\Factories\ToggleComponentFactory::class);
         UserAttributeComponentFactoryRegistry::register('radio', \Luttje\FilamentUserAttributes\Filament\Factories\RadioComponentFactory::class);
 
         UserAttributeComponentFactoryRegistry::register('datetime', \Luttje\FilamentUserAttributes\Filament\Factories\DateTimeComponentFactory::class);
@@ -318,7 +319,7 @@ class FilamentUserAttributes
             }
         }
 
-        throw new \Exception("Could not find the file for resource '$resource'.");
+        throw new \Exception("Could not find the file for resource '$resource'. Did you forget to add it's directory to the 'filament-user-attributes.discover_resources' config option?");
     }
 
     /**
@@ -343,7 +344,7 @@ class FilamentUserAttributes
             }
         }
 
-        throw new \Exception("Could not find the file for model '$model'.");
+        throw new \Exception("Could not find the file for model '$model'. Did you forget to add it's directory to the 'filament-user-attributes.discover_models' config option?");
     }
 
     /**
