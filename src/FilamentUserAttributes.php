@@ -489,7 +489,7 @@ class FilamentUserAttributes
             }
         }
 
-        if (!$siblingFound) {
+        if (!$siblingFound && $parentLabel === null) {
             $newComponents[] = $componentToAdd;
         }
 
