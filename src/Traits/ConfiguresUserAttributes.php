@@ -6,6 +6,7 @@ use Filament\Forms\Components\Field;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
@@ -51,7 +52,8 @@ trait ConfiguresUserAttributes
             }
 
             $type = $userAttribute['type'];
-            $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $resource);
+            $model = FilamentUserAttributes::getModelFromResource($resource);
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $model);
 
             if (!isset($factory)) {
                 throw new \Exception("The user attribute type '{$type}' is not yet supported.");
@@ -100,7 +102,8 @@ trait ConfiguresUserAttributes
             }
 
             $type = $userAttribute['type'];
-            $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $resource);
+            $model = FilamentUserAttributes::getModelFromResource($resource);
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $model);
 
             if (!isset($factory)) {
                 throw new \Exception("The user attribute type '{$type}' is not yet supported.");
@@ -140,6 +143,7 @@ trait ConfiguresUserAttributes
             $config = new UserAttributeConfig();
             $config->owner_type = get_class($this);
             $config->resource_type = $resource;
+            $config->model_type = FilamentUserAttributes::getModelFromResource($resource);
         }
 
         $config->config = array_merge($config->config ?? [], [

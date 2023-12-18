@@ -15,7 +15,7 @@ function createUserWithAttributeConfigs($attributesConfig)
         array_merge(
             [
                 'resource_type' => CategoryResource::class,
-                // TODO: Use a scope for always set this:
+                'model_type' => Category::class,
                 'owner_type' => get_class($user),
             ],
             $attributesConfig

@@ -13,4 +13,6 @@ interface UserAttributesConfigContract
     public static function getFieldsForOrdering(): array;
 
     public static function getColumnsForOrdering(): array;
+
+    public static function getModel(): string;
 }

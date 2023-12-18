@@ -15,7 +15,7 @@ it('can render a form with configured user attributes', function () {
     $user->userAttributesConfigs()->create(
         [
             'resource_type' => ConfiguredManageComponent::class,
-            // TODO: Use a scope for always set this:
+            'model_type' => Product::class,
             'owner_type' => get_class($user),
             'config' => [
                 [

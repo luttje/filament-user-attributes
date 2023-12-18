@@ -31,6 +31,11 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable,
         $this->form->fill();
     }
 
+    public static function getModel(): string
+    {
+        return Product::class;
+    }
+
     public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */

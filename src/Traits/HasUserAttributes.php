@@ -88,22 +88,32 @@ trait HasUserAttributes
             }
 
             if (!empty($model->dirtyUserAttributes)) {
-                // If the model already has user attributes, merge them, otherwise create a new record
-                if ($model->userAttribute()->exists()) {
-                    $newValues = array_merge($model->userAttribute->values->toArray(), $model->dirtyUserAttributes);
-                    $model->userAttribute->values = $newValues;
-                    $model->userAttribute->save();
-                } else {
-                    $model->userAttribute()->create(['values' => $model->dirtyUserAttributes]);
-
-                    // Ensure that the user attributes are dirty for the next time the model is used.
-                    //$model->unsetRelation('userAttribute'); ?/ This was here because I accidentally fetched the relationship, just before creating it. Causing it to be set as null (and then not updated after save)
-                }
+                $model->saveAllUserAttributes($model->dirtyUserAttributes);
 
                 // Clear the delayed attributes as they are now saved
                 $model->dirtyUserAttributes = [];
             }
         });
+    }
+
+    /**
+     * Saves all user attributes.
+     *
+     * @param  array  $attributes
+     */
+    public function saveAllUserAttributes(array $attributes)
+    {
+        // If the model already has user attributes, merge them, otherwise create a new record
+        if ($this->userAttribute()->exists()) {
+            $newValues = array_merge($this->userAttribute->values->toArray(), $attributes);
+            $this->userAttribute->values = $newValues;
+            $this->userAttribute->save();
+        } else {
+            $this->userAttribute()->create(['values' => $attributes]);
+
+            // Ensure that the user attributes are dirty for the next time the model is used.
+            //$this->unsetRelation('userAttribute'); ?/ This was here because I accidentally fetched the relationship, just before creating it. Causing it to be set as null (and then not updated after save)
+        }
     }
 
     /**
@@ -115,11 +125,11 @@ trait HasUserAttributes
     }
 
     /**
-     * Relationship to the user attributes resource.
+     * Relationship to the user attributes model.
      */
     public function userAttribute(): MorphOne
     {
-        return $this->morphOne(UserAttribute::class, 'resource');
+        return $this->morphOne(UserAttribute::class, 'model');
     }
 
     public function hasUserAttribute(string $key): bool
@@ -174,7 +184,7 @@ trait HasUserAttributes
     public static function getUserAttributeQuery(): Builder
     {
         return UserAttribute::query()
-            ->where('resource_type', static::class);
+            ->where('model_type', static::class);
     }
 
     public static function allUserAttributes(string $key)
@@ -190,7 +200,7 @@ trait HasUserAttributes
     public static function userAttributeSum(string $path): int
     {
         return UserAttribute::query()
-            ->where('resource_type', static::class)
+            ->where('model_type', static::class)
             ->sum('values->' . $path);
     }
 

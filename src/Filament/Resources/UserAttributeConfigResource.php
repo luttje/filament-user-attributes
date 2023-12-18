@@ -3,7 +3,6 @@
 namespace Luttje\FilamentUserAttributes\Filament\Resources;
 
 use Filament\Forms;
-use Filament\Forms\Set;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -39,7 +38,6 @@ class UserAttributeConfigResource extends Resource
                 continue;
             }
 
-            // TODO: Use a scope for always set this
             $query->where('owner_type', get_class($config))
                 ->where('owner_id', $config->getKey());
 
@@ -65,8 +63,11 @@ class UserAttributeConfigResource extends Resource
                 ->first();
 
             if (!$userAttributeConfigs) {
+                $modelType = FilamentUserAttributes::getModelFromResource($resource);
+
                 $userAttributeConfigs = UserAttributeConfig::create([
                     'resource_type' => $resource,
+                    'model_type' => $modelType,
                     'owner_type' => get_class($config),
                     'owner_id' => $config->id,
                     'config' => [],

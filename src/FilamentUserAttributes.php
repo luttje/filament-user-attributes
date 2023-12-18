@@ -9,11 +9,13 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Tables\Columns\Column;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
+use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
 /**
@@ -30,6 +32,11 @@ class FilamentUserAttributes
      * @var array|Closure List of registered resources or a closure that returns resources.
      */
     protected array | Closure $registeredResources = [];
+
+    /**
+     * @var array List of registered user attribute config components.
+     */
+    protected array $registeredConfigComponents = [];
 
     /**
      * @var array|null Cached list of discovered resources.
@@ -113,6 +120,36 @@ class FilamentUserAttributes
         UserAttributeComponentFactoryRegistry::register('radio', \Luttje\FilamentUserAttributes\Filament\Factories\RadioComponentFactory::class);
 
         UserAttributeComponentFactoryRegistry::register('datetime', \Luttje\FilamentUserAttributes\Filament\Factories\DateTimeComponentFactory::class);
+    }
+
+    /**
+     * Register a custom filament form component to be added to the user attributes configuration form.
+     */
+    public function registerUserAttributeConfigComponent(Component|Closure $component): void
+    {
+        $this->registeredConfigComponents[] = $component;
+    }
+
+    /**
+     * Returns all registered user attribute config components.
+     */
+    public function getUserAttributeConfigComponents(UserAttributeConfig $configModel): array
+    {
+        $components = [];
+
+        foreach ($this->registeredConfigComponents as $component) {
+            if ($component instanceof Closure) {
+                $component = $component($configModel);
+            }
+
+            if (!$component) {
+                continue;
+            }
+
+            $components[] = $component;
+        }
+
+        return $components;
     }
 
     /**
@@ -672,5 +709,42 @@ class FilamentUserAttributes
         $className = trans_choice('validation.attributes.' . Str::snake($className), $amount);
 
         return $className;
+    }
+
+    /**
+     * Tries to get a model from the given resource class through the getModel method.
+     * If the getModel method is not found, the user is informed on how to properly
+     * implement Livewire components.
+     */
+    public function getModelFromResource(string $resource): string
+    {
+        if (!method_exists($resource, 'getModel')) {
+            throw new \Exception("The resource '$resource' does not implement the getModel method. If you are using a Livewire component, you need to implement the static getModel method yourself.");
+        }
+
+        $model = $resource::getModel();
+
+        if ($model === null) {
+            throw new \Exception("The resource '$resource' did not return a model from the static getModel function (or it was null).");
+        }
+
+        return $model;
+    }
+
+    /**
+     * Gets all resources mapped by their models
+     */
+    public function getResourcesByModel(): Collection
+    {
+        $resources = $this->getConfigurableResources();
+        $modelsMappedToResources = collect($resources)
+            ->filter(function ($name, string $class) {
+                return method_exists($class, 'getModel');
+            })
+            ->mapWithKeys(function ($name, string $class) {
+                return [$this->getModelFromResource($class) => $class];
+            });
+
+        return $modelsMappedToResources;
     }
 }
