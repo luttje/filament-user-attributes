@@ -58,14 +58,61 @@ The following snippet shows how to get the config with all related user attribut
 
 ```php
 $configs = UserAttributeConfig::queryByConfig('should_import', true)
-    ->with('userAttributes')
+    ->with('userAttributes.model')
+    ->get();
+
+// You'll get all the user attributes, so you still have to filter out those of other tenants.
+```
+
+And this snippet checks if there's a config with a `config` key using `queryByConfigKey`, it also limits to the current tenant:
+
+```php
+$tenant = user()->tenant ?? Filament::getTenant();
+$configs = UserAttributeConfig::queryByConfigKey('import')
+    ->where('owner_id', $tenant->id)
+    ->where('owner_type', get_class($tenant))
+    ->with('userAttributes.model')
     ->get();
 ```
 
-And this snippet checks if there's a config with a `config` key:
+## 📝 Add custom user attribute configuration fields
+
+You can use `FilamentUserAttributes::registerUserAttributeConfigComponent($callbackOrComponent)` to add custom fields to the user attribute configuration form. This is useful if you want to add custom fields to the user attribute configuration form in `Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource`, but don't want to create a whole new resource for it.
 
 ```php
-$configs = UserAttributeConfig::queryByConfigKey('import')
-    ->with('userAttributes')
-    ->get();
+use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Fieldset;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
+use Illuminate\Support\ServiceProvider;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
+
+class AppServiceProvider extends ServiceProvider
+{
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        // ...
+
+        FilamentUserAttributes::registerUserAttributeConfigComponent(function(UserAttributeConfig $configModel) {
+            if ($configModel->model_type !== Product::class) {
+                return null;
+            }
+
+            return Fieldset::make(__('Import Settings'))
+                ->schema([
+                    Checkbox::make('import_enabled')
+                        ->label(__('Enable import'))
+                        ->default(false)
+                        ->live(),
+                    TextInput::make('import_name')
+                        ->label(__('Name in import file'))
+                        ->hidden(fn(Get $get) => !$get('import_enabled'))
+                        ->default(''),
+                ]);
+        });
+    }
+}
 ```

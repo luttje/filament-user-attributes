@@ -200,6 +200,12 @@ class UserAttributeComponentFactoryRegistry
                     ])
             ]);
 
+        $customConfigFields = FilamentUserAttributes::getUserAttributeConfigComponents($configModel);
+
+        foreach ($customConfigFields as $customConfigField) {
+            $schemas[] = $customConfigField;
+        }
+
         foreach (static::$factories as $type => $factoryClass) {
             /** @var UserAttributeComponentFactoryInterface */
             $factory = new $factoryClass($configModel->model_type);

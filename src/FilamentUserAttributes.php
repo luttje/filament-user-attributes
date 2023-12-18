@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
+use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
 /**
@@ -31,6 +32,11 @@ class FilamentUserAttributes
      * @var array|Closure List of registered resources or a closure that returns resources.
      */
     protected array | Closure $registeredResources = [];
+
+    /**
+     * @var array List of registered user attribute config components.
+     */
+    protected array $registeredConfigComponents = [];
 
     /**
      * @var array|null Cached list of discovered resources.
@@ -114,6 +120,36 @@ class FilamentUserAttributes
         UserAttributeComponentFactoryRegistry::register('radio', \Luttje\FilamentUserAttributes\Filament\Factories\RadioComponentFactory::class);
 
         UserAttributeComponentFactoryRegistry::register('datetime', \Luttje\FilamentUserAttributes\Filament\Factories\DateTimeComponentFactory::class);
+    }
+
+    /**
+     * Register a custom filament form component to be added to the user attributes configuration form.
+     */
+    public function registerUserAttributeConfigComponent(Component|Closure $component): void
+    {
+        $this->registeredConfigComponents[] = $component;
+    }
+
+    /**
+     * Returns all registered user attribute config components.
+     */
+    public function getUserAttributeConfigComponents(UserAttributeConfig $configModel): array
+    {
+        $components = [];
+
+        foreach ($this->registeredConfigComponents as $component) {
+            if ($component instanceof Closure) {
+                $component = $component($configModel);
+            }
+
+            if (!$component) {
+                continue;
+            }
+
+            $components[] = $component;
+        }
+
+        return $components;
     }
 
     /**
