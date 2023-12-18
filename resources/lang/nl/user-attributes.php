@@ -4,8 +4,8 @@
 return [
     'add_attribute' => 'Voeg aangepast veld toe',
     'amount' => ':amount aangepast veld|:amount aangepaste velden',
-    'checkbox_display_no' => 'Nee',
-    'checkbox_display_yes' => 'Ja',
+    'boolean_component_display_no' => 'Nee',
+    'boolean_component_display_yes' => 'Ja',
     'common' => 'Algemeen',
     'customizations_for' => 'Aanpassingen voor :type',
     'default_value_config' => 'Standaardwaarde configuratie',
@@ -24,8 +24,6 @@ return [
     'select_sibling' => 'Selecteer naastgelegen veld',
     'suffix_page' => ' Pagina',
     'suggestions_help' => "Door komma's gescheiden lijst van suggesties voor de gebruiker om uit te kiezen.",
-    'toggle_display_no' => 'Nee',
-    'toggle_display_yes' => 'Ja',
 
     /**
      * Short names of relationships.

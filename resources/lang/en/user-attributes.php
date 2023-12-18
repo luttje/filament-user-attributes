@@ -4,8 +4,8 @@
 return [
     'add_attribute' => 'Add attribute',
     'amount' => ':amount attribute|:amount attributes',
-    'checkbox_display_no' => 'No',
-    'checkbox_display_yes' => 'Yes',
+    'boolean_component_display_no' => 'No',
+    'boolean_component_display_yes' => 'Yes',
     'common' => 'Common',
     'customizations_for' => 'Customizations for :type',
     'default_value_config' => 'Default value configuration',
@@ -24,8 +24,6 @@ return [
     'select_sibling' => 'Select sibling',
     'suffix_page' => ' Page',
     'suggestions_help' => 'Comma separated list of suggestions for the user to choose from.',
-    'toggle_display_no' => 'No',
-    'toggle_display_yes' => 'Yes',
 
     /**
      * Short names of relationships.

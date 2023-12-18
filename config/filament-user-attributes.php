@@ -49,4 +49,10 @@ return [
      * use the HasUserAttributes trait.
      */
     'eager_load_user_attributes' => false,
+
+    /**
+     * Whether to use IconColumn (true) or UserAttributeColumn (false) for
+     * showing boolean user attributes in tables (like Toggle and Checkbox).
+     */
+    'use_icons_for_boolean_components' => true,
 ];

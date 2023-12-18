@@ -4,8 +4,8 @@
 return [
     'add_attribute' => 'Attribut hinzufügen',
     'amount' => ':amount Attribute|:amount Attribute',
-    'checkbox_display_no' => 'Nein',
-    'checkbox_display_yes' => 'Ja',
+    'boolean_component_display_no' => 'Nein',
+    'boolean_component_display_yes' => 'Ja',
     'common' => 'Allgemein',
     'customizations_for' => 'Anpassungen für :type',
     'default_value_config' => 'Standardwertkonfiguration',
@@ -24,8 +24,6 @@ return [
     'select_sibling' => 'Nebenattribut auswählen',
     'suffix_page' => ' Seite',
     'suggestions_help' => 'Durch Kommas getrennte Liste von Vorschlägen für den Benutzer zur Auswahl.',
-    'toggle_display_no' => 'Nein',
-    'toggle_display_yes' => 'Ja',
 
     /**
      * Short names of relationships.
