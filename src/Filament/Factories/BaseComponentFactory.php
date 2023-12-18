@@ -20,37 +20,24 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
 
     private function makeInheritedDefault(array $userAttribute, mixed $default = null): Closure
     {
-        // TODO: SHould we support situations where a relation exists, but no form field is shown for it.
-        // TODO: We currently only support relations that have a form field e.g: relation customer needs customer_id field
         return function (?Model $record, Get $get) use ($userAttribute, $default) {
-            $relatedField = $get($userAttribute['inherit_relation']);
-            $related = null;
+            if ($record !== null) {
+                $default = data_get($record, $userAttribute['inherit_relation'] . '.' . $userAttribute['inherit_attribute']);
+            } else {
+                // TODO: Should we support situations where a relation exists, but no form field is shown for it.
+                // TODO: We currently only support relations that have a form field e.g: relation customer needs customer(_id) field
+                $relatedField = $get($userAttribute['inherit_relation']);
 
-            if ($record && !str_starts_with($userAttribute['inherit_attribute'], 'user_attributes.')) {
-                $related = $record->{$userAttribute['inherit_relation']};
+                if (!$relatedField) {
+                    $relatedField = $get($userAttribute['inherit_relation'] . '_id');
+                }
 
-                dd($related);
-            }
-
-            if (!$relatedField) {
-                $relatedField = $get($userAttribute['inherit_relation'] . '_id');
-            }
-
-            if ($relatedField != null) {
-                $record = $this->resource::getModel(); // TODO: Support Livewire components (which don't have the getModel method)
-                $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
-                $related = ($inheritRelationInfo->relatedType)::find($relatedField);
-            }
-
-            if ($related) {
-                // Get user attributes differently
-                if (str_starts_with($userAttribute['inherit_attribute'], 'user_attributes.')) {
-                    $attribute = str_replace('user_attributes.', '', $userAttribute['inherit_attribute']);
-                    $default = $related->user_attributes->{$attribute};
-                } else {
+                if ($relatedField != null) {
+                    $record = $this->resource::getModel(); // TODO: Support Livewire components (which don't have the getModel method)
+                    $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
+                    $related = ($inheritRelationInfo->relatedType)::find($relatedField);
                     $default = data_get($related, $userAttribute['inherit_attribute']);
                 }
-                // TODO: How do we handle relations (e.g: where statePath is customer.address.street)?
             }
 
             return $default;

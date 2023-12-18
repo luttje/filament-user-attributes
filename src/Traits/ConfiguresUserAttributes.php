@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
