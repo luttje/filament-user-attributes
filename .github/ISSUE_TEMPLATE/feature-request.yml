@@ -1,0 +1,31 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for the Package
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We're always looking for ways to improve our Package. Can you help us by providing the following details.
+  - type: textarea
+    id: what-feature
+    attributes:
+      label: What feature would you like to see?
+      description: What would you like to see added to the Package?
+      placeholder: I would like to see X added to the Package.
+    validations:
+      required: true
+  - type: textarea
+    id: why-feature
+    attributes:
+      label: Why do you want this feature?
+      description: Why do you want this feature added to the Package?
+      placeholder: I want this feature added to the Package because X.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Use this field to provide any other notes that you feel might be relevant to the issue.
+    validations:
+      required: false
