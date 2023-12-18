@@ -122,7 +122,7 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 ## 🎈 Filament Livewire Components
 
-Filament Livewire components work roughly the same. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
+Filament Livewire components work roughly the same, but you additionally need to implement a static `getModel` method that returns the model class that should be used for the component. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
 
 ```php
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
@@ -140,6 +140,11 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     public function mount(): void
     {
         $this->form->fill();
+    }
+    
+    public static function getModel(): string
+    {
+        return Product::class;
     }
 
     public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract

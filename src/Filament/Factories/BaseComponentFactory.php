@@ -15,7 +15,7 @@ use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterfac
 abstract class BaseComponentFactory implements UserAttributeComponentFactoryInterface
 {
     public function __construct(
-        protected string $resource
+        protected string $modelType
     ) {
         //
     }
@@ -45,7 +45,7 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 }
 
                 if ($relatedField !== null) {
-                    $record = $this->resource::getModel(); // TODO: Support Livewire components (which don't have the getModel method)
+                    $record = $this->modelType;
                     $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
                     $related = ($inheritRelationInfo->relatedType)::find($relatedField);
                     $default = data_get($related, $userAttribute['inherit_attribute']);

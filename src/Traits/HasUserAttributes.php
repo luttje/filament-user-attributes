@@ -115,11 +115,11 @@ trait HasUserAttributes
     }
 
     /**
-     * Relationship to the user attributes resource.
+     * Relationship to the user attributes model.
      */
     public function userAttribute(): MorphOne
     {
-        return $this->morphOne(UserAttribute::class, 'resource');
+        return $this->morphOne(UserAttribute::class, 'model');
     }
 
     public function hasUserAttribute(string $key): bool
@@ -174,7 +174,7 @@ trait HasUserAttributes
     public static function getUserAttributeQuery(): Builder
     {
         return UserAttribute::query()
-            ->where('resource_type', static::class);
+            ->where('model_type', static::class);
     }
 
     public static function allUserAttributes(string $key)
@@ -190,7 +190,7 @@ trait HasUserAttributes
     public static function userAttributeSum(string $path): int
     {
         return UserAttribute::query()
-            ->where('resource_type', static::class)
+            ->where('model_type', static::class)
             ->sum('values->' . $path);
     }
 

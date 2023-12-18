@@ -19,6 +19,7 @@ return new class () extends Migration {
 
             // The resource or component to which the configurations apply.
             $table->string('resource_type');
+            $table->string('model_type'); // For easy matching to the user_attributes table
             $table->json('config');
 
             // Ensure that each model can only have one set of configurations per resource.

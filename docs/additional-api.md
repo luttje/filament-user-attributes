@@ -51,3 +51,21 @@ Besides using the package as described in the [README](../README.md) you can als
     ```
 
 > You'll find all the attributes in the `user_attributes` table of your database. However you don't have to worry about it's existence. The `HasUserAttributes` trait handles all the database interactions for you.
+
+## 🔎 Querying by config value
+
+The following snippet shows how to get the config with all related user attributes that have the config value `should_import` set to `true`:
+
+```php
+$configs = UserAttributeConfig::queryByConfig('should_import', true)
+    ->with('userAttributes')
+    ->get();
+```
+
+And this snippet checks if there's a config with a `config` key:
+
+```php
+$configs = UserAttributeConfig::queryByConfigKey('import')
+    ->with('userAttributes')
+    ->get();
+```

@@ -2,6 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes\Facades;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -24,6 +25,9 @@ use Illuminate\Support\Facades\Facade;
  * @method static array mergeCustomTableColumns(array $columns, $resource)
  * @method static string classNameToLabel(string $className)
  * @method static string classNameToModelLabel(string $className)
+ * @method static string getModelFromResource(string $resource)
+ * @method static Collection getResourcesByModel(string $resource)
+ *
  *
  * @see \Luttje\FilamentUserAttributes\FilamentUserAttributes
  */

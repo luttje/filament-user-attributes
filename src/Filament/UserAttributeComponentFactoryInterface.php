@@ -7,7 +7,7 @@ use Filament\Tables\Columns\Column;
 
 interface UserAttributeComponentFactoryInterface
 {
-    public function __construct(string $resource);
+    public function __construct(string $modelType);
 
     public function makeColumn(array $userAttribute): Column;
 

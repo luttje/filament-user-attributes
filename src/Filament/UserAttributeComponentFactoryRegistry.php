@@ -32,13 +32,13 @@ class UserAttributeComponentFactoryRegistry
         static::$factories[$type] = $factory;
     }
 
-    public static function getFactory(string $type, string $resource): UserAttributeComponentFactoryInterface
+    public static function getFactory(string $type, string $modelType): UserAttributeComponentFactoryInterface
     {
         if (!isset(static::$factories[$type])) {
             throw new \Exception("Factory for type {$type} not registered.");
         }
 
-        return new static::$factories[$type]($resource);
+        return new static::$factories[$type]($modelType);
     }
 
     public static function getRegisteredTypes(): array
@@ -52,25 +52,11 @@ class UserAttributeComponentFactoryRegistry
      */
     public static function getInheritRelationOptions(UserAttributeConfig $configModel): array
     {
-        $resourceClass = $configModel->resource_type;
-        $resourceClassParents = class_parents($resourceClass);
-
-        if (!in_array(\Filament\Resources\Resource::class, $resourceClassParents)) {
-            // TODO: Support Livewire components
-            return [];
-        }
-
-        // TODO: CLean this up, possibly moving it somewhere else
+        // TODO: Clean this up, possibly moving it somewhere else
         $resources = FilamentUserAttributes::getConfigurableResources();
-        $modelsMappedToResources = collect($resources)
-            ->filter(function ($name, string $class) {
-                return method_exists($class, 'getModel');
-            })
-            ->mapWithKeys(function ($name, string $class) {
-                return [$class::getModel() => $class];
-            });
+        $modelsMappedToResources = FilamentUserAttributes::getResourcesByModel();
 
-        $model = $resourceClass::getModel();
+        $model = $configModel->model_type;
         $relations = [];
 
         $self = new EloquentHelperRelationshipInfo();
@@ -137,7 +123,6 @@ class UserAttributeComponentFactoryRegistry
                                 };
                             },
                         ])
-                        ->readOnlyOn('edit')
                         ->helperText(ucfirst(__('filament-user-attributes::user-attributes.name_help')))
                         ->maxLength(255),
                     Forms\Components\Select::make('type')
@@ -183,9 +168,9 @@ class UserAttributeComponentFactoryRegistry
                                 }
 
                                 if ($inheritRelationName === '__self') {
-                                    $inheritRelatedModelType = $configModel->resource_type::getModel();
+                                    $inheritRelatedModelType = $configModel->model_type;
                                 } else {
-                                    $model = $configModel->resource_type::getModel();
+                                    $model = $configModel->model_type;
                                     $inheritRelationInfo = EloquentHelper::getRelationInfo($model, $inheritRelationName);
 
                                     if (!$inheritRelationInfo) {
@@ -195,14 +180,7 @@ class UserAttributeComponentFactoryRegistry
                                     $inheritRelatedModelType = $inheritRelationInfo->relatedType;
                                 }
 
-                                $resources = FilamentUserAttributes::getConfigurableResources();
-                                $resource = collect($resources)
-                                    ->filter(function ($name, string $class) {
-                                        return method_exists($class, 'getModel');
-                                    })
-                                    ->mapWithKeys(function ($name, string $class) {
-                                        return [$class::getModel() => $class];
-                                    })
+                                $resource = FilamentUserAttributes::getResourcesByModel()
                                     ->filter(function ($class, $model) use ($inheritRelatedModelType) {
                                         return $model === $inheritRelatedModelType;
                                     })
@@ -224,7 +202,7 @@ class UserAttributeComponentFactoryRegistry
 
         foreach (static::$factories as $type => $factoryClass) {
             /** @var UserAttributeComponentFactoryInterface */
-            $factory = new $factoryClass($configModel->resource_type);
+            $factory = new $factoryClass($configModel->model_type);
             $factorySchema = $factory->makeConfigurationSchema();
 
             $schemas[] = Forms\Components\Fieldset::make('customizations_for_' . $type)

@@ -15,9 +15,9 @@ class UserAttribute extends Model
         'values' => AsArrayObject::class,
     ];
 
-    public function resource()
+    public function model()
     {
-        return $this->morphTo(__FUNCTION__, 'resource_type', 'resource_id');
+        return $this->morphTo();
     }
 
     public static function make(array $values): object
