@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $owner_type
  * @property string $owner_id
  * @property string $resource_type
+ * @property string $model_type
  * @property array $config
  */
 class UserAttributeConfig extends Model

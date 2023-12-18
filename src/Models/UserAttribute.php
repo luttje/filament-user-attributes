@@ -5,6 +5,11 @@ namespace Luttje\FilamentUserAttributes\Models;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property string $model_type
+ * @property string $model_id
+ * @property array $values
+ */
 class UserAttribute extends Model
 {
     protected $fillable = [

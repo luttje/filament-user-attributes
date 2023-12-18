@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static string classNameToLabel(string $className)
  * @method static string classNameToModelLabel(string $className)
  * @method static string getModelFromResource(string $resource)
- * @method static Collection getResourcesByModel(string $resource)
+ * @method static Collection getResourcesByModel()
  *
  *
  * @see \Luttje\FilamentUserAttributes\FilamentUserAttributes
