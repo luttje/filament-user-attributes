@@ -166,7 +166,6 @@ class UserAttributeComponentFactoryRegistry
                                     return [];
                                 }
 
-                                // $inheritRelationName is the method name, check if it's a relation, then get the related model
                                 $model = $configModel->resource_type::getModel();
                                 $inheritRelationInfo = EloquentHelper::getRelationInfo($model, $inheritRelationName);
 

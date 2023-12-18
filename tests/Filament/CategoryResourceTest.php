@@ -86,7 +86,7 @@ it('can render a resource with configured user attributes', function () {
         ->assertSeeInOrder(['red', 'blue', 'green']);
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');
@@ -119,7 +119,7 @@ it('can render a resource with configured user attribute which is hidden in the 
         ->assertDontSee('red');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');
@@ -154,7 +154,7 @@ it('can render a resource with configured text input user attribute which is to 
         ->assertSeeInOrder(['yetanothercategory', 'red', 'DESCRIPTION #2']);
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');
@@ -188,7 +188,7 @@ it('can render a resource with configured checkbox input user attribute which is
         ->assertDontSee('Terms of service');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->terms)
         ->toBe(true);

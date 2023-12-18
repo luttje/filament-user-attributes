@@ -16,13 +16,13 @@ it('can add a custom attribute to a new model', function () {
     $model->user_attributes = $attributes;
 
     // It shouldn't be saved yet
-    expect($model->userAttributes()->count())->toBe(0);
+    expect($model->userAttribute()->count())->toBe(0);
 
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
-    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->userAttribute->resource->id)->toBe($model->id);
     expect($model->name)->toBe('Test Product');
 });
 
@@ -47,7 +47,7 @@ it('can add arrays to a new model', function () {
 
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValue('color'))->toBe('red');
     expect($model->getUserAttributeValue('sizes'))->toMatchArray(['small', 'medium', 'large']);
     expect($model->getUserAttributeValue('materials'))->toMatchArray(['cotton', 'polyester']);
@@ -63,9 +63,9 @@ it('can add a custom attribute to an existing model', function () {
     $model->user_attributes = $attributes;
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
-    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->userAttribute->resource->id)->toBe($model->id);
 });
 
 it('can update a custom attribute on an existing model', function () {
@@ -76,9 +76,9 @@ it('can update a custom attribute on an existing model', function () {
     $model->user_attributes = $newValues;
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray((array) $newValues);
-    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->userAttribute->resource->id)->toBe($model->id);
 });
 
 it('can remove a custom attribute from an existing model', function () {
@@ -88,7 +88,7 @@ it('can remove a custom attribute from an existing model', function () {
     unset($model->user_attributes);
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(0);
+    expect($model->userAttribute()->count())->toBe(0);
 });
 
 it('throws exception when setting a custom attribute if the attributes were destroyed', function () {
@@ -162,15 +162,15 @@ it('can update a single attribute on an existing model', function () {
     $model->user_attributes = UserAttribute::make(['key' => 'value']);
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
 
     $model->user_attributes->key = 'new value';
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'new value']);
-    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->userAttribute->resource->id)->toBe($model->id);
 });
 
 it('can get a single attribute from an existing model', function () {
@@ -225,9 +225,9 @@ it('can create a model with user attributes through mass assignment', function (
         'user_attributes' => UserAttribute::make(['key' => 'value']),
     ]);
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
-    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->userAttribute->resource->id)->toBe($model->id);
     expect($model->user_attributes->key)->toBe('value');
 });
 
@@ -242,9 +242,9 @@ it('can add a custom attribute when mass assignable filter is guarded', function
     $model->user_attributes->key = 'value';
     $model->save();
 
-    expect($model->userAttributes()->count())->toBe(1);
+    expect($model->userAttribute()->count())->toBe(1);
     expect($model->getUserAttributeValues())->toMatchArray(['key' => 'value']);
-    expect($model->userAttributes->resource->id)->toBe($model->id);
+    expect($model->userAttribute->resource->id)->toBe($model->id);
     expect($model->user_attributes->key)->toBe('value');
     expect($model->name)->toBe('Test Product');
 });

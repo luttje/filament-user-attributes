@@ -59,30 +59,6 @@ trait ConfiguresUserAttributes
             }
 
             $field = $factory->makeField($userAttribute);
-            $field->required($userAttribute['required'] ?? false);
-            $defaultValue = $factory->makeDefaultValue($userAttribute, $userAttribute['customizations'] ?? []);
-
-            $field->statePath('user_attributes.' . $userAttribute['name']);
-            $field->afterStateHydrated(static function (Component $component, string | array | null $state) use ($defaultValue): void {
-                $component->state(function (?Model $record) use ($component, $defaultValue) {
-                    if ($record === null) {
-                        return null;
-                    }
-
-                    $key = $component->getName();
-
-                    /** @var HasUserAttributesContract */
-                    $record = $record;
-
-                    $value = $record->user_attributes->$key;
-
-                    if ($value === null) {
-                        return $defaultValue;
-                    }
-
-                    return $value;
-                });
-            });
 
             $fields[] = [
                 'field' => $field,

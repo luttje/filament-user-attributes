@@ -17,7 +17,7 @@ interface HasUserAttributesContract
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
      */
-    public function userAttributes(): MorphOne;
+    public function userAttribute(): MorphOne;
 
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes

@@ -47,7 +47,7 @@ it('can render a form with configured user attributes', function () {
         ->assertSee('red');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Product::with('userAttributes')->first();
+    $product = Product::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');

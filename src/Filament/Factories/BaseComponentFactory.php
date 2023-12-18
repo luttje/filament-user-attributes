@@ -6,6 +6,7 @@ use Closure;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Get;
 use Filament\Tables\Columns\Column;
+use Illuminate\Database\Eloquent\Model;
 use Luttje\FilamentUserAttributes\EloquentHelper;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
@@ -21,17 +22,23 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
     {
         // TODO: SHould we support situations where a relation exists, but no form field is shown for it.
         // TODO: We currently only support relations that have a form field e.g: relation customer needs customer_id field
-        return function (Get $get) use ($userAttribute, $default) {
+        return function (?Model $record, Get $get) use ($userAttribute, $default) {
             $relatedField = $get($userAttribute['inherit_relation']);
             $related = null;
+
+            if ($record && !str_starts_with($userAttribute['inherit_attribute'], 'user_attributes.')) {
+                $related = $record->{$userAttribute['inherit_relation']};
+
+                dd($related);
+            }
 
             if (!$relatedField) {
                 $relatedField = $get($userAttribute['inherit_relation'] . '_id');
             }
 
             if ($relatedField != null) {
-                $model = $this->resource::getModel(); // TODO: Support Livewire components (which don't have the getModel method)
-                $inheritRelationInfo = EloquentHelper::getRelationInfo($model, $userAttribute['inherit_relation']);
+                $record = $this->resource::getModel(); // TODO: Support Livewire components (which don't have the getModel method)
+                $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
                 $related = ($inheritRelationInfo->relatedType)::find($relatedField);
             }
 
@@ -66,15 +73,17 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
 
     public function setUpField(Field $field, array $userAttribute): Field
     {
-        $customizations = $userAttribute['customizations'] ?? [];
-        $default = $customizations['default'] ?? false;
+        $default = $this->makeDefaultValue($userAttribute) ?? null;
 
         if (isset($userAttribute['inherit']) && $userAttribute['inherit'] === true) {
             $default = $this->makeInheritedDefault($userAttribute, $default);
         }
 
-        return $field
+        $field->required($userAttribute['required'] ?? false)
+            ->statePath('user_attributes.' . $userAttribute['name'])
             ->label($userAttribute['label'])
             ->default($default);
+
+        return $field;
     }
 }

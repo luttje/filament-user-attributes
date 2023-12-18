@@ -2,6 +2,8 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -9,6 +11,7 @@ use Illuminate\Support\Arr;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
 
 /**
+ * @see Model
  * @property object $user_attributes
  */
 trait HasUserAttributes
@@ -36,12 +39,15 @@ trait HasUserAttributes
     protected function initializeHasUserAttributes()
     {
         if (config('filament-user-attributes.eager_load_user_attributes', false)) {
-            $this->with[] = 'userAttributes';
+            $this->with[] = 'userAttribute';
         }
 
         if (!empty($this->fillable)) {
             $this->mergeFillable(['user_attributes']);
         }
+
+        // Ensure that the user attributes are appended to the model when it is serialized.
+        $this->append('user_attributes');
     }
 
     /**
@@ -76,7 +82,7 @@ trait HasUserAttributes
 
         static::saved(function ($model) {
             if ($model->shouldDestroyUserAttributes) {
-                $model->userAttributes()->delete();
+                $model->userAttribute()->delete();
                 $model->shouldDestroyUserAttributes = false;
 
                 return;
@@ -84,15 +90,15 @@ trait HasUserAttributes
 
             if (!empty($model->dirtyUserAttributes)) {
                 // If the model already has user attributes, merge them, otherwise create a new record
-                if ($model->userAttributes()->exists()) {
-                    $newValues = array_merge($model->userAttributes->values->toArray(), $model->dirtyUserAttributes);
-                    $model->userAttributes->values = $newValues;
-                    $model->userAttributes->save();
+                if ($model->userAttribute()->exists()) {
+                    $newValues = array_merge($model->userAttribute->values->toArray(), $model->dirtyUserAttributes);
+                    $model->userAttribute->values = $newValues;
+                    $model->userAttribute->save();
                 } else {
-                    $model->userAttributes()->create(['values' => $model->dirtyUserAttributes]);
+                    $model->userAttribute()->create(['values' => $model->dirtyUserAttributes]);
 
                     // Ensure that the user attributes are dirty for the next time the model is used.
-                    //$model->unsetRelation('userAttributes'); ?/ This was here because I accidentally fetched the relationship, just before creating it. Causing it to be set as null (and then not updated after save)
+                    //$model->unsetRelation('userAttribute'); ?/ This was here because I accidentally fetched the relationship, just before creating it. Causing it to be set as null (and then not updated after save)
                 }
 
                 // Clear the delayed attributes as they are now saved
@@ -102,16 +108,24 @@ trait HasUserAttributes
     }
 
     /**
+     * Accessor for serializing the model including the user attributes.
+     */
+    public function getUserAttributesAttribute()
+    {
+        return $this->getUserAttributeValues()->toArray();
+    }
+
+    /**
      * Relationship to the user attributes resource.
      */
-    public function userAttributes(): MorphOne
+    public function userAttribute(): MorphOne
     {
         return $this->morphOne(UserAttribute::class, 'resource');
     }
 
     public function hasUserAttribute(string $key): bool
     {
-        return $this->userAttributes()->where('values->' . $key, '!=', null)->exists();
+        return $this->userAttribute()->where('values->' . $key, '!=', null)->exists();
     }
 
     public function setUserAttributeValue(string $key, $value)
@@ -139,7 +153,8 @@ trait HasUserAttributes
 
     public function getUserAttributeValue(string $keyOrPath)
     {
-        $array = $this->userAttributes?->values;
+        $userAttribute = $this->userAttribute;
+        $array = $userAttribute?->values;
 
         if (!$array) {
             return null;
@@ -150,7 +165,8 @@ trait HasUserAttributes
 
     public function getUserAttributeValues(): ArrayObject
     {
-        return $this->userAttributes->values;
+        $userAttribute = $this->userAttribute;
+        return $userAttribute?->values ?? new ArrayObject([]);
     }
 
     /**
@@ -184,14 +200,14 @@ trait HasUserAttributes
      */
     public static function whereUserAttribute(string $key, $value)
     {
-        return static::whereHas('userAttributes', function ($query) use ($key, $value) {
+        return static::whereHas('userAttribute', function ($query) use ($key, $value) {
             $query->where('values->' . $key, $value);
         });
     }
 
     public static function whereUserAttributeContains(string $key, $value)
     {
-        return static::whereHas('userAttributes', function ($query) use ($key, $value) {
+        return static::whereHas('userAttribute', function ($query) use ($key, $value) {
             $query->whereJsonContains('values->' . $key, $value);
         });
     }
@@ -203,7 +219,7 @@ trait HasUserAttributes
             $operator = '=';
         }
 
-        return static::whereHas('userAttributes', function ($query) use ($key, $operator, $value) {
+        return static::whereHas('userAttribute', function ($query) use ($key, $operator, $value) {
             $query->whereJsonLength('values->' . $key, $operator, $value);
         });
     }
@@ -242,6 +258,16 @@ trait HasUserAttributes
                     public function __set($key, $value)
                     {
                         $this->owner->setUserAttributeValue($key, $value);
+                    }
+
+                    public function __unset($key)
+                    {
+                        $this->owner->setUserAttributeValue($key, null);
+                    }
+
+                    public function __isset($key)
+                    {
+                        return $this->owner->hasUserAttribute($key);
                     }
                 };
             }
@@ -291,5 +317,20 @@ trait HasUserAttributes
         }
 
         parent::__unset($key);
+    }
+
+    /**
+     * When the user attempts to check if the user_attributes property is set, we intercept it
+     * for user_attributes.
+     *
+     * @param  mixed  $key
+     */
+    public function __isset($key)
+    {
+        if ($key === 'user_attributes') {
+            return true;
+        }
+
+        return parent::__isset($key);
     }
 }
