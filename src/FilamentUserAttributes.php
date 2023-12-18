@@ -4,11 +4,13 @@ namespace Luttje\FilamentUserAttributes;
 
 use Closure;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Tables\Columns\Column;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
@@ -57,6 +59,17 @@ class FilamentUserAttributes
 
         $this->appNamespace = rtrim($this->appNamespace, '\\') . '\\';
         $this->appPath = rtrim($this->appPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Returns whether the component can have child components.
+     */
+    public function componentHasChildren(Component $component): bool
+    {
+        return $component instanceof Tabs
+            || $component instanceof Tab
+            || $component instanceof Section
+            || $component instanceof Fieldset;
     }
 
     /**
@@ -376,11 +389,11 @@ class FilamentUserAttributes
     {
         $label = $component->getLabel();
 
-        if (!empty($label)) {
-            return $parentLabel ? ($parentLabel . ' > ' . $label) : $label;
+        if ($label === null) {
+            $label = '';
         }
 
-        return $parentLabel ?? '';
+        return $parentLabel ? ($parentLabel . ' > ' . $label) : $label;
     }
 
     /**
@@ -397,13 +410,11 @@ class FilamentUserAttributes
                 $namesWithLabels[] = [
                     'name' => $component->getName(),
                     'label' => $label,
+                    'statePath' => $component->getStatePath(false),
                 ];
             }
 
-            if ($component instanceof Tabs
-                || $component instanceof Tab
-                || $component instanceof Section
-            ) {
+            if ($this->componentHasChildren($component)) {
                 $namesWithLabels = array_merge(
                     $namesWithLabels,
                     $this->getAllFieldComponents(
@@ -424,6 +435,7 @@ class FilamentUserAttributes
     {
         $namesWithLabels = [];
 
+        /** @var Column $column */
         foreach ($columns as $column) {
             $label = $this->getComponentLabel($column);
             $namesWithLabels[] = [
@@ -464,10 +476,7 @@ class FilamentUserAttributes
                 }
             }
 
-            if ($component instanceof Tabs
-                || $component instanceof Tab
-                || $component instanceof Section
-            ) {
+            if ($this->componentHasChildren($component)) {
                 $containerChildComponents = $component->getChildComponents();
                 $childComponents = $this->addFieldBesidesField(
                     $containerChildComponents,
@@ -482,7 +491,7 @@ class FilamentUserAttributes
             }
         }
 
-        if (!$siblingFound) {
+        if (!$siblingFound && $parentLabel === null) {
             $newComponents[] = $componentToAdd;
         }
 
@@ -521,8 +530,21 @@ class FilamentUserAttributes
     public function mergeCustomFormFields(array $fields, string $resource): array
     {
         $customFields = collect(FilamentUserAttributes::getUserAttributeFields($resource));
+        $customFieldCount = $customFields->count();
 
-        for ($i = 0; $i < $customFields->count(); $i++) {
+        $inheritingFieldsMap = $customFields->filter(function ($customField) {
+            return $customField['inheritance']['enabled'] === true;
+        })->mapWithKeys(function ($customField) {
+            $key = $customField['inheritance']['relation'];
+
+            if ($key === '__self') {
+                $key = $customField['inheritance']['attribute'];
+            }
+
+            return [$key => $customField];
+        });
+
+        for ($i = 0; $i < $customFieldCount; $i++) {
             $customField = $customFields->pop();
 
             if (!isset($customField['ordering'])
@@ -539,7 +561,55 @@ class FilamentUserAttributes
             );
         }
 
-        return array_merge($fields, $customFields->pluck('field')->toArray());
+        $fields = array_merge($fields, $customFields->pluck('field')->toArray());
+
+        $this->addStateChangeSignalToInheritedFields($fields, $inheritingFieldsMap);
+
+        return $fields;
+    }
+
+    /**
+     * Adds a state change signal to all fields that inherit from another model.
+     * This ensures the inherited field updates, when the related field value
+     * changes.
+     */
+    public function addStateChangeSignalToInheritedFields(array $fields, $inheritingFieldsMap): void
+    {
+        /** @var Component $field */
+        foreach ($fields as $field) {
+            if ($this->componentHasChildren($field)) {
+                $this->addStateChangeSignalToInheritedFields(
+                    $field->getChildComponents(),
+                    $inheritingFieldsMap
+                );
+            }
+
+            $statePath = $field->getStatePath(false);
+            $statePath = preg_replace('/_id$/', '', $statePath);
+            $inheritingField = $inheritingFieldsMap->get($statePath);
+
+            if (!$inheritingField) {
+                continue;
+            }
+
+            // Ensure that the related field is live, so that state changes are reactive.
+            if (!$field->isLive()) {
+                $field->live();
+            }
+
+            $field->afterStateUpdated(static function (Component $component) use ($inheritingField): void {
+                $components = $component->getContainer()
+                    ->getFlatComponents(true);
+
+                foreach ($components as $component) {
+                    if ($component->getId() !== $inheritingField['field']->getId()) {
+                        continue;
+                    }
+
+                    $component->fill();
+                }
+            });
+        }
     }
 
     /**
@@ -548,8 +618,9 @@ class FilamentUserAttributes
     public function mergeCustomTableColumns(array $columns, $resource): array
     {
         $customColumns = collect(FilamentUserAttributes::getUserAttributeColumns($resource));
+        $customColumnCount = $customColumns->count();
 
-        for ($i = 0; $i < $customColumns->count(); $i++) {
+        for ($i = 0; $i < $customColumnCount; $i++) {
             $customColumn = $customColumns->pop();
 
             if (!isset($customColumn['ordering'])
@@ -586,6 +657,19 @@ class FilamentUserAttributes
         $className = class_basename($className);
         $className = preg_replace('/(?<!^)[A-Z]/', ' $0', $className);
         $className = preg_replace('/Resource$/', ucfirst(__('filament-user-attributes::user-attributes.suffix_page')), $className);
+
+        return $className;
+    }
+
+    /**
+     * Converts a model class name to a human readable label by getting
+     * the last part of the name and translating it using the validation
+     * localization file.
+     */
+    public function classNameToModelLabel(string $className, int $amount = 1): string
+    {
+        $className = class_basename($className);
+        $className = trans_choice('validation.attributes.' . Str::snake($className), $amount);
 
         return $className;
     }

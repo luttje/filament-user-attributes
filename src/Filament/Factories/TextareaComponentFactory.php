@@ -7,25 +7,28 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class TextareaComponentFactory implements UserAttributeComponentFactoryInterface
+class TextareaComponentFactory extends BaseComponentFactory
 {
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+        $column = UserAttributeColumn::make($userAttribute['name']);
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
-        return Textarea::make($userAttribute['name'])
-            ->label($userAttribute['label'])
+        $customizations = $userAttribute['customizations'] ?? [];
+
+        $field = Textarea::make($userAttribute['name'])
             ->placeholder($customizations['placeholder'] ?? null)
             ->maxLength(9000);
+
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return '';
     }

@@ -39,8 +39,20 @@ return [
     ],
 
     /**
+     * Which function to use to transform the name for a model when
+     * discovering models.
+     */
+    'discovery_model_name_transformer' => Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::class . '::classNameToModelLabel',
+
+    /**
      * Whether to eager load the user attributes relationship on models that
      * use the HasUserAttributes trait.
      */
     'eager_load_user_attributes' => false,
+
+    /**
+     * Whether to use IconColumn (true) or UserAttributeColumn (false) for
+     * showing boolean user attributes in tables (like Toggle and Checkbox).
+     */
+    'use_icons_for_boolean_components' => true,
 ];

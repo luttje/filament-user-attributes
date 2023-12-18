@@ -86,7 +86,7 @@ it('can render a resource with configured user attributes', function () {
         ->assertSeeInOrder(['red', 'blue', 'green']);
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');
@@ -119,7 +119,7 @@ it('can render a resource with configured user attribute which is hidden in the 
         ->assertDontSee('red');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');
@@ -154,7 +154,7 @@ it('can render a resource with configured text input user attribute which is to 
         ->assertSeeInOrder(['yetanothercategory', 'red', 'DESCRIPTION #2']);
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
         ->toBe('red');
@@ -188,7 +188,7 @@ it('can render a resource with configured checkbox input user attribute which is
         ->assertDontSee('Terms of service');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
-    $product = Category::with('userAttributes')->first();
+    $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->terms)
         ->toBe(true);
@@ -202,7 +202,6 @@ it('can configure a text input user attribute for a resource', function () {
                 'name' => 'terms',
                 'label' => 'Terms of service',
                 'type' => 'checkbox',
-                'order_position_form' => 'at_end',
             ],
             [
                 'name' => 'color',
@@ -303,15 +302,17 @@ it('can configure a text input user attribute for a resource', function () {
     $this->actingAs($user)
         ->get(CategoryResource::getUrl('edit', ['record' => Category::factory()->create()]))
         ->assertSeeInOrder([
+            // Specifically configured to be in front of name:
             'Richeditor',
             'Name',
+            // The rest are in order of configuration:
+            'Terms of service',
             'Color',
             'Multiple Choice',
             'Select',
             'Number',
             'Datetime',
             'Date',
-            'Terms of service',
         ])
         ->assertDontSee('data.user_attributes.time');
 });

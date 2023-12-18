@@ -143,6 +143,13 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 - [x] Allow users to hide attributes
   - [x] In the form
   - [x] In the table
+- [x] Users can specify default values for attributes
+- [x] Users can specify if attributes are required
+- [x] Users can specify if attributes inherit their value from another attribute, even from a related model
+  - [x] For Resources
+  - [ ] For Livewire components
+  - [x] For related fields that have a {relation}_id field in the form
+  - [ ] For related attributes that have no field in this form
 - [x] User interface for managing user attributes
 - [x] Support for Tabs and Sections in the form
 - [x] Wizard command to help you setup your project code

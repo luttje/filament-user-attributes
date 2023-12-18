@@ -10,25 +10,30 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
+class DateTimeComponentFactory extends BaseComponentFactory
 {
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
+        $customizations = $userAttribute['customizations'] ?? [];
+
         $dateFormat = match ($customizations['format'] ?? 'date') {
             'datetime' => 'd-m-Y H:i:s',
             'date' => 'd-m-Y',
             'time' => 'H:i:s',
             default => throw new \Exception('Invalid date format'),
         };
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->dateTime($dateFormat)
-            ->label($userAttribute['label']);
+
+        $column = UserAttributeColumn::make($userAttribute['name'])
+            ->dateTime($dateFormat);
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
+        $customizations = $userAttribute['customizations'] ?? [];
+
         switch ($customizations['format'] ?? 'date') {
             case 'datetime':
                 $field = DateTimePicker::make($userAttribute['name']);
@@ -45,10 +50,10 @@ class DateTimeComponentFactory implements UserAttributeComponentFactoryInterface
             $field->minDate(now());
         }
 
-        return $field->label($userAttribute['label']);
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return now();
     }

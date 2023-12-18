@@ -6,24 +6,27 @@ use Filament\Forms\Components\Field;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class TextComponentFactory implements UserAttributeComponentFactoryInterface
+class TextComponentFactory extends BaseComponentFactory
 {
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+        $column = UserAttributeColumn::make($userAttribute['name']);
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
-        return TextInput::make($userAttribute['name'])
-            ->label($userAttribute['label'])
+        $customizations = $userAttribute['customizations'] ?? [];
+
+        $field = TextInput::make($userAttribute['name'])
             ->placeholder($customizations['placeholder'] ?? null);
+
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return '';
     }

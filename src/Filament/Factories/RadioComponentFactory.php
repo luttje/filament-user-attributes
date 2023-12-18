@@ -8,29 +8,32 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class RadioComponentFactory implements UserAttributeComponentFactoryInterface
+class RadioComponentFactory extends BaseComponentFactory
 {
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+        $column = UserAttributeColumn::make($userAttribute['name']);
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
+        $customizations = $userAttribute['customizations'] ?? [];
+
         $options = collect($customizations['options'] ?? [])
             ->mapWithKeys(function ($option) {
                 return [$option['id'] => $option['label']];
             });
 
-        return Radio::make($userAttribute['name'])
-            ->options($options)
-            ->label($userAttribute['label']);
+        $field = Radio::make($userAttribute['name'])
+            ->options($options);
+
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return null;
     }
