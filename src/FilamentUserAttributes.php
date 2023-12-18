@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes;
 
 use Closure;
 use Filament\Forms\Components\Component;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
@@ -57,6 +58,17 @@ class FilamentUserAttributes
 
         $this->appNamespace = rtrim($this->appNamespace, '\\') . '\\';
         $this->appPath = rtrim($this->appPath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Returns whether the component can have child components.
+     */
+    public function componentHasChildren(Component $component): bool
+    {
+        return $component instanceof Tabs
+            || $component instanceof Tab
+            || $component instanceof Section
+            || $component instanceof Fieldset;
     }
 
     /**
@@ -400,10 +412,7 @@ class FilamentUserAttributes
                 ];
             }
 
-            if ($component instanceof Tabs
-                || $component instanceof Tab
-                || $component instanceof Section
-            ) {
+            if ($this->componentHasChildren($component)) {
                 $namesWithLabels = array_merge(
                     $namesWithLabels,
                     $this->getAllFieldComponents(
@@ -464,10 +473,7 @@ class FilamentUserAttributes
                 }
             }
 
-            if ($component instanceof Tabs
-                || $component instanceof Tab
-                || $component instanceof Section
-            ) {
+            if ($this->componentHasChildren($component)) {
                 $containerChildComponents = $component->getChildComponents();
                 $childComponents = $this->addFieldBesidesField(
                     $containerChildComponents,
