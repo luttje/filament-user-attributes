@@ -72,7 +72,7 @@ If the project maintainer has any additional requirements, you will find them li
 
 In place of `../filament-user-attributes` you should specify the path to where you cloned this package.
 
-Run composer require "luttje/filament-user-attributes @dev" inside the test project
+Run `composer require "luttje/filament-user-attributes @dev"` inside the test project
 
 You can now test and modify this package. Changes will immediately be reflected in the test project.
 

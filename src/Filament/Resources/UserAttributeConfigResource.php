@@ -52,6 +52,11 @@ class UserAttributeConfigResource extends Resource
         if(class_exists($key)) {
             $resource = $key;
             $config = $resource::getUserAttributesConfig();
+
+            if (!$config) {
+                throw new \Exception("No valid user attributes config found for resource {$resource}. Did you forget to implement the `UserAttributesConfigContract` method `getUserAttributesConfig()`?");
+            }
+
             $userAttributeConfigs = $config
                 ->userAttributesConfigs()
                 ->where('resource_type', $resource)
