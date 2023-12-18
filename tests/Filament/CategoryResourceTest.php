@@ -202,7 +202,6 @@ it('can configure a text input user attribute for a resource', function () {
                 'name' => 'terms',
                 'label' => 'Terms of service',
                 'type' => 'checkbox',
-                'order_position_form' => 'at_end',
             ],
             [
                 'name' => 'color',
@@ -303,15 +302,17 @@ it('can configure a text input user attribute for a resource', function () {
     $this->actingAs($user)
         ->get(CategoryResource::getUrl('edit', ['record' => Category::factory()->create()]))
         ->assertSeeInOrder([
+            // Specifically configured to be in front of name:
             'Richeditor',
             'Name',
+            // The rest are in order of configuration:
+            'Terms of service',
             'Color',
             'Multiple Choice',
             'Select',
             'Number',
             'Datetime',
             'Date',
-            'Terms of service',
         ])
         ->assertDontSee('data.user_attributes.time');
 });

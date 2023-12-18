@@ -389,11 +389,11 @@ class FilamentUserAttributes
     {
         $label = $component->getLabel();
 
-        if (!empty($label)) {
-            return $parentLabel ? ($parentLabel . ' > ' . $label) : $label;
+        if ($label === null) {
+            $label = '';
         }
 
-        return $parentLabel ?? '';
+        return $parentLabel ? ($parentLabel . ' > ' . $label) : $label;
     }
 
     /**
@@ -528,8 +528,9 @@ class FilamentUserAttributes
     public function mergeCustomFormFields(array $fields, string $resource): array
     {
         $customFields = collect(FilamentUserAttributes::getUserAttributeFields($resource));
+        $customFieldCount = $customFields->count();
 
-        for ($i = 0; $i < $customFields->count(); $i++) {
+        for ($i = 0; $i < $customFieldCount; $i++) {
             $customField = $customFields->pop();
 
             if (!isset($customField['ordering'])
@@ -555,8 +556,9 @@ class FilamentUserAttributes
     public function mergeCustomTableColumns(array $columns, $resource): array
     {
         $customColumns = collect(FilamentUserAttributes::getUserAttributeColumns($resource));
+        $customColumnCount = $customColumns->count();
 
-        for ($i = 0; $i < $customColumns->count(); $i++) {
+        for ($i = 0; $i < $customColumnCount; $i++) {
             $customColumn = $customColumns->pop();
 
             if (!isset($customColumn['ordering'])
