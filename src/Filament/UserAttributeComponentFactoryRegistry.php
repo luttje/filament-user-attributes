@@ -13,7 +13,7 @@ class UserAttributeComponentFactoryRegistry
 {
     protected static $factories = [];
 
-    private static $relatedAmountMap = [
+    protected static $relatedAmountMap = [
         'belongsTo' => 1,
         'belongsToMany' => 99,
         'hasMany' => 99,
@@ -61,10 +61,10 @@ class UserAttributeComponentFactoryRegistry
         // TODO: CLean this up, possibly moving it somewhere else
         $resources = FilamentUserAttributes::getConfigurableResources();
         $modelsMappedToResources = collect($resources)
-            ->filter(function ($name, $class) {
+            ->filter(function ($name, string $class) {
                 return method_exists($class, 'getModel');
             })
-            ->mapWithKeys(function ($name, $class) {
+            ->mapWithKeys(function ($name, string $class) {
                 return [$class::getModel() => $class];
             });
         $model = $resourceClass::getModel();
@@ -177,10 +177,10 @@ class UserAttributeComponentFactoryRegistry
                                 $inheritRelatedModelType = $inheritRelationInfo->relatedType;
                                 $resources = FilamentUserAttributes::getConfigurableResources();
                                 $resource = collect($resources)
-                                    ->filter(function ($name, $class) {
+                                    ->filter(function ($name, string $class) {
                                         return method_exists($class, 'getModel');
                                     })
-                                    ->mapWithKeys(function ($name, $class) {
+                                    ->mapWithKeys(function ($name, string $class) {
                                         return [$class::getModel() => $class];
                                     })
                                     ->filter(function ($class, $model) use ($inheritRelatedModelType) {

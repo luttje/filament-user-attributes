@@ -15,6 +15,8 @@ class DateTimeComponentFactory extends BaseComponentFactory
 {
     public function makeColumn(array $userAttribute): Column
     {
+        $customizations = $userAttribute['customizations'] ?? [];
+
         $dateFormat = match ($customizations['format'] ?? 'date') {
             'datetime' => 'd-m-Y H:i:s',
             'date' => 'd-m-Y',

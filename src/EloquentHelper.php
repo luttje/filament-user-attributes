@@ -23,7 +23,6 @@ class EloquentHelper
      * Get eloquent relationships by using reflection on the provided model.
      *
      * @see https://github.com/PabloMerener/eloquent-relationships/blob/30ef1c6e4a25de6036dd1003893543744f5a3375/src/helpers.php
-     * @return object
      */
     public static function discoverRelations(Model|string $model): array
     {
@@ -54,6 +53,7 @@ class EloquentHelper
                 $methodReturn = $instance->$methodName();
             } catch (\Throwable $th) {
                 // throw new \Exception("Error while trying to get relation {$methodName} on model {$class}: {$th->getMessage()}");
+                $methodReturn = null;
             }
 
             if ($methodReturn instanceof Relation) {

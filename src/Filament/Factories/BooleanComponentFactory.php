@@ -35,6 +35,7 @@ abstract class BooleanComponentFactory extends BaseComponentFactory
 
     public function makeDefaultValue(array $userAttribute): mixed
     {
+        $customizations = $userAttribute['customizations'] ?? [];
         return $customizations['default'] ?? false;
     }
 
