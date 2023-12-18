@@ -12,6 +12,7 @@ use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 class UserAttributeComponentFactoryRegistry
 {
     protected static $factories = [];
+
     private static $relatedAmountMap = [
         'belongsTo' => 1,
         'belongsToMany' => 99,

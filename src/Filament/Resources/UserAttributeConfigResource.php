@@ -23,6 +23,9 @@ class UserAttributeConfigResource extends Resource
 
     protected static ?string $tenantOwnershipRelationshipName = 'owner';
 
+    /**
+     * Limit the query to only the user attributes for the correct config (like a user or tenant).
+     */
     public static function getEloquentQuery(): Builder
     {
         $resources = FilamentUserAttributes::getConfigurableResources();
@@ -37,11 +40,10 @@ class UserAttributeConfigResource extends Resource
             }
 
             // TODO: Use a scope for always set this
-            $query->orWhere(function ($query) use ($resource, $config) {
-                $query->where('resource_type', $resource)
-                    ->where('owner_type', get_class($config))
-                    ->where('owner_id', $config->getKey());
-            });
+            $query->where('owner_type', get_class($config))
+                ->where('owner_id', $config->getKey());
+
+            break;
         }
 
         return $query;
