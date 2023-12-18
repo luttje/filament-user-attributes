@@ -13,10 +13,10 @@ class UserAttributeColumn extends TextColumn
     {
         parent::setUp();
 
-        self::setUpColumn($this);
+        self::setUpColumnState($this);
     }
 
-    public static function setUpColumn(Column $column): Column
+    public static function setUpColumnState(Column $column): Column
     {
         $column->getStateUsing(function (?Model $record) use ($column) {
             /** @var HasUserAttributesContract */

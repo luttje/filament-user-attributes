@@ -6,25 +6,28 @@ use Filament\Forms\Components\Field;
 use Filament\Forms\Components\TagsInput;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class TagsInputComponentFactory implements UserAttributeComponentFactoryInterface
+class TagsInputComponentFactory extends BaseComponentFactory
 {
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+        $column = UserAttributeColumn::make($userAttribute['name']);
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
-        return TagsInput::make($userAttribute['name'])
+        $customizations = $userAttribute['customizations'] ?? [];
+
+        $field = TagsInput::make($userAttribute['name'])
             ->splitKeys(['Tab', ' '])
-            ->label($userAttribute['label'])
             ->suggestions($customizations['suggestions'] ?? []);
+
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return [];
     }

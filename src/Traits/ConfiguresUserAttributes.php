@@ -52,17 +52,13 @@ trait ConfiguresUserAttributes
             }
 
             $type = $userAttribute['type'];
-            $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $resource);
 
             if (!isset($factory)) {
                 throw new \Exception("The user attribute type '{$type}' is not yet supported.");
             }
 
-            /** @var UserAttributeComponentFactoryInterface $factory */
-            $factoryClass = $factory;
-            $factory = new $factoryClass();
-
-            $field = $factory->makeField($userAttribute, $userAttribute['customizations'] ?? []);
+            $field = $factory->makeField($userAttribute);
             $field->required($userAttribute['required'] ?? false);
             $defaultValue = $factory->makeDefaultValue($userAttribute, $userAttribute['customizations'] ?? []);
 
@@ -93,7 +89,12 @@ trait ConfiguresUserAttributes
                 'ordering' => [
                     'position' => $userAttribute['order_position_form'] ?? null,
                     'sibling' => $userAttribute['order_sibling_form'] ?? null,
-                ]
+                ],
+                'inheritance' => [
+                    'enabled' => $userAttribute['inherit'] ?? false,
+                    'relation' => $userAttribute['inherit_relation'] ?? null,
+                    'attribute' => $userAttribute['inherit_attribute'] ?? null,
+                ],
             ];
         }
 
@@ -124,17 +125,13 @@ trait ConfiguresUserAttributes
             }
 
             $type = $userAttribute['type'];
-            $factory = UserAttributeComponentFactoryRegistry::getFactory($type);
+            $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $resource);
 
             if (!isset($factory)) {
                 throw new \Exception("The user attribute type '{$type}' is not yet supported.");
             }
 
-            /** @var UserAttributeComponentFactoryInterface $factory */
-            $factoryClass = $factory;
-            $factory = new $factoryClass();
-
-            $column = $factory->makeColumn($userAttribute, $userAttribute['customizations'] ?? [])
+            $column = $factory->makeColumn($userAttribute)
                 ->sortable($userAttribute['sortable'] ?? false);
 
             $columns[] = [
@@ -142,7 +139,7 @@ trait ConfiguresUserAttributes
                 'ordering' => [
                     'position' => $userAttribute['order_position_table'] ?? null,
                     'sibling' => $userAttribute['order_sibling_table'] ?? null,
-                ]
+                ],
             ];
         }
 

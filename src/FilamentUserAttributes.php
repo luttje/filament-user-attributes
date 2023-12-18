@@ -410,6 +410,7 @@ class FilamentUserAttributes
                 $namesWithLabels[] = [
                     'name' => $component->getName(),
                     'label' => $label,
+                    'statePath' => $component->getStatePath(false),
                 ];
             }
 
@@ -434,6 +435,7 @@ class FilamentUserAttributes
     {
         $namesWithLabels = [];
 
+        /** @var Column $column */
         foreach ($columns as $column) {
             $label = $this->getComponentLabel($column);
             $namesWithLabels[] = [
@@ -530,6 +532,12 @@ class FilamentUserAttributes
         $customFields = collect(FilamentUserAttributes::getUserAttributeFields($resource));
         $customFieldCount = $customFields->count();
 
+        $inheritingFieldsMap = $customFields->filter(function ($customField) {
+            return $customField['inheritance']['enabled'] === true;
+        })->mapWithKeys(function ($customField) {
+            return [$customField['inheritance']['relation'] => $customField];
+        });
+
         for ($i = 0; $i < $customFieldCount; $i++) {
             $customField = $customFields->pop();
 
@@ -547,7 +555,49 @@ class FilamentUserAttributes
             );
         }
 
-        return array_merge($fields, $customFields->pluck('field')->toArray());
+        $fields = array_merge($fields, $customFields->pluck('field')->toArray());
+
+        $this->addStateChangeSignalToInheritedFields($fields, $inheritingFieldsMap);
+
+        return $fields;
+    }
+
+    /**
+     * Adds a state change signal to all fields that inherit from another model.
+     * This ensures the inherited field updates, when the related field value
+     * changes.
+     */
+    public function addStateChangeSignalToInheritedFields(array $fields, $inheritingFieldsMap): void
+    {
+        foreach ($fields as $field) {
+            if ($this->componentHasChildren($field)) {
+                $this->addStateChangeSignalToInheritedFields(
+                    $field->getChildComponents(),
+                    $inheritingFieldsMap
+                );
+            }
+
+            $statePath = $field->getStatePath(false);
+            $statePath = preg_replace('/_id$/', '', $statePath);
+            $inheritingField = $inheritingFieldsMap->get($statePath);
+
+            if (!$inheritingField) {
+                continue;
+            }
+
+            $field->afterStateUpdated(static function (Component $component) use ($inheritingField): void {
+                $components = $component->getContainer()
+                    ->getFlatComponents(true);
+
+                foreach ($components as $component) {
+                    if ($component->getId() !== $inheritingField['field']->getId()) {
+                        continue;
+                    }
+
+                    $component->fill();
+                }
+            });
+        }
     }
 
     /**

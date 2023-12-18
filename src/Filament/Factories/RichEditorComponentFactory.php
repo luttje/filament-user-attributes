@@ -6,24 +6,25 @@ use Filament\Forms\Components\Field;
 use Filament\Forms\Components\RichEditor;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class RichEditorComponentFactory implements UserAttributeComponentFactoryInterface
+class RichEditorComponentFactory extends BaseComponentFactory
 {
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->label($userAttribute['label']);
+        $column = UserAttributeColumn::make($userAttribute['name']);
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
-        return RichEditor::make($userAttribute['name'])
-            ->label($userAttribute['label'])
+        $field = RichEditor::make($userAttribute['name'])
             ->maxLength(9000);
+
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return '';
     }

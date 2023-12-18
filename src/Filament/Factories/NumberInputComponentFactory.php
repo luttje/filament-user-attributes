@@ -7,32 +7,35 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
-use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
-class NumberInputComponentFactory implements UserAttributeComponentFactoryInterface
+class NumberInputComponentFactory extends BaseComponentFactory
 {
     public const DEFAULT_MINIMUM = -999999;
 
     public const DEFAULT_MAXIMUM = 999999;
 
-    public function makeColumn(array $userAttribute, array $customizations): Column
+    public function makeColumn(array $userAttribute): Column
     {
-        return UserAttributeColumn::make($userAttribute['name'])
-            ->numeric()
-            ->label($userAttribute['label']);
+        $column = UserAttributeColumn::make($userAttribute['name'])
+            ->numeric();
+
+        return $this->setUpColumn($column, $userAttribute);
     }
 
-    public function makeField(array $userAttribute, array $customizations): Field
+    public function makeField(array $userAttribute): Field
     {
-        return TextInput::make($userAttribute['name'])
+        $customizations = $userAttribute['customizations'] ?? [];
+
+        $field = TextInput::make($userAttribute['name'])
             ->numeric()
-            ->label($userAttribute['label'])
             ->step(10 ** ($customizations['decimal_places'] ?? 0))
             ->minValue($customizations['minimum'] ?? static::DEFAULT_MINIMUM)
             ->maxValue($customizations['maximum'] ?? static::DEFAULT_MAXIMUM);
+
+        return $this->setUpField($field, $userAttribute);
     }
 
-    public function makeDefaultValue(array $userAttribute, array $customizations): mixed
+    public function makeDefaultValue(array $userAttribute): mixed
     {
         return 0;
     }

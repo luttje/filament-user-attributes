@@ -25,7 +25,7 @@ class EloquentHelper
      * @see https://github.com/PabloMerener/eloquent-relationships/blob/30ef1c6e4a25de6036dd1003893543744f5a3375/src/helpers.php
      * @return object
      */
-    public static function discoverRelations(Model|string $model)
+    public static function discoverRelations(Model|string $model): array
     {
         // To prevent side effects, we run the methods in a transaction and rollback
         DB::beginTransaction();
@@ -72,6 +72,22 @@ class EloquentHelper
 
         DB::rollBack();
 
-        return (object) $relations;
+        return $relations;
+    }
+
+    /**
+     * Gets the relation type for the given relation name.
+     */
+    public static function getRelationInfo(Model|string $model, string $relationName): ?EloquentHelperRelationshipInfo
+    {
+        $relations = self::discoverRelations($model);
+
+        foreach ($relations as $relation) {
+            if ($relation->name === $relationName) {
+                return $relation;
+            }
+        }
+
+        return null;
     }
 }
