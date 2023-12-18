@@ -535,7 +535,13 @@ class FilamentUserAttributes
         $inheritingFieldsMap = $customFields->filter(function ($customField) {
             return $customField['inheritance']['enabled'] === true;
         })->mapWithKeys(function ($customField) {
-            return [$customField['inheritance']['relation'] => $customField];
+            $key = $customField['inheritance']['relation'];
+
+            if ($key === '__self') {
+                $key = $customField['inheritance']['attribute'];
+            }
+
+            return [$key => $customField];
         });
 
         for ($i = 0; $i < $customFieldCount; $i++) {
@@ -569,6 +575,7 @@ class FilamentUserAttributes
      */
     public function addStateChangeSignalToInheritedFields(array $fields, $inheritingFieldsMap): void
     {
+        /** @var Component $field */
         foreach ($fields as $field) {
             if ($this->componentHasChildren($field)) {
                 $this->addStateChangeSignalToInheritedFields(
@@ -583,6 +590,11 @@ class FilamentUserAttributes
 
             if (!$inheritingField) {
                 continue;
+            }
+
+            // Ensure that the related field is live, so that state changes are reactive.
+            if (!$field->isLive()) {
+                $field->live();
             }
 
             $field->afterStateUpdated(static function (Component $component) use ($inheritingField): void {

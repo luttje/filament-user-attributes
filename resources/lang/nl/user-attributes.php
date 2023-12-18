@@ -12,6 +12,7 @@ return [
     'inherit_attribute' => 'Veld om van te erven',
     'inherit_help' => 'U kunt de standaardwaarde instellen door deze te erven van een ander veld (ook van een andere bron).',
     'inherit_relation_option_label' => ':related_name (:resource :relationship :related_resource)',
+    'inherit_relation_option_label_self' => ':related_name (zelf)',
     'inherit_relation' => 'Te erven van',
     'inherit' => 'Waarde erven',
     'manage_user_attributes' => 'Beheer aangepaste velden',
@@ -29,6 +30,7 @@ return [
      * Short names of relationships.
      */
     'relationships' => [
+        '__self' => 'zelf',
         'belongsTo' => 'behoort tot',
         'belongsToMany' => 'behoort tot meerdere',
         'hasMany' => 'heeft meerdere',

@@ -12,6 +12,7 @@ return [
     'inherit_attribute' => 'Attribut zum Erben',
     'inherit_help' => 'Sie können den Standardwert festlegen, indem Sie ihn von einem anderen Attribut erben (auch von einer anderen Ressource).',
     'inherit_relation_option_label' => ':related_name (:resource :relationship :related_resource)',
+    'inherit_relation_option_label_self' => ':related_name (selbst)',
     'inherit_relation' => 'Zu erben von',
     'inherit' => 'Wert erben',
     'manage_user_attributes' => 'Attribute verwalten',
@@ -29,6 +30,7 @@ return [
      * Short names of relationships.
      */
     'relationships' => [
+        '__self' => 'selbst',
         'belongsTo' => 'gehört zu',
         'belongsToMany' => 'gehört zu mehreren',
         'hasMany' => 'hat mehreren',

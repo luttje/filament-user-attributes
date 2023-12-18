@@ -6,6 +6,7 @@ use Closure;
 use Filament\Forms;
 use Filament\Forms\Get;
 use Luttje\FilamentUserAttributes\EloquentHelper;
+use Luttje\FilamentUserAttributes\EloquentHelperRelationshipInfo;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
@@ -14,6 +15,7 @@ class UserAttributeComponentFactoryRegistry
     protected static $factories = [];
 
     protected static $relatedAmountMap = [
+        '__self' => 1,
         'belongsTo' => 1,
         'belongsToMany' => 99,
         'hasMany' => 99,
@@ -67,8 +69,17 @@ class UserAttributeComponentFactoryRegistry
             ->mapWithKeys(function ($name, string $class) {
                 return [$class::getModel() => $class];
             });
+
         $model = $resourceClass::getModel();
-        $relations = EloquentHelper::discoverRelations($model);
+        $relations = [];
+
+        $self = new EloquentHelperRelationshipInfo();
+        $self->name = '__self';
+        $self->relationTypeShort = '__self';
+        $self->relatedType = $model;
+        $relations[] = $self;
+
+        $relations = [...$relations, ...EloquentHelper::discoverRelations($model)];
 
         $options = [];
         $nameTransformer = config('filament-user-attributes.discovery_model_name_transformer');
@@ -82,8 +93,13 @@ class UserAttributeComponentFactoryRegistry
             }
 
             $relationAmount = static::$relatedAmountMap[$relation->relationTypeShort];
+            $languageKey = 'filament-user-attributes::user-attributes.inherit_relation_option_label';
 
-            $options[$relation->name] = __('filament-user-attributes::user-attributes.inherit_relation_option_label', [
+            if ($relation->name === '__self') {
+                $languageKey = 'filament-user-attributes::user-attributes.inherit_relation_option_label_self';
+            }
+
+            $options[$relation->name] = __($languageKey, [
                 'related_name' => $resources[$relatedResource],
                 'resource' => $nameTransformer($model),
                 'relationship' => __('filament-user-attributes::user-attributes.relationships.' . $relation->relationTypeShort),
@@ -166,14 +182,19 @@ class UserAttributeComponentFactoryRegistry
                                     return [];
                                 }
 
-                                $model = $configModel->resource_type::getModel();
-                                $inheritRelationInfo = EloquentHelper::getRelationInfo($model, $inheritRelationName);
+                                if ($inheritRelationName === '__self') {
+                                    $inheritRelatedModelType = $configModel->resource_type::getModel();
+                                } else {
+                                    $model = $configModel->resource_type::getModel();
+                                    $inheritRelationInfo = EloquentHelper::getRelationInfo($model, $inheritRelationName);
 
-                                if (!$inheritRelationInfo) {
-                                    return [];
+                                    if (!$inheritRelationInfo) {
+                                        return [];
+                                    }
+
+                                    $inheritRelatedModelType = $inheritRelationInfo->relatedType;
                                 }
 
-                                $inheritRelatedModelType = $inheritRelationInfo->relatedType;
                                 $resources = FilamentUserAttributes::getConfigurableResources();
                                 $resource = collect($resources)
                                     ->filter(function ($name, string $class) {

@@ -6,17 +6,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
-class EloquentHelperRelationshipInfo
-{
-    public string $name;
-
-    public string $relationTypeShort;
-
-    public string $relationType;
-
-    public string $relatedType;
-}
-
 class EloquentHelper
 {
     /**

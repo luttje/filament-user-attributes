@@ -12,6 +12,7 @@ return [
     'inherit_attribute' => 'Attribute to inherit from',
     'inherit_help' => 'You can set the default value by inheriting it from another attribute (even from another resource).',
     'inherit_relation_option_label' => ':related_name (:resource :relationship :related_resource)',
+    'inherit_relation_option_label_self' => ':related_name (self)',
     'inherit_relation' => 'Relation to inherit from',
     'inherit' => 'Inherit value',
     'manage_user_attributes' => 'Manage user attributes',
@@ -29,6 +30,7 @@ return [
      * Short names of relationships.
      */
     'relationships' => [
+        '__self' => 'self',
         'belongsTo' => 'belongs to',
         'belongsToMany' => 'belongs to multiple',
         'hasMany' => 'has multiple',
