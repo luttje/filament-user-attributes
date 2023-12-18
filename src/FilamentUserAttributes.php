@@ -10,6 +10,7 @@ use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Tables\Columns\Column;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
@@ -592,6 +593,19 @@ class FilamentUserAttributes
         $className = class_basename($className);
         $className = preg_replace('/(?<!^)[A-Z]/', ' $0', $className);
         $className = preg_replace('/Resource$/', ucfirst(__('filament-user-attributes::user-attributes.suffix_page')), $className);
+
+        return $className;
+    }
+
+    /**
+     * Converts a model class name to a human readable label by getting
+     * the last part of the name and translating it using the validation
+     * localization file.
+     */
+    public function classNameToModelLabel(string $className, int $amount = 1): string
+    {
+        $className = class_basename($className);
+        $className = trans_choice('validation.attributes.' . Str::snake($className), $amount);
 
         return $className;
     }

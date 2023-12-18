@@ -6,10 +6,14 @@ return [
     'amount' => ':amount Attribute|:amount Attribute',
     'checkbox_display_no' => 'Nein',
     'checkbox_display_yes' => 'Ja',
-    'toggle_display_no' => 'Nein',
-    'toggle_display_yes' => 'Ja',
     'common' => 'Allgemein',
     'customizations_for' => 'Anpassungen für :type',
+    'default_value_config' => 'Standardwertkonfiguration',
+    'inherit_attribute' => 'Attribut zum Erben',
+    'inherit_help' => 'Sie können den Standardwert festlegen, indem Sie ihn von einem anderen Attribut erben (auch von einer anderen Ressource).',
+    'inherit_relation_option_label' => ':related_name (:resource :relationship :related_resource)',
+    'inherit_relation' => 'Zu erben von',
+    'inherit' => 'Wert erben',
     'manage_user_attributes' => 'Attribute verwalten',
     'name_already_exists' => 'Dieser Name existiert bereits, Attribute können nicht denselben Namen haben.',
     'name_help' => 'Dieser Name kann nach der Erstellung nicht mehr geändert werden.',
@@ -20,6 +24,23 @@ return [
     'select_sibling' => 'Nebenattribut auswählen',
     'suffix_page' => ' Seite',
     'suggestions_help' => 'Durch Kommas getrennte Liste von Vorschlägen für den Benutzer zur Auswahl.',
+    'toggle_display_no' => 'Nein',
+    'toggle_display_yes' => 'Ja',
+
+    /**
+     * Short names of relationships.
+     */
+    'relationships' => [
+        'belongsTo' => 'gehört zu',
+        'belongsToMany' => 'gehört zu mehreren',
+        'hasMany' => 'hat mehreren',
+        'hasOne' => 'hat eins',
+        'morphMany' => 'hat mehreren',
+        'morphOne' => 'hat eins',
+        'morphTo' => 'gehört zu',
+        'morphToMany' => 'gehört zu mehreren',
+        'morphedByMany' => 'hat mehreren',
+    ],
 
     /**
      * Names of the attributes that occur in fields.

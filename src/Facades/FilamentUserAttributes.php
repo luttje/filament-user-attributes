@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static array mergeCustomFormFields(array $fields, string $resource)
  * @method static array mergeCustomTableColumns(array $columns, $resource)
  * @method static string classNameToLabel(string $className)
+ * @method static string classNameToModelLabel(string $className)
  *
  * @see \Luttje\FilamentUserAttributes\FilamentUserAttributes
  */

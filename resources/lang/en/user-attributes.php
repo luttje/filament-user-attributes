@@ -6,10 +6,14 @@ return [
     'amount' => ':amount attribute|:amount attributes',
     'checkbox_display_no' => 'No',
     'checkbox_display_yes' => 'Yes',
-    'toggle_display_no' => 'No',
-    'toggle_display_yes' => 'Yes',
     'common' => 'Common',
     'customizations_for' => 'Customizations for :type',
+    'default_value_config' => 'Default value configuration',
+    'inherit_attribute' => 'Attribute to inherit from',
+    'inherit_help' => 'You can set the default value by inheriting it from another attribute (even from another resource).',
+    'inherit_relation_option_label' => ':related_name (:resource :relationship :related_resource)',
+    'inherit_relation' => 'Relation to inherit from',
+    'inherit' => 'Inherit value',
     'manage_user_attributes' => 'Manage user attributes',
     'name_already_exists' => 'This name already exists, attributes cannot have the same name.',
     'name_help' => 'This name can not be changed after creation.',
@@ -20,6 +24,23 @@ return [
     'select_sibling' => 'Select sibling',
     'suffix_page' => ' Page',
     'suggestions_help' => 'Comma separated list of suggestions for the user to choose from.',
+    'toggle_display_no' => 'No',
+    'toggle_display_yes' => 'Yes',
+
+    /**
+     * Short names of relationships.
+     */
+    'relationships' => [
+        'belongsTo' => 'belongs to',
+        'belongsToMany' => 'belongs to multiple',
+        'hasMany' => 'has multiple',
+        'hasOne' => 'has one',
+        'morphMany' => 'has multiple',
+        'morphOne' => 'has one',
+        'morphTo' => 'belongs to',
+        'morphToMany' => 'belongs to multiple',
+        'morphedByMany' => 'has multiple',
+    ],
 
     /**
      * Names of the attributes that occur in fields.

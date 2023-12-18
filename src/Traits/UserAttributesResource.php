@@ -64,14 +64,12 @@ trait UserAttributesResource
     }
 
     /**
-     * Calls the `form` function to get which fields exist.
+     * Gets all field components by calling the `form` method on the instance
      */
-    public static function getFieldsForOrdering(): array
+    public static function getAllFieldComponents(): array
     {
         $form = Form::make(new FormsCapturer());
-        self::$blockInjectUserAttributes = true;
         $result = self::callInstanceOrStatic('form', $form);
-        self::$blockInjectUserAttributes = false;
 
         if (!$result) {
             return [];
@@ -83,14 +81,12 @@ trait UserAttributesResource
     }
 
     /**
-     * Calls the `table` function to get which columns exist.
+     * Gets all table columns by calling the `table` method on the instance
      */
-    public static function getColumnsForOrdering(): array
+    public static function getAllTableColumns(): array
     {
         $table = Table::make(new TablesCapturer());
-        self::$blockInjectUserAttributes = true;
         $result = self::callInstanceOrStatic('table', $table);
-        self::$blockInjectUserAttributes = false;
 
         if (!$result) {
             return [];
@@ -99,6 +95,32 @@ trait UserAttributesResource
         $columns = $result->getColumns();
 
         return FilamentUserAttributes::getAllTableColumns($columns);
+    }
+
+    /**
+     * Gets the field components that should be used for ordering (without
+     * injecting user attributes)
+     */
+    public static function getFieldsForOrdering(): array
+    {
+        self::$blockInjectUserAttributes = true;
+        $fields = self::getAllFieldComponents();
+        self::$blockInjectUserAttributes = false;
+
+        return $fields;
+    }
+
+    /**
+     * Gets the table columns that should be used for ordering (without
+     * injecting user attributes)
+     */
+    public static function getColumnsForOrdering(): array
+    {
+        self::$blockInjectUserAttributes = true;
+        $columns = self::getAllTableColumns();
+        self::$blockInjectUserAttributes = false;
+
+        return $columns;
     }
 }
 

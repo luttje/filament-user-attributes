@@ -39,6 +39,12 @@ return [
     ],
 
     /**
+     * Which function to use to transform the name for a model when
+     * discovering models.
+     */
+    'discovery_model_name_transformer' => Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes::class . '::classNameToModelLabel',
+
+    /**
      * Whether to eager load the user attributes relationship on models that
      * use the HasUserAttributes trait.
      */
