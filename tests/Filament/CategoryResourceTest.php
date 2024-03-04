@@ -67,13 +67,13 @@ it('can render a resource with configured user attributes', function () {
     $names = ['Test Category', 'Another cat', 'yetanothercategory'];
     $userAttributes = [
         [
-            'color' => 'red',
+            'color' => 'X_red_X',
         ],
         [
-            'color' => 'blue',
+            'color' => 'X_blue_X',
         ],
         [
-            'color' => 'green',
+            'color' => 'X_green_X',
         ],
     ];
     $categories = createCategories($names);
@@ -83,13 +83,13 @@ it('can render a resource with configured user attributes', function () {
         ->get(CategoryResource::getUrl('index'))
         ->assertSuccessful()
         ->assertSeeInOrder(['Test Category', 'Another cat', 'yetanothercategory'])
-        ->assertSeeInOrder(['red', 'blue', 'green']);
+        ->assertSeeInOrder(['X_red_X', 'X_blue_X', 'X_green_X']);
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
     $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
-        ->toBe('red');
+        ->toBe('X_red_X');
 });
 
 it('can render a resource with configured user attribute which is hidden in the table', function () {
@@ -108,7 +108,7 @@ it('can render a resource with configured user attribute which is hidden in the 
     $categories = createCategories($names);
 
     $categories->each(function ($category, $index) {
-        $category->user_attributes->color = 'red';
+        $category->user_attributes->color = 'X_red_X';
         $category->save();
     });
 
@@ -116,13 +116,13 @@ it('can render a resource with configured user attribute which is hidden in the 
         ->get(CategoryResource::getUrl('index'))
         ->assertSuccessful()
         ->assertSeeInOrder(['Test Category', 'Another cat', 'yetanothercategory'])
-        ->assertDontSee('red');
+        ->assertDontSee('X_red_X');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
     $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
-        ->toBe('red');
+        ->toBe('X_red_X');
 });
 
 it('can render a resource with configured text input user attribute which is to appear after the name in the table', function () {
@@ -142,22 +142,22 @@ it('can render a resource with configured text input user attribute which is to 
     $categories = createCategories($names);
 
     $categories->each(function ($category, $index) {
-        $category->user_attributes->color = 'red';
+        $category->user_attributes->color = 'X_red_X';
         $category->save();
     });
 
     $this->actingAs($user)
         ->get(CategoryResource::getUrl('index'))
         ->assertSuccessful()
-        ->assertSeeInOrder(['Test Category', 'red', 'DESCRIPTION #0'])
-        ->assertSeeInOrder(['Another cat', 'red', 'DESCRIPTION #1'])
-        ->assertSeeInOrder(['yetanothercategory', 'red', 'DESCRIPTION #2']);
+        ->assertSeeInOrder(['Test Category', 'X_red_X', 'DESCRIPTION #0'])
+        ->assertSeeInOrder(['Another cat', 'X_red_X', 'DESCRIPTION #1'])
+        ->assertSeeInOrder(['yetanothercategory', 'X_red_X', 'DESCRIPTION #2']);
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
     $product = Category::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
-        ->toBe('red');
+        ->toBe('X_red_X');
 });
 
 it('can render a resource with configured checkbox input user attribute which is to be hidden in the table', function () {

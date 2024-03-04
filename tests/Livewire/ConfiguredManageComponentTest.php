@@ -32,7 +32,7 @@ it('can render a form with configured user attributes', function () {
         ->assertSuccessful()
         ->fillForm([
             'name' => 'Test product',
-            'user_attributes.color' => 'red',
+            'user_attributes.color' => 'X_red_X',
         ])
         ->call('create')
         ->assertHasNoFormErrors()
@@ -44,11 +44,11 @@ it('can render a form with configured user attributes', function () {
         // But in the table:
         ->assertSee('test-product')
         ->assertSee('Test product')
-        ->assertSee('red');
+        ->assertSee('X_red_X');
 
     // Double-check that it's actually added to the database, with the polymorphic relation:
     $product = Product::with('userAttribute')->first();
 
     expect($product->user_attributes->color)
-        ->toBe('red');
+        ->toBe('X_red_X');
 });
