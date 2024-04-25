@@ -292,6 +292,32 @@ it('can get a configurationSchema', function () {
             ],
         ],
     ];
+
     $configurationSchema = UserAttributeComponentFactoryRegistry::getConfigurationSchemas($config);
+
+    // This also catches problems with relation types that aren't implemented. See issue #12 for an example.
     $this->assertIsArray($configurationSchema);
+});
+
+it('has appropriate translations for all relationships', function () {
+    // It makes no sense to me to expose $relatedAmountMap publicly, so we test it through a mock.
+    class UserAttributeComponentFactoryRegistryMock extends UserAttributeComponentFactoryRegistry
+    {
+        public static function getRelatedAmountMap(): array
+        {
+            return static::$relatedAmountMap;
+        }
+    }
+
+    $translations = array_keys(UserAttributeComponentFactoryRegistryMock::getRelatedAmountMap());
+
+    $languages = ['en', 'nl', 'de'];
+
+    foreach ($translations as $translation) {
+        foreach ($languages as $language) {
+            expect(__('filament-user-attributes::user-attributes.relationships.' . $translation, [], $language))
+                ->not()
+                ->toBe('filament-user-attributes::user-attributes.relationships.' . $translation);
+        }
+    }
 });
