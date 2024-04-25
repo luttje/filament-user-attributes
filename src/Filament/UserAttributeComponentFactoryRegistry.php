@@ -19,7 +19,9 @@ class UserAttributeComponentFactoryRegistry
         'belongsTo' => 1,
         'belongsToMany' => 99,
         'hasMany' => 99,
+        'hasManyThrough' => 99,
         'hasOne' => 1,
+        'hasOneThrough' => 1,
         'morphMany' => 99,
         'morphOne' => 1,
         'morphTo' => 1,
@@ -75,6 +77,12 @@ class UserAttributeComponentFactoryRegistry
             $relatedResource = $modelsMappedToResources[$relatedModel] ?? null;
 
             if (!$relatedResource) {
+                continue;
+            }
+
+            if (!isset(static::$relatedAmountMap[$relation->relationTypeShort])) {
+                trigger_error("Relation type {$relation->relationTypeShort} not found in relatedAmountMap", E_USER_WARNING);
+
                 continue;
             }
 
