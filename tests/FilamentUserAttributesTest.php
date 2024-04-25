@@ -8,7 +8,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Config;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
+use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
+use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
+use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\SomeSubFolder\ProductResource;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire\SimpleTable;
@@ -260,4 +263,35 @@ it('can discover models from specified app directories even sub folders', functi
         User::class,
         PriceRange::class,
     ]);
+});
+
+it('can get a configurationSchema', function() {
+    Config::set('filament-user-attributes.discover_models', [
+        'Models',
+    ]);
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__.'/Fixtures'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures',
+    ));
+
+    $config = new UserAttributeConfig();
+    $config->owner_type = User::class;
+    $config->owner_id = 1;
+    $config->resource_type = UserAttributeConfigResource::class;
+    $config->model_type = User::class;
+    $config->config = [
+        'fields' => [
+            'name' => [
+                'type' => 'text',
+                'label' => 'Name',
+            ],
+            'description' => [
+                'type' => 'textarea',
+                'label' => 'Description',
+            ],
+        ],
+    ];
+    $configurationSchema = UserAttributeComponentFactoryRegistry::getConfigurationSchemas($config);
+    $this->assertIsArray($configurationSchema);
 });

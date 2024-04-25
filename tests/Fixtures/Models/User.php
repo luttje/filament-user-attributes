@@ -64,4 +64,9 @@ class User extends Authenticatable implements ConfiguresUserAttributesContract, 
     {
         return UserFactory::new();
     }
+
+    public function favoriteCategories()
+    {
+        return $this->hasManyThrough(Category::class, CategoryUser::class, 'id', 'category_id');
+    }
 }
