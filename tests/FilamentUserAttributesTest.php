@@ -265,7 +265,7 @@ it('can discover models from specified app directories even sub folders', functi
     ]);
 });
 
-it('can get a configurationSchema', function() {
+it('can get a configurationSchema', function () {
     Config::set('filament-user-attributes.discover_models', [
         'Models',
     ]);
