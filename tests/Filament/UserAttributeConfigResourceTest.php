@@ -105,6 +105,12 @@ it('can configure a text(area) input user attribute for a resource', function ($
         'type' => $inputType,
         'customizations' => [
             'placeholder' => 'Enter your promotional text here',
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
         ],
     ], $user);
 })->with([
@@ -159,6 +165,13 @@ it('can configure a number input with min, max and decimal places', function () 
             'minimum' => 0,
             'maximum' => 100,
             'decimal_places' => 2,
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
+            'is_currency' => false,
         ],
     ], $user);
 });
@@ -184,6 +197,12 @@ it('can configure a binary input user attribute for a resource', function ($inpu
         'type' => $inputType,
         'customizations' => [
             'default' => true,
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
         ],
     ], $user);
 })->with(['checkbox', 'toggle']);
@@ -223,6 +242,12 @@ it('can configure a select/radio input user attribute for a resource', function 
                     'label' => 'Option 1',
                 ]
             ],
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
         ],
     ], $user);
 })->with([
@@ -269,6 +294,12 @@ it('can configure date, time and datetime input format', function () {
         'customizations' => [
             'format' => 'date',
             'allow_before_now' => false,
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
         ],
     ], $user);
 
@@ -279,6 +310,12 @@ it('can configure date, time and datetime input format', function () {
         'customizations' => [
             'format' => 'time',
             'allow_before_now' => false,
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
         ],
     ], $user, 1);
 
@@ -289,6 +326,12 @@ it('can configure date, time and datetime input format', function () {
         'customizations' => [
             'format' => 'datetime',
             'allow_before_now' => true,
+
+            'limit' => 50,
+            'is_limited' => true,
+            'wraps_text' => true,
+            'is_sortable' => true,
+            'is_searchable' => true,
         ],
     ], $user, 2);
 });
