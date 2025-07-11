@@ -17,7 +17,7 @@
 
 # Filament User Attributes
 
-Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress.
+Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress. For Laravel 10, 11 and 12 and Filament 3.
 
 > **Demonstration:** showing the creation of a custom user attribute for the 'Locations' resource of this app:
 >
@@ -128,6 +128,18 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     ```bash
     php artisan vendor:publish --tag=filament-user-attributes-config
     ```
+
+## ⚠️ Important note about guarded columns in Laravel 10
+
+When you use guarded columns in your model (e.g: `protected $guarded = ['some_process_data'];`) this package will explicitly add the `user_attributes` column included with all columns that are NOT guarded to the fillable array. This is because Laravel considers any attributes that don't exist in the database as guarded, unless we explicitly add them to the fillable array.
+
+Take note of this, because it is a bit of a hack and may not be the expected behavior. This problem doesn't exist since Laravel 11, because there we can
+influence what is considered a guardable column by implementing an accessor.
+
+For more information see:
+
+- [`initializeHasUserAttributes` in `src/Traits/HasUserAttributes.php` in this package](src/Traits/HasUserAttributes.php)
+- [`isFillable`, `isGuarded` and `isGuardableColumn` in `vendor/laravel/framework/src/Illuminate/Database/Eloquent/Concerns/GuardsAttributes.php` in Laravel 10](https://github.com/laravel/framework/blob/37455bbd9ece2ab48443b4ad2af85abf2140e326/src/Illuminate/Database/Eloquent/Concerns/GuardsAttributes.php#L167-L229)
 
 ## ✨ Features
 

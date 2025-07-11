@@ -231,15 +231,19 @@ it('can create a model with user attributes through mass assignment', function (
     expect($model->user_attributes->key)->toBe('value');
 });
 
+// Since filament will use mass assignment to create or update models, we need to ensure that the user attributes can be set even if the mass assignable filter is guarded.
 it('can add a custom attribute when mass assignable filter is guarded', function () {
     $model = new ProductButGuarded([
         'name' => 'Test Product',
         'slug' => 'test-product',
         'description' => 'A cool product',
         'price' => 10.22,
+        'some_process_data' => 'This is process data that should not be mass assignable',
+        'user_attributes' => [
+            'key' => 'value',
+        ]
     ]);
 
-    $model->user_attributes->key = 'value';
     $model->save();
 
     expect($model->userAttribute()->count())->toBe(1);

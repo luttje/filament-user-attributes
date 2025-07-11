@@ -87,7 +87,7 @@ it('can render a resource with configured user attributes', function () {
     ));
 
     $this->artisan('filament-user-attributes:wizard')
-        ->expectsConfirmation('Do add support for user attributes to your models?', 'no')
+        ->expectsConfirmation('Do you want to add support for user attributes to your models?', 'no')
         ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'no')
         ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'no')
         ->assertExitCode(0);
@@ -102,7 +102,7 @@ it('can render a resource with configured user attributes', function () {
 //     ));
 
 //     $this->artisan('filament-user-attributes:wizard')
-//         ->expectsConfirmation('Do add support for user attributes to your models?', 'yes')
+//         ->expectsConfirmation('Do you want to add support for user attributes to your models?', 'yes')
 //         ->expectsQuestion('Which of your models should be able to have user attributes? (comma separated)', [
 //             'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category',
 //             'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\TagNotSetup',
@@ -130,7 +130,7 @@ it('can render a resource with configured user attributes', function () {
 //     ));
 
 //     $this->artisan('filament-user-attributes:wizard')
-//         ->expectsConfirmation('Do add support for user attributes to your models?', 'no')
+//         ->expectsConfirmation('Do you want to add support for user attributes to your models?', 'no')
 //         ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'yes')
 //         ->expectsQuestion('Which model should configure user attributes?', 'Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Team')
 //         ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'no')
@@ -156,7 +156,7 @@ it('can render a resource with configured user attributes', function () {
 //     ));
 
 //     $this->artisan('filament-user-attributes:wizard')
-//         ->expectsConfirmation('Do add support for user attributes to your models?', 'no')
+//         ->expectsConfirmation('Do you want to add support for user attributes to your models?', 'no')
 //         ->expectsConfirmation('Do you want to let a model (like user or tenant) configure user attributes?', 'no')
 //         ->expectsConfirmation('Do you want to setup any resources to display and edit user attributes?', 'yes')
 //         ->expectsQuestion('Which resources should display and edit user attributes?', [

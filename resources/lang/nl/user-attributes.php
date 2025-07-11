@@ -17,7 +17,7 @@ return [
     'inherit' => 'Waarde erven',
     'manage_user_attributes' => 'Beheer aangepaste velden',
     'name_already_exists' => 'Deze naam bestaat al, aangepaste velden kunnen niet dezelfde naam hebben.',
-    'name_help' => 'Deze naam kan niet meer worden gewijzigd na aanmaak.',
+    'name_help' => 'Deze naam kan niet meer worden gewijzigd na het aanmaken.',
     'order_sibling_help' => 'Kies het bestaande veld om dit veld ervoor of erna te ordenen.',
     'ordering_form' => 'In Formulier',
     'ordering_table' => 'In Tabel',

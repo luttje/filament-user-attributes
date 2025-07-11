@@ -58,7 +58,7 @@ If the project maintainer has any additional requirements, you will find them li
 
 1. Clone this repository to your device
 2. Inside the root of this repository run composer install
-3. Create a test project in which you will use this package (Follow Usage instructions above)
+3. Create a test project in which you will use this package (Follow Usage instructions in the [`README.md`](../README.md) of this package)
 4. Add the package locally using the following additions to your composer.
 
 ```json

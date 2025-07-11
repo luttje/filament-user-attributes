@@ -30,7 +30,7 @@ class WizardStepModels extends Command
     protected function promptForModelSetup(): bool
     {
         return $this->confirm(
-            "Do add support for user attributes to your models?",
+            "Do you want to add support for user attributes to your models?",
             true
         );
     }

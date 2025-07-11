@@ -19,5 +19,5 @@ class ProductButGuarded extends Model implements HasUserAttributesContract
      *
      * @var array
      */
-    protected $guarded = [];
+    protected $guarded = ['some_process_data'];
 }

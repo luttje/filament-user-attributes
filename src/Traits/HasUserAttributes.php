@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -41,8 +40,37 @@ trait HasUserAttributes
             $this->with[] = 'userAttribute';
         }
 
+        // In case fillable is used, we need to ensure that the user_attributes
+        // are included in the fillable attributes of the model or they won't
+        // be saved when the model is saved.
         if (!empty($this->fillable)) {
             $this->mergeFillable(['user_attributes']);
+        } else {
+            $version = app()->version();
+            $major = (int) explode('.', $version)[0];
+            $isHighEnoughLaravel = $major >= 11;
+
+            // Laravel 11 and higher consider user_attributes a guardable column
+            // because we implemented the `setUserAttributesAttribute` mutator.
+            // So we only need to perform the below hack if the Laravel version is
+            // lower than 11.
+            if (!$isHighEnoughLaravel) {
+                // Otherwise guarded is used, in that case we need to ensure that all
+                // attributes not in guarded are fillable, including user_attributes.
+                $columns = $this->getConnection()
+                            ->getSchemaBuilder()
+                            ->getColumnListing($this->getTable());
+
+                $fillable = array_diff($columns, $this->guarded);
+                $fillable[] = 'user_attributes';
+
+                // We have to fiddle with the fillable array here, because if any
+                // attributes are in $guarded, Laravel will consider any attributes
+                // that don't exist in the database as guarded, unless we explicitly
+                // add them to the fillable array.
+                // NOTE: This is quite a hack, so we mention this in the README.md!
+                $this->mergeFillable($fillable);
+            }
         }
 
         // Ensure that the user attributes are appended to the model when it is serialized.
@@ -122,6 +150,18 @@ trait HasUserAttributes
     public function getUserAttributesAttribute()
     {
         return $this->getUserAttributeValues()->toArray();
+    }
+
+    /**
+     * Mutator for setting the user attributes.
+     *
+     * This is only here so that in Laravel 11 and higher, the user_attributes
+     * attribute is considered a 'guardable' column. This causes guarded models
+     * to still save user_attributes, even if that is not a real database column.
+     */
+    public function setUserAttributesAttribute($value)
+    {
+        $this->attributes['user_attributes'] = $value;
     }
 
     /**
