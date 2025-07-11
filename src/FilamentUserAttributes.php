@@ -508,7 +508,7 @@ class FilamentUserAttributes
                 $siblingFound = true;
                 if ($position === 'before') {
                     array_splice($newComponents, count($newComponents) - 1, 0, [$componentToAdd]);
-                } elseif($position === 'after') {
+                } elseif ($position === 'after') {
                     $newComponents[] = $componentToAdd;
                 }
             }
