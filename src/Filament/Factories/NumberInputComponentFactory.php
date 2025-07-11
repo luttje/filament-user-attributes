@@ -98,7 +98,8 @@ class NumberInputComponentFactory extends BaseComponentFactory
                     __('filament-user-attributes::user-attributes.attributes.currency_format_other') => $remainingCurrencies
                 ])
                 ->default('EUR')
-                ->visible(fn (Get $get) => $get('is_currency')),
+                ->visible(fn (Get $get) => $get('is_currency'))
+                ->dehydrated(fn (Get $get) => $get('is_currency')),
 
             TextInput::make('decimal_places')
                 ->numeric()

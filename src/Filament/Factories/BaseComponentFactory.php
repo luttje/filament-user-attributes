@@ -208,6 +208,7 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 ->step(1)
                 ->required()
                 ->visible(fn (Get $get) => $get('is_limited'))
+                ->dehydrated(fn (Get $get) => $get('is_limited'))
                 ->default(50),
         ];
     }
