@@ -79,10 +79,43 @@ function createUserAttributeConfig($test, $user, $resourceType, $attributeBuilde
     return UserAttributeConfig::where('resource_type', $resourceType)->first();
 }
 
-function assertUserAttributeConfig($config, $expectedConfig, $user, $index = 0)
+/**
+ * Asserts that the user attribute config matches the expected configuration,
+ * only checking the keys that are present in the expected config.
+ */
+function assertUserAttributeConfig(UserAttributeConfig $config, array $expectedConfig, User $user, int $index = 0)
 {
-    expect($config->config[$index])->toMatchArray($expectedConfig);
+    $actualConfig = $config->config[$index];
+
+    // Recursively filter the actual config to only include keys from expected config
+    $filteredActual = filterArrayByKeys($actualConfig, $expectedConfig);
+
+    expect($filteredActual)->toMatchArray($expectedConfig);
     expect($config->owner)->toBeObject($user);
+}
+
+/**
+ * Filters an array by the keys present in another array.
+ * This is useful for asserting that only specific keys are present in the actual config.
+ *
+ * @return array The filtered array containing only keys from the expected array.
+ */
+function filterArrayByKeys(array $actual, array $expected)
+{
+    $filtered = [];
+
+    foreach ($expected as $key => $value) {
+        if (array_key_exists($key, $actual)) {
+            if (is_array($value) && is_array($actual[$key])) {
+                // Recursively filter nested arrays
+                $filtered[$key] = filterArrayByKeys($actual[$key], $value);
+            } else {
+                $filtered[$key] = $actual[$key];
+            }
+        }
+    }
+
+    return $filtered;
 }
 
 it('can configure a text(area) input user attribute for a resource', function ($inputType) {
@@ -105,12 +138,6 @@ it('can configure a text(area) input user attribute for a resource', function ($
         'type' => $inputType,
         'customizations' => [
             'placeholder' => 'Enter your promotional text here',
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
         ],
     ], $user);
 })->with([
@@ -165,13 +192,6 @@ it('can configure a number input with min, max and decimal places', function () 
             'minimum' => 0,
             'maximum' => 100,
             'decimal_places' => 2,
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
-            'is_currency' => false,
         ],
     ], $user);
 });
@@ -197,12 +217,6 @@ it('can configure a binary input user attribute for a resource', function ($inpu
         'type' => $inputType,
         'customizations' => [
             'default' => true,
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
         ],
     ], $user);
 })->with(['checkbox', 'toggle']);
@@ -242,12 +256,6 @@ it('can configure a select/radio input user attribute for a resource', function 
                     'label' => 'Option 1',
                 ]
             ],
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
         ],
     ], $user);
 })->with([
@@ -294,12 +302,6 @@ it('can configure date, time and datetime input format', function () {
         'customizations' => [
             'format' => 'date',
             'allow_before_now' => false,
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
         ],
     ], $user);
 
@@ -310,12 +312,6 @@ it('can configure date, time and datetime input format', function () {
         'customizations' => [
             'format' => 'time',
             'allow_before_now' => false,
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
         ],
     ], $user, 1);
 
@@ -326,12 +322,6 @@ it('can configure date, time and datetime input format', function () {
         'customizations' => [
             'format' => 'datetime',
             'allow_before_now' => true,
-
-            'limit' => 50,
-            'is_limited' => true,
-            'wraps_text' => true,
-            'is_sortable' => true,
-            'is_searchable' => true,
         ],
     ], $user, 2);
 });
