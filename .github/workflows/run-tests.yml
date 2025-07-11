@@ -34,6 +34,8 @@ jobs:
             laravel: 10.*
             testbench: 8.*
             carbon: ^2.63
+            pest: ^2.0
+            pest-plugin: ^2.0
             stability: prefer-lowest
 
           - os: ubuntu-latest
@@ -41,6 +43,8 @@ jobs:
             laravel: 10.*
             testbench: 8.*
             carbon: ^2.63
+            pest: ^2.0
+            pest-plugin: ^2.0
             stability: prefer-stable
 
           - os: ubuntu-latest
@@ -48,6 +52,8 @@ jobs:
             laravel: 10.*
             testbench: 8.*
             carbon: ^2.63
+            pest: ^2.0
+            pest-plugin: ^2.0
             stability: prefer-lowest
 
           - os: ubuntu-latest
@@ -55,6 +61,8 @@ jobs:
             laravel: 10.*
             testbench: 8.*
             carbon: ^2.63
+            pest: ^2.0
+            pest-plugin: ^2.0
             stability: prefer-stable
 
           # Laravel 11
@@ -63,6 +71,8 @@ jobs:
             laravel: 11.*
             testbench: 9.*
             carbon: ^2.63
+            pest: ^2.0
+            pest-plugin: ^2.0
             stability: prefer-lowest
 
           - os: ubuntu-latest
@@ -70,6 +80,8 @@ jobs:
             laravel: 11.*
             testbench: 9.*
             carbon: ^2.63
+            pest: ^2.0
+            pest-plugin: ^2.0
             stability: prefer-stable
 
           # Laravel 12
@@ -78,6 +90,8 @@ jobs:
             laravel: 12.*
             testbench: 10.*
             carbon: ^3.0
+            pest: ^3.7
+            pest-plugin: ^3.1
             stability: prefer-lowest
 
           - os: ubuntu-latest
@@ -85,6 +99,8 @@ jobs:
             laravel: 12.*
             testbench: 10.*
             carbon: ^3.0
+            pest: ^3.7
+            pest-plugin: ^3.1
             stability: prefer-stable
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
@@ -107,7 +123,13 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" "nesbot/carbon:${{ matrix.carbon }}" --no-interaction --no-update
+          composer require \
+            "laravel/framework:${{ matrix.laravel }}" \
+            "orchestra/testbench:${{ matrix.testbench }}" \
+            "nesbot/carbon:${{ matrix.carbon }}" \
+            "pestphp/pest:^3.7" \
+            "pestphp/pest-plugin-laravel:^3.1" \
+            --dev --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
