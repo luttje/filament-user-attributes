@@ -165,7 +165,7 @@ jobs:
         run: |
           composer require \
             "livewire/livewire:${{ matrix.livewire }}" \
-            "laravel/contracts:${{ matrix.laravel }}" \
+            "illuminate/contracts:${{ matrix.laravel }}" \
             --no-interaction --no-update
 
           composer require \
