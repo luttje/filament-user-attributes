@@ -92,7 +92,7 @@ jobs:
             pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
-            collision: ^11.0
+            collision: ^8.0
             stability: prefer-lowest
 
           - os: ubuntu-latest
@@ -105,7 +105,7 @@ jobs:
             pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
-            collision: ^11.0
+            collision: ^8.0
             stability: prefer-stable
 
           # Laravel 12
