@@ -127,8 +127,8 @@ jobs:
             "laravel/framework:${{ matrix.laravel }}" \
             "orchestra/testbench:${{ matrix.testbench }}" \
             "nesbot/carbon:${{ matrix.carbon }}" \
-            "pestphp/pest:^3.7" \
-            "pestphp/pest-plugin-laravel:^3.1" \
+            "pestphp/pest:${{ matrix.pest }}" \
+            "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin }}" \
             --dev --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
