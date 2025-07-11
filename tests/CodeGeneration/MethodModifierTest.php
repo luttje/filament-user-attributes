@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes\Tests\CodeGeneration;
 
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Illuminate\Support\Facades\Config;
 
 it('can add a method to a class', function () {
     $contents = file_get_contents(__DIR__ . '/../../src/Commands/WizardCommand.php');
@@ -32,5 +33,5 @@ it('can add a method to a class', function () {
         });
     });
 
-    expect($edit->getCode())->toContain('public static function getUserAttributesConfig() : ?\Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract');
+    expect($edit->getCode())->toContain('public static function getUserAttributesConfig(): ?\Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract');
 });

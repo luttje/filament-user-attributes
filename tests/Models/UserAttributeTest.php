@@ -118,7 +118,7 @@ it('throws if trying to set a non-object as attributes', function (mixed $data) 
     'string' => 'string',
     'int' => 1,
     'float' => 1.1,
-    'array' => ['key' => 'value'],
+    'array' => [['key' => 'value']],
     'null' => null,
     'bool' => true,
     'callable' => fn () => null,

@@ -5,6 +5,7 @@ namespace Luttje\FilamentUserAttributes\CodeGeneration;
 use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter;
 use PhpParser\NodeVisitor;
+use PhpParser\ParserFactory;
 
 /**
  * @internal
@@ -102,7 +103,7 @@ final class CodeEditor
 
     private static function parseAndTraverseUntilUsing($code, $symbolFilter)
     {
-        [$parser, $lexer] = self::makeParserWithLexer();
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
         $ast = $parser->parse($code);
 
         return self::traverseUntilUsing($ast, $symbolFilter);
@@ -133,42 +134,25 @@ final class CodeEditor
         return '\\' . $class;
     }
 
-    private static function makeParserWithLexer()
-    {
-        $lexer = new \PhpParser\Lexer\Emulative([
-            'usedAttributes' => [
-                'comments',
-                'startLine', 'endLine',
-                'startTokenPos', 'endTokenPos',
-            ],
-        ]);
-        $parser = new \PhpParser\Parser\Php7($lexer);
-
-        return [$parser, $lexer];
-    }
-
     public static function astFromTemplate($template)
     {
-        [$parser, $lexer] = self::makeParserWithLexer();
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
         return $parser->parse($template);
     }
 
     private static function modifyCode($code, $nodeName, $modifierClass, ?\Closure $builder = null)
     {
-        [$parser, $lexer] = self::makeParserWithLexer();
-
         // Create a traverser to clone the AST so we can keep the original formatting
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new NodeVisitor\CloningVisitor());
+        $traverser = new NodeTraverser(new NodeVisitor\CloningVisitor());
+        $parser = (new ParserFactory())->createForNewestSupportedVersion();
 
         $ast = $parser->parse($code);
-        $origTokens = $lexer->getTokens();
+        $origTokens = $parser->getTokens();
 
         $modifiedAst = $traverser->traverse($ast);
 
         // Create a new traverser to modify the AST
-        $traverser = new NodeTraverser();
-        $traverser->addVisitor(new $modifierClass($nodeName, $builder));
+        $traverser = new NodeTraverser(new $modifierClass($nodeName, $builder));
 
         $modifiedAst = $traverser->traverse($modifiedAst);
 

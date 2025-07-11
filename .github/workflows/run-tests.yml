@@ -32,10 +32,11 @@ jobs:
           - os: ubuntu-latest
             php: 8.1
             laravel: 10.*
+            livewire: ^3.0
             testbench: 8.*
             carbon: ^2.63
             pest: ^2.0
-            pest-plugin: ^2.0
+            pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
             collision: ^7.0
@@ -44,10 +45,11 @@ jobs:
           - os: ubuntu-latest
             php: 8.1
             laravel: 10.*
+            livewire: ^3.0
             testbench: 8.*
             carbon: ^2.63
             pest: ^2.0
-            pest-plugin: ^2.0
+            pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
             collision: ^7.0
@@ -56,10 +58,11 @@ jobs:
           - os: ubuntu-latest
             php: 8.2
             laravel: 10.*
+            livewire: ^3.0
             testbench: 8.*
             carbon: ^2.63
             pest: ^2.0
-            pest-plugin: ^2.0
+            pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
             collision: ^7.0
@@ -68,10 +71,11 @@ jobs:
           - os: ubuntu-latest
             php: 8.2
             laravel: 10.*
+            livewire: ^3.0
             testbench: 8.*
             carbon: ^2.63
             pest: ^2.0
-            pest-plugin: ^2.0
+            pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
             collision: ^7.0
@@ -81,50 +85,54 @@ jobs:
           - os: ubuntu-latest
             php: 8.2
             laravel: 11.*
+            livewire: ^3.3.5
             testbench: 9.*
             carbon: ^2.63
             pest: ^2.0
-            pest-plugin: ^2.0
+            pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
-            collision: ^7.0
+            collision: ^11.0
             stability: prefer-lowest
 
           - os: ubuntu-latest
             php: 8.2
             laravel: 11.*
+            livewire: ^3.3.5
             testbench: 9.*
             carbon: ^2.63
             pest: ^2.0
-            pest-plugin: ^2.0
+            pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
-            collision: ^7.0
+            collision: ^11.0
             stability: prefer-stable
 
           # Laravel 12
           - os: ubuntu-latest
             php: 8.2
             laravel: 12.*
+            livewire: ^3.5.20
             testbench: 10.*
             carbon: ^3.0
             pest: ^3.7
-            pest-plugin: ^3.1
+            pest-plugin-laravel: ^3.1.0
             pest-plugin-arch: ^3.1
-            pest-plugin-livewire: ^3.0
-            collision: ^8.8
+            pest-plugin-livewire: ^3.0.0
+            collision: ^8.0
             stability: prefer-lowest
 
           - os: ubuntu-latest
             php: 8.2
             laravel: 12.*
+            livewire: ^3.5.20
             testbench: 10.*
             carbon: ^3.0
             pest: ^3.7
-            pest-plugin: ^3.1
+            pest-plugin-laravel: ^3.1.0
             pest-plugin-arch: ^3.1
-            pest-plugin-livewire: ^3.0
-            collision: ^8.8
+            pest-plugin-livewire: ^3.0.0
+            collision: ^8.0
             stability: prefer-stable
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
@@ -148,15 +156,20 @@ jobs:
       - name: Install dependencies
         run: |
           composer require \
+            "livewire/livewire:${{ matrix.livewire }}" \
+            --no-interaction --no-update
+
+          composer require \
             "laravel/framework:${{ matrix.laravel }}" \
             "orchestra/testbench:${{ matrix.testbench }}" \
             "nesbot/carbon:${{ matrix.carbon }}" \
             "pestphp/pest:${{ matrix.pest }}" \
-            "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin }}" \
+            "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin-laravel }}" \
             "pestphp/pest-plugin-arch:${{ matrix.pest-plugin-arch }}" \
             "pestphp/pest-plugin-livewire:${{ matrix.pest-plugin-livewire }}" \
             "nunomaduro/collision:${{ matrix.collision }}" \
             --dev --no-interaction --no-update
+
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
