@@ -36,6 +36,8 @@ jobs:
             carbon: ^2.63
             pest: ^2.0
             pest-plugin: ^2.0
+            pest-plugin-arch: ^2.0
+            pest-plugin-livewire: ^2.1
             collision: ^7.0
             stability: prefer-lowest
 
@@ -46,6 +48,8 @@ jobs:
             carbon: ^2.63
             pest: ^2.0
             pest-plugin: ^2.0
+            pest-plugin-arch: ^2.0
+            pest-plugin-livewire: ^2.1
             collision: ^7.0
             stability: prefer-stable
 
@@ -56,6 +60,8 @@ jobs:
             carbon: ^2.63
             pest: ^2.0
             pest-plugin: ^2.0
+            pest-plugin-arch: ^2.0
+            pest-plugin-livewire: ^2.1
             collision: ^7.0
             stability: prefer-lowest
 
@@ -66,6 +72,8 @@ jobs:
             carbon: ^2.63
             pest: ^2.0
             pest-plugin: ^2.0
+            pest-plugin-arch: ^2.0
+            pest-plugin-livewire: ^2.1
             collision: ^7.0
             stability: prefer-stable
 
@@ -77,6 +85,8 @@ jobs:
             carbon: ^2.63
             pest: ^2.0
             pest-plugin: ^2.0
+            pest-plugin-arch: ^2.0
+            pest-plugin-livewire: ^2.1
             collision: ^7.0
             stability: prefer-lowest
 
@@ -87,6 +97,8 @@ jobs:
             carbon: ^2.63
             pest: ^2.0
             pest-plugin: ^2.0
+            pest-plugin-arch: ^2.0
+            pest-plugin-livewire: ^2.1
             collision: ^7.0
             stability: prefer-stable
 
@@ -98,6 +110,8 @@ jobs:
             carbon: ^3.0
             pest: ^3.7
             pest-plugin: ^3.1
+            pest-plugin-arch: ^3.1
+            pest-plugin-livewire: ^3.0
             collision: ^8.8
             stability: prefer-lowest
 
@@ -108,6 +122,8 @@ jobs:
             carbon: ^3.0
             pest: ^3.7
             pest-plugin: ^3.1
+            pest-plugin-arch: ^3.1
+            pest-plugin-livewire: ^3.0
             collision: ^8.8
             stability: prefer-stable
 
@@ -137,6 +153,8 @@ jobs:
             "nesbot/carbon:${{ matrix.carbon }}" \
             "pestphp/pest:${{ matrix.pest }}" \
             "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin }}" \
+            "pestphp/pest-plugin-arch:${{ matrix.pest-plugin-arch }}" \
+            "pestphp/pest-plugin-livewire:${{ matrix.pest-plugin-livewire }}" \
             "nunomaduro/collision:${{ matrix.collision }}" \
             --dev --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
