@@ -49,7 +49,7 @@ class UserAttributeConfigResource extends Resource
 
     public static function resolveRecordRouteBinding(int | string $key): ?Model
     {
-        if(class_exists($key)) {
+        if (class_exists($key)) {
             $resource = $key;
             $config = $resource::getUserAttributesConfig();
 
