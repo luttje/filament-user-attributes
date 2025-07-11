@@ -47,8 +47,7 @@ trait HasUserAttributes
             $this->mergeFillable(['user_attributes']);
         } else {
             $version = app()->version();
-            $major = (int) explode('.', $version)[0];
-            $isHighEnoughLaravel = $major >= 11;
+            $isHighEnoughLaravel = version_compare($version, '11.26.0', '>=');
 
             // Laravel 11 and higher consider user_attributes a guardable column
             // because we implemented the `setUserAttributesAttribute` mutator.

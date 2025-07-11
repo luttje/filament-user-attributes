@@ -129,12 +129,12 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     php artisan vendor:publish --tag=filament-user-attributes-config
     ```
 
-## ⚠️ Important note about guarded columns in Laravel 10
+## ⚠️ Important note about guarded columns until Laravel `v11.26.0`
 
 When you use guarded columns in your model (e.g: `protected $guarded = ['some_process_data'];`) this package will explicitly add the `user_attributes` column included with all columns that are NOT guarded to the fillable array. This is because Laravel considers any attributes that don't exist in the database as guarded, unless we explicitly add them to the fillable array.
 
-Take note of this, because it is a bit of a hack and may not be the expected behavior. This problem doesn't exist since Laravel 11, because there we can
-influence what is considered a guardable column by implementing an accessor.
+Take note of this, because it is a bit of a hack and may not be the expected behavior. This problem doesn't exist from Laravel v11.26.0 and beyond, because since that version we can
+influence what is considered a guardable column by implementing an accessor (which we do with the `setUserAttributesAttribute` mutator).
 
 For more information see:
 
