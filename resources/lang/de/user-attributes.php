@@ -77,4 +77,22 @@ return [
         'suggestions' => 'Vorschläge',
         'type' => 'Typ',
     ],
+
+    /**
+     * Names of types of user attributes.
+     */
+    'types' => [
+        'text' => 'Text (Zeile)',
+        'textarea' => 'Text (Absatz)',
+        'richeditor' => 'Text (Rich Editor)',
+        'number' => 'Zahl',
+        'select' => 'Auswahl (Optionen)',
+        'checkbox' => 'Kontrollkästchen',
+        'toggle' => 'Umschalter',
+        'radio' => 'Mehrfachauswahl',
+        'tags' => 'Stichwörter',
+        'datetime' => 'Datum und Uhrzeit',
+        'date' => 'Datum',
+        'time' => 'Uhrzeit',
+    ],
 ];

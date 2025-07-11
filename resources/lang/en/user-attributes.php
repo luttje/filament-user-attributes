@@ -77,4 +77,22 @@ return [
         'suggestions' => 'suggestions',
         'type' => 'type',
     ],
+
+    /**
+     * Names of types of user attributes.
+     */
+    'types' => [
+        'text' => 'Text (Line)',
+        'textarea' => 'Text (Paragraph)',
+        'richeditor' => 'Text (Rich Editor)',
+        'number' => 'Number',
+        'select' => 'Select (Options)',
+        'checkbox' => 'Checkbox',
+        'toggle' => 'Toggle',
+        'radio' => 'Multiple choice',
+        'tags' => 'Tags',
+        'datetime' => 'Date and time',
+        'date' => 'Date',
+        'time' => 'Time',
+    ],
 ];

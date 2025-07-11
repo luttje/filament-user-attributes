@@ -77,4 +77,22 @@ return [
         'suggestions' => 'suggesties',
         'type' => 'type',
     ],
+
+    /**
+     * Names of types of user attributes.
+     */
+    'types' => [
+        'text' => 'Tekst (Regel)',
+        'textarea' => 'Tekst (Paragraaf)',
+        'richeditor' => 'Tekst (Uitgebreide Editor)',
+        'number' => 'Nummer',
+        'select' => 'Selecteren (Opties)',
+        'checkbox' => 'Vinkdoos',
+        'toggle' => 'Schakelaar',
+        'radio' => 'Meerdere keuzes',
+        'tags' => 'Tags',
+        'datetime' => 'Datum en tijd',
+        'date' => 'Datum',
+        'time' => 'Tijd',
+    ],
 ];

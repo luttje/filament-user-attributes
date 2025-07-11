@@ -111,6 +111,11 @@ class UserAttributeComponentFactoryRegistry
         $schemas[] = Forms\Components\Fieldset::make('common')
             ->label(ucfirst(__('filament-user-attributes::user-attributes.common')))
             ->schema(function () {
+                $registeredTypes = static::getRegisteredTypes();
+                $registeredTypeOptions = array_combine($registeredTypes, array_map(function ($type) {
+                    return __('filament-user-attributes::user-attributes.types.' . $type);
+                }, $registeredTypes));
+
                 return [
                     // TODO: Make configs for these, so developers can tweak which default fields are shown
                     Forms\Components\TextInput::make('name')
@@ -133,11 +138,13 @@ class UserAttributeComponentFactoryRegistry
                         ])
                         ->helperText(ucfirst(__('filament-user-attributes::user-attributes.name_help')))
                         ->maxLength(255),
+
                     Forms\Components\Select::make('type')
-                        ->options(array_combine(static::getRegisteredTypes(), static::getRegisteredTypes()))
+                        ->options($registeredTypeOptions)
                         ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.type')))
                         ->required()
                         ->live(),
+
                     Forms\Components\TextInput::make('label')
                         ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.label')))
                         ->required()
@@ -220,7 +227,7 @@ class UserAttributeComponentFactoryRegistry
             $factorySchema = $factory->makeConfigurationSchema();
 
             $schemas[] = Forms\Components\Fieldset::make('customizations_for_' . $type)
-                ->label(ucfirst(__('filament-user-attributes::user-attributes.customizations_for', ['type' => $type])))
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.customizations_for', ['type' => __('filament-user-attributes::user-attributes.types.' . $type)])))
                 ->statePath('customizations')
                 ->schema($factorySchema)
                 ->mutateDehydratedStateUsing(function (Get $get, $state) use ($type, $factorySchema) {
