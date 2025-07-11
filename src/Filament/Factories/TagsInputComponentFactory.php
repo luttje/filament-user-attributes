@@ -39,6 +39,8 @@ class TagsInputComponentFactory extends BaseComponentFactory
                 ->splitKeys(['Tab', ' '])
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.suggestions')))
                 ->helperText(__('filament-user-attributes::user-attributes.suggestions_help')),
+
+            ...parent::makeConfigurationSchema(),
         ];
     }
 }

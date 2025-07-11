@@ -72,6 +72,8 @@ class DateTimeComponentFactory extends BaseComponentFactory
             Checkbox::make('allow_before_now')
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.allow_history')))
                 ->default(false),
+
+            ...parent::makeConfigurationSchema(),
         ];
     }
 }

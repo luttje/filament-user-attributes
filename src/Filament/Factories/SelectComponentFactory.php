@@ -45,7 +45,9 @@ class SelectComponentFactory extends BaseComponentFactory
                 ->schema([
                     TextInput::make('id')->required(),
                     TextInput::make('label'),
-                ])
+                ]),
+
+            ...parent::makeConfigurationSchema(),
         ];
     }
 }

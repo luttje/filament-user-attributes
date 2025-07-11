@@ -37,6 +37,8 @@ class TextComponentFactory extends BaseComponentFactory
             TextInput::make('placeholder')
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.placeholder')))
                 ->maxLength(255),
+
+            ...parent::makeConfigurationSchema(),
         ];
     }
 }

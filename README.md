@@ -149,20 +149,21 @@ For more information see:
 - [x] Easily display the attributes in a Filament form
 - [x] Easily display the attributes in a Filament table
 - [x] Sensible validations for input types
-- [x] Allow users to specify order of attributes
-  - [x] In the form
-  - [x] In the table
-- [x] Allow users to hide attributes
-  - [x] In the form
-  - [x] In the table
-- [x] Users can specify default values for attributes
-- [x] Users can specify if attributes are required
-- [x] Users can specify if attributes inherit their value from another attribute, even from a related model
+- [x] User interface for managing user attributes, including:
+  - [x] Allow users to specify order of attributes
+    - [x] In the form
+    - [x] In the table
+  - [x] Allow users to hide attributes
+    - [x] In the form
+    - [x] In the table
+  - [x] Users can specify default values for attributes
+  - [x] Users can specify if attributes are required
+  - [x] Users can specify if attributes inherit their value from another attribute, even from a related model
   - [x] For Resources
   - [x] For Livewire components (if they implement the static `::getModel()` method)
   - [x] For related fields that have a {relation}_id field in the form
   - [ ] For related attributes that have no field in this form
-- [x] User interface for managing user attributes
+  - [x] Allow users to specify if an attribute should have a limit, wrap text or format as currency
 - [x] Support for Tabs and Sections in the form
 - [x] Wizard command to help you setup your project code
 

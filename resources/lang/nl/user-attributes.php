@@ -49,6 +49,13 @@ return [
      */
     'attributes' => [
         'config' => 'configuratie',
+        'wrap_text' => 'tekst teruglopen',
+        'is_limited' => 'is beperkt',
+        'limit' => 'limiet',
+        'is_currency' => 'is geld',
+        'currency_format' => 'geld formaat',
+        'currency_format_common' => 'Veelvoorkomende valuta',
+        'currency_format_other' => 'Andere valuta',
         'decimal_places' => 'decimale plaatsen',
         'default' => 'standaard',
         'format' => 'formaat',

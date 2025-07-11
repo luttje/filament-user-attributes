@@ -32,6 +32,7 @@ class RichEditorComponentFactory extends BaseComponentFactory
     public function makeConfigurationSchema(): array
     {
         return [
+            ...parent::makeConfigurationSchema(),
         ];
     }
 }

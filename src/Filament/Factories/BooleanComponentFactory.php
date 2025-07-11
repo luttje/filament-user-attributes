@@ -44,6 +44,8 @@ abstract class BooleanComponentFactory extends BaseComponentFactory
         return [
             Toggle::make('default')
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.default'))),
+
+            ...parent::makeConfigurationSchema(),
         ];
     }
 }

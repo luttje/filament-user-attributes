@@ -49,6 +49,13 @@ return [
      */
     'attributes' => [
         'config' => 'Konfiguration',
+        'wrap_text' => 'Text umbrechen',
+        'is_limited' => 'ist begrenzt',
+        'limit' => 'Limit',
+        'is_currency' => 'Ist Geld',
+        'currency_format' => 'Geldformat',
+        'currency_format_common' => 'Gängige Währungen',
+        'currency_format_other' => 'Andere Währungen',
         'decimal_places' => 'Dezimalstellen',
         'default' => 'Standard',
         'format' => 'Format',

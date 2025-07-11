@@ -49,6 +49,13 @@ return [
      */
     'attributes' => [
         'config' => 'config',
+        'wrap_text' => 'wrap text',
+        'is_limited' => 'is limited',
+        'limit' => 'limit',
+        'is_currency' => 'is currency',
+        'currency_format' => 'currency format',
+        'currency_format_common' => 'Common currencies',
+        'currency_format_other' => 'Other currencies',
         'decimal_places' => 'decimal places',
         'default' => 'default',
         'format' => 'format',

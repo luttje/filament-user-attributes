@@ -3,9 +3,12 @@
 namespace Luttje\FilamentUserAttributes\Filament\Factories;
 
 use Closure;
+use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
@@ -65,6 +68,14 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
             $default = $this->makeInheritedDefault($userAttribute, $default);
         }
 
+        if (isset($customizations['is_limited']) && $customizations['is_limited'] === true) {
+            $column->limit($customizations['limit'] ?? 50);
+        }
+
+        if (isset($customizations['wraps_text']) && $customizations['wraps_text'] === true) {
+            $column->wrap();
+        }
+
         return $column
             ->label($userAttribute['label'])
             ->default($default);
@@ -103,5 +114,32 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
             ->default($default);
 
         return $field;
+    }
+
+    public function makeConfigurationSchema(): array
+    {
+        return [
+            Checkbox::make('wraps_text')
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.wrap_text')))
+                ->default(true),
+
+            Checkbox::make('is_limited')
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.is_limited')))
+                ->default(true)
+                ->live()
+                ->afterStateUpdated(function (Set $set, ?bool $state) {
+                    if ($state) {
+                        $set('limit', 50);
+                    }
+                }),
+
+            TextInput::make('limit')
+                ->numeric()
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.limit')))
+                ->step(1)
+                ->required()
+                ->visible(fn (Get $get) => $get('is_limited'))
+                ->default(50),
+        ];
     }
 }
