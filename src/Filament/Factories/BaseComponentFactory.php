@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Tables\Columns\Column;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\EloquentHelper;
@@ -76,6 +77,66 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
             $column->wrap();
         }
 
+        $userAttributeName = $userAttribute['name'];
+
+        if (isset($customizations['is_searchable']) && $customizations['is_searchable'] === true) {
+            $column->searchable(query: function (Builder $query, string $search) use ($userAttributeName): Builder {
+                $jsonPath = '$."' . str_replace('"', '\"', $userAttributeName) . '"';
+
+                $query->whereHas('userAttribute', function (Builder $query) use ($jsonPath, $search) {
+                    $query->where(function (Builder $subQuery) use ($jsonPath, $search) {
+                        $subQuery->whereRaw(
+                            "JSON_UNQUOTE(JSON_EXTRACT(`values`, ?)) LIKE ?",
+                            [$jsonPath, '%' . $search . '%']
+                        );
+
+                        // If search contains comma, also search with dot, because the database only stores JSON numbers with dots
+                        if (strpos($search, ',') !== false) {
+                            $searchWithDot = str_replace(',', '.', $search);
+                            $subQuery->orWhereRaw(
+                                "JSON_UNQUOTE(JSON_EXTRACT(`values`, ?)) LIKE ?",
+                                [$jsonPath, '%' . $searchWithDot . '%']
+                            );
+                        }
+                    });
+                });
+                return $query;
+            });
+        }
+
+        if (isset($customizations['is_sortable']) && $customizations['is_sortable'] === true) {
+            $column->sortable(
+                query: function (Builder $query, string $direction) use ($userAttributeName): Builder {
+                    $jsonPath = '$."' . str_replace('"', '\"', $userAttributeName) . '"';
+                    $model = $query->getModel();
+                    $modelClass = get_class($model);
+                    $modelTable = $model->getTable();
+                    $modelKey = $model->getKeyName();
+                    $nullsFirst = $direction === 'desc';
+
+                    return $query
+                        ->select($modelTable . '.*') // Ensure we're selecting all columns from main table (or we get a `Missing required parameter` error)
+                        ->leftJoin('user_attributes', function ($join) use ($modelClass, $modelTable, $modelKey) {
+                            $join->on('user_attributes.model_id', '=', $modelTable . '.' . $modelKey)
+                                 ->where('user_attributes.model_type', '=', $modelClass);
+                        })
+                        ->orderByRaw("
+                            CASE
+                                WHEN user_attributes.id IS NULL THEN ?
+                                ELSE ?
+                            END,
+                            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(user_attributes.values, ?)), '') {$direction}
+                        ", [
+                            $nullsFirst ? 0 : 1,  // NULL records priority
+                            $nullsFirst ? 1 : 0,  // Non-NULL records priority
+                            $jsonPath
+                        ]);
+                }
+            );
+        }
+
+        $column->toggleable();
+
         return $column
             ->label($userAttribute['label'])
             ->default($default);
@@ -119,6 +180,14 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
     public function makeConfigurationSchema(): array
     {
         return [
+            Checkbox::make('is_searchable')
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.is_searchable')))
+                ->default(true),
+
+            Checkbox::make('is_sortable')
+                ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.is_sortable')))
+                ->default(true),
+
             Checkbox::make('wraps_text')
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.wrap_text')))
                 ->default(true),

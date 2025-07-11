@@ -109,11 +109,8 @@ trait ConfiguresUserAttributes
                 throw new \Exception("The user attribute type '{$type}' is not yet supported.");
             }
 
-            $column = $factory->makeColumn($userAttribute)
-                ->sortable($userAttribute['sortable'] ?? false);
-
             $columns[] = [
-                'column' => $column,
+                'column' => $factory->makeColumn($userAttribute),
                 'ordering' => [
                     'position' => $userAttribute['order_position_table'] ?? null,
                     'sibling' => $userAttribute['order_sibling_table'] ?? null,

@@ -49,6 +49,8 @@ return [
      */
     'attributes' => [
         'config' => 'configuratie',
+        'is_searchable' => 'is doorzoekbaar',
+        'is_sortable' => 'is sorteerbaar',
         'wrap_text' => 'tekst teruglopen',
         'is_limited' => 'is beperkt',
         'limit' => 'limiet',

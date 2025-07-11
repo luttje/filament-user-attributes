@@ -158,12 +158,14 @@ For more information see:
     - [x] In the table
   - [x] Users can specify default values for attributes
   - [x] Users can specify if attributes are required
-  - [x] Users can specify if attributes inherit their value from another attribute, even from a related model
-  - [x] For Resources
-  - [x] For Livewire components (if they implement the static `::getModel()` method)
-  - [x] For related fields that have a {relation}_id field in the form
-  - [ ] For related attributes that have no field in this form
+  - [x] Users can specify if attributes inherit their value from another attribute, even from a related model, for:
+    - [x] Resources
+    - [x] Livewire components (if they implement the static `::getModel()` method)
+    - [x] Related fields that have a {relation}_id field in the form
+    - [ ] Related attributes that have no field in this form
   - [x] Allow users to specify if an attribute should have a limit, wrap text or format as currency
+  - [x] Allow users to specify if an attribute should be searchable and/or sortable
+  - [x] Support for toggleable attribute columns in the table on a per-user basis
 - [x] Support for Tabs and Sections in the form
 - [x] Wizard command to help you setup your project code
 

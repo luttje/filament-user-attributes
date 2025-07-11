@@ -49,6 +49,8 @@ return [
      */
     'attributes' => [
         'config' => 'Konfiguration',
+        'is_searchable' => 'ist durchsuchbar',
+        'is_sortable' => 'ist sortierbar',
         'wrap_text' => 'Text umbrechen',
         'is_limited' => 'ist begrenzt',
         'limit' => 'Limit',
