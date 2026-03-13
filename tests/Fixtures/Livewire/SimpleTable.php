@@ -2,6 +2,8 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire;
 
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Columns\TextColumn;
@@ -12,10 +14,11 @@ use Livewire\Component;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 
-class SimpleTable extends Component implements HasForms, HasTable
+class SimpleTable extends Component implements HasForms, HasTable, HasActions
 {
     use InteractsWithForms;
     use InteractsWithTable;
+    use InteractsWithActions;
 
     public function table(Table $table): Table
     {
@@ -29,10 +32,10 @@ class SimpleTable extends Component implements HasForms, HasTable
             ->filters([
                 // ...
             ])
-            ->actions([
+            ->recordActions([
                 // ...
             ])
-            ->bulkActions([
+            ->toolbarActions([
                 // ...
             ]);
     }

@@ -2,8 +2,8 @@
 
 namespace Luttje\FilamentUserAttributes\Tests;
 
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Support\Facades\Config;
@@ -52,7 +52,7 @@ it('can discover resources from specified app directories', function () {
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/Fixtures/Filament'),
+        realpath(__DIR__ . '/Fixtures/Filament'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures\Filament',
     ));
 
@@ -70,7 +70,7 @@ it('can discover resources from specified app directories even sub folders', fun
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/Fixtures/Filament'),
+        realpath(__DIR__ . '/Fixtures/Filament'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures\Filament',
     ));
 
@@ -89,7 +89,7 @@ it('can transform names of discovered resources to labels', function () {
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/Fixtures/Filament'),
+        realpath(__DIR__ . '/Fixtures/Filament'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures\Filament',
     ));
 
@@ -229,7 +229,7 @@ it('can discover models from specified app directories', function () {
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/Fixtures'),
+        realpath(__DIR__ . '/Fixtures'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures',
     ));
 
@@ -250,7 +250,7 @@ it('can discover models from specified app directories even sub folders', functi
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/Fixtures'),
+        realpath(__DIR__ . '/Fixtures'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures',
     ));
 
@@ -271,7 +271,7 @@ it('can get a configurationSchema', function () {
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/Fixtures'),
+        realpath(__DIR__ . '/Fixtures'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures',
     ));
 
