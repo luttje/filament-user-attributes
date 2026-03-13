@@ -30,7 +30,7 @@ function createCategories($names, $attributes = [])
     return Category::factory()
         ->count(count($names))
         ->sequence(
-            fn($sequence) => array_merge(
+            fn ($sequence) => array_merge(
                 [
                     'name' => $names[$sequence->index],
                     'slug' => Str::of($names[$sequence->index])->slug('-'),
