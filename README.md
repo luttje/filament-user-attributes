@@ -17,7 +17,7 @@
 
 # Filament User Attributes
 
-Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress. For Laravel 10, 11 and 12 and Filament 3.
+Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress. For Laravel 11 and 12 and Filament 4.
 
 > **Demonstration:** showing the creation of a custom user attribute for the 'Locations' resource of this app:
 >
@@ -34,9 +34,9 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 ## 🚀 Getting started
 
 1. Make sure your project meets these requirements:
-    - PHP 8.1 or higher
-    - [Livewire 3.0.3](https://livewire.laravel.com/) or higher
-    - [Filament 3.0](https://filamentphp.com/docs) or higher
+    - PHP 8.2 or higher
+    - [Livewire 3.4](https://livewire.laravel.com/) or higher
+    - [Filament 4.0](https://filamentphp.com/docs) or higher
     - A database that supports JSON columns, e.g:
         - MySQL 5.7.8 or higher
         - PostgreSQL 9.2 or higher
