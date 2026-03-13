@@ -29,7 +29,7 @@ class TagNotSetupResource extends Resource
     public static function form(Schema $form): Schema
     {
         return $form
-            ->schema([
+            ->components([
                 Section::make()
                     ->schema([
                         Tabs::make()

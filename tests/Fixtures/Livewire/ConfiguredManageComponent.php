@@ -59,7 +59,7 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable,
     public function form(Schema $form): Schema
     {
         return $form
-            ->schema(
+            ->components(
                 self::withUserAttributeFields([
                     TextInput::make('name'),
                 ])

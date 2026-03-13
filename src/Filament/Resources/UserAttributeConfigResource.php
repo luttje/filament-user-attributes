@@ -87,7 +87,7 @@ class UserAttributeConfigResource extends Resource
         /** @var UserAttributeConfig */
         $model = $form->model;
         return $form
-            ->schema([
+            ->components([
                 Forms\Components\Repeater::make('config')
                     ->addActionLabel(__('filament-user-attributes::user-attributes.add_attribute'))
                     ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.config')))

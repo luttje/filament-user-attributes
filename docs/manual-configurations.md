@@ -73,7 +73,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
     public static function form(Schema $form): Schema
     {
         return $form
-            ->schema(
+            ->components(
                 // Wrap your schema with:
                 self::withUserAttributeFields([
                     // You add non user attribute fields here as you normally would in the `form` method, e.g:
@@ -171,7 +171,7 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     public function form(Schema $form): Schema
     {
         return $form
-            ->schema(
+            ->components(
                 // Wrap your schema with:
                 self::withUserAttributeFields([
                     TextInput::make('name'),

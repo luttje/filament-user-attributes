@@ -43,7 +43,7 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
     public static function form(Schema $form): Schema
     {
         return $form
-            ->schema(
+            ->components(
                 self::withUserAttributeFields([
                     Section::make()
                         ->schema([
