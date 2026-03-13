@@ -19,7 +19,7 @@
         }
     ],
     "require": {
-        "php": "^8.3",
+        "php": "^8.2",
         "filament/filament": "^4.0",
         "filament/forms": "^4.0",
         "filament/tables": "^4.0",
