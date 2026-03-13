@@ -183,4 +183,4 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
 }
 ```
 
-*For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/main/tests/Fixtures/Livewire/ConfiguredManageComponent.php).*
+*For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/filament-v4/tests/Fixtures/Livewire/ConfiguredManageComponent.php).*

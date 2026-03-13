@@ -2,9 +2,9 @@ name: run-tests
 
 on:
   push:
-    branches: [main]
+    branches: [main, filament-v4]
   pull_request:
-    branches: [main]
+    branches: [main, filament-v4]
 
 jobs:
   test:
