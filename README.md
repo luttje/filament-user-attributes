@@ -1,11 +1,12 @@
+
+> [!CAUTION]
+> This version of the package is no longer maintained. It is superseded by newer versions, that support newer versions of Laravel and Filament, and have more features.
+
 <div align="center">
 
 ![Filament User Attributes](./.github/banner.jpeg)
 
 </div>
-
-> [!Warning]
-> This package is still in development. It is not yet ready for production use and the API may change at any time.
 
 <div align="center">
 
