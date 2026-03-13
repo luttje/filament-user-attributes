@@ -11,42 +11,10 @@ use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
+use Filament\Forms\Components\Repeater;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 
-// Quick hack to find the id for a user attribute config item
-// TODO: Make a test mixin for this
-// !Repeaters are hard to test, consider: https://github.com/filamentphp/filament/discussions/6070
-function findIdInComponent($component, $skip, $suffix = '.')
-{
-    $html = $component->effects['html'];
-    $prefix = 'wire:model="data.config' . $suffix;
-    $counter = 0;
-    $foundIds = [];
-
-    do {
-        $line = substr($html, 0, strpos($html, "\n"));
-        if (strpos($line, $prefix) !== false) {
-            preg_match('/' . $prefix . '([^.]+)/', $line, $matches);
-            $id = $matches[1];
-
-            if (!in_array($id, $foundIds)) {
-                $foundIds[] = $id;
-                $counter++;
-            }
-
-            if ($counter > $skip) {
-                return $id;
-            }
-        }
-
-        $html = substr($html, strpos($html, "\n") + 1);
-    } while (strpos($html, $prefix) !== false);
-
-    return null;
-}
-
 // Configures a user attribute through the management form
-// TODO: Make a test mixin for this
 function configureUserAttributes($test, $user, $resource, $attributeBuilders)
 {
     // Ensure the config is created in the database
@@ -54,20 +22,19 @@ function configureUserAttributes($test, $user, $resource, $attributeBuilders)
         ->get(UserAttributeConfigResource::getUrl('edit', ['record' => $resource]))
         ->assertSuccessful();
 
+    $undoRepeaterFake = Repeater::fake();
+
     $component = Livewire::actingAs($user)
         ->test(EditUserAttributeConfig::class, ['record' => $resource]);
 
     foreach ($attributeBuilders as $index => $attributeBuilder) {
-        $component->call('mountFormComponentAction', 'data.config', 'add')
-            ->assertSee('Common');
-
-        $id = findIdInComponent($component, $index);
-
-        $attributeBuilder($id, $component);
+        $attributeBuilder($index, $component);
     }
 
     $component->call('save')
         ->assertHasNoErrors();
+
+    $undoRepeaterFake();
 
     return $component;
 }
@@ -233,10 +200,9 @@ it('can configure a select/radio input user attribute for a resource', function 
                 "config.$id.type" => $inputType,
             ]);
 
-            $component//->call('mountFormComponentAction', "data.config.$id.customizations.options", 'add')
-                ->assertSeeInOrder(['Id', 'Label']);
+            $component->assertSeeInOrder(['Id', 'Label']);
 
-            $optionId = findIdInComponent($component, 0, ".$id.customizations.options.");
+            $optionId = 0;
 
             $component->fillForm([
                 "config.$id.customizations.options.$optionId.id" => 'option_1',
@@ -331,7 +297,7 @@ it('can manage user attributes through the action', function () {
         ->create();
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
-        realpath(__DIR__.'/../Fixtures'),
+        realpath(__DIR__ . '/../Fixtures'),
         'Luttje\FilamentUserAttributes\Tests\Fixtures',
     ));
     Config::set('filament-user-attributes.discover_resources', [
@@ -344,5 +310,5 @@ it('can manage user attributes through the action', function () {
             'resource_type' => CategoryResource::class,
         ])
         ->assertSee('Resource type')
-        ->assertHasNoActionErrors();
+        ->assertHasNoFormErrors();
 });

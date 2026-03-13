@@ -5,7 +5,7 @@ namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -56,7 +56,7 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable,
             );
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema(
