@@ -28,7 +28,11 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
     {
         return function (?Model $record, Get $get) use ($userAttribute, $default) {
             if ($userAttribute['inherit_relation'] === '__self') {
-                $relatedField = $get($userAttribute['inherit_attribute']);
+                try {
+                    $relatedField = $get($userAttribute['inherit_attribute']);
+                } catch (\Error) {
+                    $relatedField = null;
+                }
 
                 if ($relatedField !== null) {
                     return $relatedField;
@@ -42,10 +46,14 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
             } else {
                 // TODO: Should we support situations where a relation exists, but no form field is shown for it.
                 // TODO: We currently only support relations that have a form field e.g: relation customer needs customer(_id) field
-                $relatedField = $get($userAttribute['inherit_relation']);
+                try {
+                    $relatedField = $get($userAttribute['inherit_relation']);
 
-                if (!$relatedField) {
-                    $relatedField = $get($userAttribute['inherit_relation'] . '_id');
+                    if (!$relatedField) {
+                        $relatedField = $get($userAttribute['inherit_relation'] . '_id');
+                    }
+                } catch (\Error) {
+                    $relatedField = null;
                 }
 
                 if ($relatedField !== null) {
@@ -207,8 +215,8 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.limit')))
                 ->step(1)
                 ->required()
-                ->visible(fn (Get $get) => $get('is_limited'))
-                ->dehydrated(fn (Get $get) => $get('is_limited'))
+                ->visible(fn(Get $get) => $get('is_limited'))
+                ->dehydrated(fn(Get $get) => $get('is_limited'))
                 ->default(50),
         ];
     }

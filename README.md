@@ -151,6 +151,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     - [x] Livewire components (if they implement the static `::getModel()` method)
     - [x] Related fields that have a {relation}_id field in the form
     - [ ] Related attributes that have no field in this form
+    - [ ] Fields nested inside layout components (Section, Tabs, Fieldset) whose children are defined via a `Closure` — these cannot be resolved outside a Livewire context and will not appear in the inherit attribute dropdown
   - [x] Allow users to specify if an attribute should have a limit, wrap text or format as currency
   - [x] Allow users to specify if an attribute should be searchable and/or sortable
   - [x] Support for toggleable attribute columns in the table on a per-user basis

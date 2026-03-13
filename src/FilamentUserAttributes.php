@@ -453,10 +453,16 @@ class FilamentUserAttributes
             }
 
             if ($this->componentHasChildren($component)) {
+                try {
+                    $childComponents = $component->getChildComponents();
+                } catch (\Error $e) {
+                    $raw = $component->getDefaultChildComponents();
+                    $childComponents = is_array($raw) ? $raw : [];
+                }
                 $namesWithLabels = array_merge(
                     $namesWithLabels,
                     $this->getAllFieldComponents(
-                        $component->getChildComponents(),
+                        $childComponents,
                         $label
                     )
                 );
@@ -517,7 +523,12 @@ class FilamentUserAttributes
             }
 
             if ($this->componentHasChildren($component)) {
-                $containerChildComponents = $component->getChildComponents();
+                try {
+                    $containerChildComponents = $component->getChildComponents();
+                } catch (\Error $e) {
+                    $raw = $component->getDefaultChildComponents();
+                    $containerChildComponents = is_array($raw) ? $raw : [];
+                }
                 $childComponents = $this->addFieldBesidesField(
                     $containerChildComponents,
                     $siblingComponentName,
@@ -620,10 +631,17 @@ class FilamentUserAttributes
         /** @var Component $field */
         foreach ($fields as $field) {
             if ($this->componentHasChildren($field)) {
-                $this->addStateChangeSignalToInheritedFields(
-                    $field->getChildComponents(),
-                    $inheritingFieldsMap
-                );
+                try {
+                    $childComponents = $field->getChildComponents();
+                } catch (\Error $e) {
+                    // The component's container is not yet initialized (e.g. during schema
+                    // capture before getComponents() has been invoked on the parent schema).
+                    // Fall back to the raw stored child components to continue traversal.
+                    $rawChildren = $field->getDefaultChildComponents();
+                    $childComponents = is_array($rawChildren) ? $rawChildren : [];
+                }
+
+                $this->addStateChangeSignalToInheritedFields($childComponents, $inheritingFieldsMap);
             }
 
             $statePath = $field->getStatePath(false);

@@ -2,9 +2,9 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
+use Livewire\Component;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Schemas\Components\Component;
+use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -127,7 +127,7 @@ trait UserAttributesResource
 /**
  * Shim class to capture the form components that are being configured.
  */
-class FormsCapturer extends Component implements HasForms
+class FormsCapturer extends Component implements HasSchemas
 {
     use InteractsWithForms;
 }
