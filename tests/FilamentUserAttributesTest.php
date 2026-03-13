@@ -156,8 +156,8 @@ it('adds a field into a tab if the sibling is in a tab', function () {
     $components = [$tabParent];
     $updatedComponents = FilamentUserAttributes::addFieldBesidesField($components, 'Tab Parent > Email', 'before', $componentAge);
 
-    expect($updatedComponents[0]->getChildComponents())->toHaveLength(3);
-    expect($updatedComponents[0]->getChildComponents())->toMatchArray([
+    expect($updatedComponents[0]->getDefaultChildComponents())->toHaveLength(3);
+    expect($updatedComponents[0]->getDefaultChildComponents())->toMatchArray([
         $componentName,
         $componentAge,
         $componentEmail,
@@ -183,8 +183,8 @@ it('adds a field into a section in a tab if that is how deep it is nested', func
     $components = [$tabParent];
     $updatedComponents = FilamentUserAttributes::addFieldBesidesField($components, 'Tab Parent > Section Parent > Email', 'before', $componentAge);
 
-    expect($updatedComponents[0]->getChildComponents()[0]->getChildComponents())->toHaveLength(3);
-    expect($updatedComponents[0]->getChildComponents()[0]->getChildComponents())->toMatchArray([
+    expect($updatedComponents[0]->getDefaultChildComponents()[0]->getDefaultChildComponents())->toHaveLength(3);
+    expect($updatedComponents[0]->getDefaultChildComponents()[0]->getDefaultChildComponents())->toMatchArray([
         $componentName,
         $componentAge,
         $componentEmail,
