@@ -3,7 +3,6 @@
 namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\SomeSubFolder;
 
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;

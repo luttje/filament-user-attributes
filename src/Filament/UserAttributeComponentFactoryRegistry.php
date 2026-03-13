@@ -173,8 +173,8 @@ class UserAttributeComponentFactoryRegistry
                         Forms\Components\Select::make('inherit_relation')
                             ->options($inheritRelationOptions)
                             ->label(ucfirst(__('filament-user-attributes::user-attributes.inherit_relation')))
-                            ->required(fn(Get $get) => $get('inherit'))
-                            ->disabled(fn(Get $get) => !$get('inherit'))
+                            ->required(fn (Get $get) => $get('inherit'))
+                            ->disabled(fn (Get $get) => !$get('inherit'))
                             ->live(),
                         Forms\Components\Select::make('inherit_attribute')
                             ->options(function (Get $get) use ($configModel) {
@@ -212,8 +212,8 @@ class UserAttributeComponentFactoryRegistry
                                 return $attributes;
                             })
                             ->label(ucfirst(__('filament-user-attributes::user-attributes.inherit_attribute')))
-                            ->required(fn(Get $get) => $get('inherit'))
-                            ->disabled(fn(Get $get) => !$get('inherit')),
+                            ->required(fn (Get $get) => $get('inherit'))
+                            ->disabled(fn (Get $get) => !$get('inherit')),
                     ])
             ]);
 
@@ -250,8 +250,8 @@ class UserAttributeComponentFactoryRegistry
 
                     return $state;
                 })
-                ->hidden(fn(Get $get) => $get('type') !== $type || count($factorySchema) === 0)
-                ->disabled(fn(Get $get) => $get('type') !== $type || count($factorySchema) === 0);
+                ->hidden(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0)
+                ->disabled(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0);
         }
 
         $schemas[] = Fieldset::make('ordering')
