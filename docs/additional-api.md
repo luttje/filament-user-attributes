@@ -25,6 +25,7 @@ Besides using the package as described in the [README](../README.md) you can als
     ```
 
 * To display a single user attribute as a column use the `UserAttributeColumn` class:
+
     ```php
     use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 
@@ -80,10 +81,10 @@ $configs = UserAttributeConfig::queryByConfigKey('import')
 You can use `FilamentUserAttributes::registerUserAttributeConfigComponent($callbackOrComponent)` to add custom fields to the user attribute configuration form. This is useful if you want to add custom fields to the user attribute configuration form in `Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource`, but don't want to create a whole new resource for it.
 
 ```php
-use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Checkbox;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\ServiceProvider;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 

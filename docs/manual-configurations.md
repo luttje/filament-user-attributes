@@ -2,7 +2,7 @@
 
 > [!Warning]
 > The steps described below can also be done automatically by running the [🚀 Getting Started](../README.md#-getting-started) wizard (`php artisan filament-user-attributes:wizard`) command.
-> 
+>
 > The information below is only for those who want to manually configure the package.
 
 ## 📦 Setup models to have custom user attributes
@@ -23,7 +23,7 @@
 
 You can let your users configure which custom attributes should be added to your filament tables and forms.
 
-2. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
+1. Add the `ConfiguresUserAttributesContract` interface and `ConfiguresUserAttributes` trait to the model that should be able to configure user attributes (e.g. a user or tenant model):
 
     ```php
     use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
@@ -39,13 +39,13 @@ You can let your users configure which custom attributes should be added to your
 
 Now it's time to setup a resource that should display the user attributes and allow editting them:
 
-3. Have the resource use the `UserAttributesResource` trait.
+1. Have the resource use the `UserAttributesResource` trait.
 
-4. In your resource wrap the array for your fields (in the `form` method) in `self::withUserAttributeFields()`.
+2. In your resource wrap the array for your fields (in the `form` method) in `self::withUserAttributeFields()`.
 
-5. Similarly wrap the array for your columns (in the `table` method) in `self::withUserAttributeColumns()`.
+3. Similarly wrap the array for your columns (in the `table` method) in `self::withUserAttributeColumns()`.
 
-6. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user or tenant).
+4. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user or tenant).
 
 **Your resource should now look something like this:**
 
@@ -70,7 +70,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
         return $user;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema(
@@ -104,7 +104,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
 
 Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
-7. Create a resource and inherit from the `UserAttributeConfigResource` class:
+1. Create a resource and inherit from the `UserAttributeConfigResource` class:
 
     ```php
     // app/Filament/Resources/UserAttributeConfigResource.php
@@ -114,7 +114,7 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
     class UserAttributeConfigResource extends BaseUserAttributeConfigResource
     {
-        protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+        protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     }
     ```
 
@@ -168,7 +168,7 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
             );
     }
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $form
             ->schema(
@@ -182,4 +182,5 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     }
 }
 ```
+
 *For a complete example of a Livewire component see [the test mock component here](https://github.com/luttje/filament-user-attributes/blob/main/tests/Fixtures/Livewire/ConfiguredManageComponent.php).*

@@ -12,6 +12,8 @@ use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
+use BackedEnum;
+use Filament\Schemas\Schema;
 
 class ProductResource extends Resource implements UserAttributesConfigContract
 {
@@ -21,7 +23,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
 
     protected static bool $isDiscovered = false;
 
-    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static ?string $navigationLabel = 'Product';
 
@@ -37,7 +39,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
         return $user;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema([

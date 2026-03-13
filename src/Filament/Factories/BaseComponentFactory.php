@@ -4,11 +4,11 @@ namespace Luttje\FilamentUserAttributes\Filament\Factories;
 
 use Closure;
 use Filament\Forms\Components\Checkbox;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -118,7 +118,7 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                         ->select($modelTable . '.*') // Ensure we're selecting all columns from main table (or we get a `Missing required parameter` error)
                         ->leftJoin('user_attributes', function ($join) use ($modelClass, $modelTable, $modelKey) {
                             $join->on('user_attributes.model_id', '=', $modelTable . '.' . $modelKey)
-                                 ->where('user_attributes.model_type', '=', $modelClass);
+                                ->where('user_attributes.model_type', '=', $modelClass);
                         })
                         ->orderByRaw("
                             CASE
@@ -207,8 +207,8 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.limit')))
                 ->step(1)
                 ->required()
-                ->visible(fn (Get $get) => $get('is_limited'))
-                ->dehydrated(fn (Get $get) => $get('is_limited'))
+                ->visible(fn(Get $get) => $get('is_limited'))
+                ->dehydrated(fn(Get $get) => $get('is_limited'))
                 ->default(50),
         ];
     }

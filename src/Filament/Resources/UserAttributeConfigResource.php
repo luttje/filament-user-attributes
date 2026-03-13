@@ -2,9 +2,11 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Resources;
 
+use Closure;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -47,7 +49,7 @@ class UserAttributeConfigResource extends Resource
         return $query;
     }
 
-    public static function resolveRecordRouteBinding(int | string $key): ?Model
+    public static function resolveRecordRouteBinding(int | string $key, ?Closure $modifyQuery = null): ?Model
     {
         if (class_exists($key)) {
             $resource = $key;
@@ -80,7 +82,7 @@ class UserAttributeConfigResource extends Resource
         return parent::resolveRecordRouteBinding($key);
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         /** @var UserAttributeConfig */
         $model = $form->model;
@@ -93,7 +95,7 @@ class UserAttributeConfigResource extends Resource
                     ->schema([
                         ...UserAttributeComponentFactoryRegistry::getConfigurationSchemas($model),
                     ])
-                ])
+            ])
             ->columns(1);
     }
 
@@ -114,9 +116,9 @@ class UserAttributeConfigResource extends Resource
                         return trans_choice('filament-user-attributes::user-attributes.amount', $count, ['amount' => $count]);
                     }),
             ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+            ->recordActions([
+                EditAction::make(),
+                EditAction::make(),
             ]);
     }
 

@@ -6,8 +6,8 @@ use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables\Columns\Column;
 use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 
@@ -98,8 +98,8 @@ class NumberInputComponentFactory extends BaseComponentFactory
                     __('filament-user-attributes::user-attributes.attributes.currency_format_other') => $remainingCurrencies
                 ])
                 ->default('EUR')
-                ->visible(fn (Get $get) => $get('is_currency'))
-                ->dehydrated(fn (Get $get) => $get('is_currency')),
+                ->visible(fn(Get $get) => $get('is_currency'))
+                ->dehydrated(fn(Get $get) => $get('is_currency')),
 
             TextInput::make('decimal_places')
                 ->numeric()
@@ -111,14 +111,14 @@ class NumberInputComponentFactory extends BaseComponentFactory
             TextInput::make('minimum')
                 ->numeric()
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.minimum')))
-                ->step(fn (Get $get) => $get('decimal_places') * 0.1)
+                ->step(fn(Get $get) => $get('decimal_places') * 0.1)
                 ->minValue(static::DEFAULT_MINIMUM)
                 ->default(static::DEFAULT_MINIMUM),
 
             TextInput::make('maximum')
                 ->numeric()
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.maximum')))
-                ->step(fn (Get $get) => $get('decimal_places') * 0.1)
+                ->step(fn(Get $get) => $get('decimal_places') * 0.1)
                 ->maxValue(static::DEFAULT_MAXIMUM)
                 ->default(static::DEFAULT_MAXIMUM),
 

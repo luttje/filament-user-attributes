@@ -4,7 +4,9 @@ namespace Luttje\FilamentUserAttributes\Filament;
 
 use Closure;
 use Filament\Forms;
-use Filament\Forms\Get;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Utilities\Get;
 use Luttje\FilamentUserAttributes\EloquentHelper;
 use Luttje\FilamentUserAttributes\EloquentHelperRelationshipInfo;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
@@ -108,7 +110,7 @@ class UserAttributeComponentFactoryRegistry
     {
         $schemas = [];
 
-        $schemas[] = Forms\Components\Fieldset::make('common')
+        $schemas[] = Fieldset::make('common')
             ->label(ucfirst(__('filament-user-attributes::user-attributes.common')))
             ->schema(function () {
                 $registeredTypes = static::getRegisteredTypes();
@@ -154,12 +156,12 @@ class UserAttributeComponentFactoryRegistry
 
         $inheritRelationOptions = static::getInheritRelationOptions($configModel);
 
-        $schemas[] = Forms\Components\Fieldset::make(__('filament-user-attributes::user-attributes.default_value_config'))
+        $schemas[] = Fieldset::make(__('filament-user-attributes::user-attributes.default_value_config'))
             ->schema([
                 Forms\Components\Checkbox::make('required')
                     ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.required'))),
 
-                Forms\Components\Grid::make()
+                Grid::make()
                     ->columns([
                         'lg' => 3
                     ])
@@ -171,8 +173,8 @@ class UserAttributeComponentFactoryRegistry
                         Forms\Components\Select::make('inherit_relation')
                             ->options($inheritRelationOptions)
                             ->label(ucfirst(__('filament-user-attributes::user-attributes.inherit_relation')))
-                            ->required(fn (Get $get) => $get('inherit'))
-                            ->disabled(fn (Get $get) => !$get('inherit'))
+                            ->required(fn(Get $get) => $get('inherit'))
+                            ->disabled(fn(Get $get) => !$get('inherit'))
                             ->live(),
                         Forms\Components\Select::make('inherit_attribute')
                             ->options(function (Get $get) use ($configModel) {
@@ -210,8 +212,8 @@ class UserAttributeComponentFactoryRegistry
                                 return $attributes;
                             })
                             ->label(ucfirst(__('filament-user-attributes::user-attributes.inherit_attribute')))
-                            ->required(fn (Get $get) => $get('inherit'))
-                            ->disabled(fn (Get $get) => !$get('inherit')),
+                            ->required(fn(Get $get) => $get('inherit'))
+                            ->disabled(fn(Get $get) => !$get('inherit')),
                     ])
             ]);
 
@@ -226,7 +228,7 @@ class UserAttributeComponentFactoryRegistry
             $factory = new $factoryClass($configModel->model_type);
             $factorySchema = $factory->makeConfigurationSchema();
 
-            $schemas[] = Forms\Components\Fieldset::make('customizations_for_' . $type)
+            $schemas[] = Fieldset::make('customizations_for_' . $type)
                 ->label(ucfirst(__('filament-user-attributes::user-attributes.customizations_for', ['type' => __('filament-user-attributes::user-attributes.types.' . $type)])))
                 ->statePath('customizations')
                 ->schema($factorySchema)
@@ -248,14 +250,14 @@ class UserAttributeComponentFactoryRegistry
 
                     return $state;
                 })
-                ->hidden(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0)
-                ->disabled(fn (Get $get) => $get('type') !== $type || count($factorySchema) === 0);
+                ->hidden(fn(Get $get) => $get('type') !== $type || count($factorySchema) === 0)
+                ->disabled(fn(Get $get) => $get('type') !== $type || count($factorySchema) === 0);
         }
 
-        $schemas[] = Forms\Components\Fieldset::make('ordering')
+        $schemas[] = Fieldset::make('ordering')
             ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering')))
             ->schema([
-                Forms\Components\Fieldset::make('ordering_form')
+                Fieldset::make('ordering_form')
                     ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering_form')))
                     ->schema(function () use ($configModel) {
                         return [
@@ -290,7 +292,7 @@ class UserAttributeComponentFactoryRegistry
                                 ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.order_sibling'))),
                         ];
                     }),
-                Forms\Components\Fieldset::make('ordering_table')
+                Fieldset::make('ordering_table')
                     ->label(ucfirst(__('filament-user-attributes::user-attributes.ordering_table')))
                     ->schema(function () use ($configModel) {
                         return [

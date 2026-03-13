@@ -2,10 +2,10 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
-use Filament\Forms\Components\Component;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Form;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Schema;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
@@ -68,8 +68,8 @@ trait UserAttributesResource
      */
     public static function getAllFieldComponents(): array
     {
-        $form = Form::make(new FormsCapturer());
-        $result = self::callInstanceOrStatic('form', $form);
+        $schema = Schema::make(new FormsCapturer());
+        $result = self::callInstanceOrStatic('form', $schema);
 
         if (!$result) {
             return [];

@@ -79,7 +79,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 
     class UserAttributeConfigResource extends BaseUserAttributeConfigResource
     {
-        protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+        protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
     }
     ```
 

@@ -3,11 +3,12 @@
 namespace Luttje\FilamentUserAttributes;
 
 use Closure;
-use Filament\Forms\Components\Component;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Field;
+use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Columns\Column;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -59,7 +60,7 @@ class FilamentUserAttributes
      * @param string|null $appPath       Optional path to the application directory.
      * @param string|null $appNamespace  Optional namespace of the application.
      */
-    public function __construct(string $appPath = null, string $appNamespace = null)
+    public function __construct(?string $appPath = null, ?string $appNamespace = null)
     {
         $this->appNamespace = $appNamespace ?? app()->getNamespace();
         $this->appPath = $appPath ?? app_path();
@@ -443,7 +444,7 @@ class FilamentUserAttributes
         foreach ($components as $component) {
             $label = $this->getComponentLabel($component, $parentLabel);
 
-            if ($component instanceof \Filament\Forms\Components\Field) {
+            if ($component instanceof Field) {
                 $namesWithLabels[] = [
                     'name' => $component->getName(),
                     'label' => $label,
@@ -503,8 +504,10 @@ class FilamentUserAttributes
 
             $newComponents[] = $component;
 
-            if ($component instanceof \Filament\Forms\Components\Field
-            && $label === $siblingComponentName) {
+            if (
+                $component instanceof Field
+                && $label === $siblingComponentName
+            ) {
                 $siblingFound = true;
                 if ($position === 'before') {
                     array_splice($newComponents, count($newComponents) - 1, 0, [$componentToAdd]);
@@ -584,8 +587,10 @@ class FilamentUserAttributes
         for ($i = 0; $i < $customFieldCount; $i++) {
             $customField = $customFields->pop();
 
-            if (!isset($customField['ordering'])
-                || $customField['ordering']['sibling'] === null) {
+            if (
+                !isset($customField['ordering'])
+                || $customField['ordering']['sibling'] === null
+            ) {
                 $customFields->prepend($customField);
                 continue;
             }
@@ -660,8 +665,10 @@ class FilamentUserAttributes
         for ($i = 0; $i < $customColumnCount; $i++) {
             $customColumn = $customColumns->pop();
 
-            if (!isset($customColumn['ordering'])
-                || $customColumn['ordering']['sibling'] === null) {
+            if (
+                !isset($customColumn['ordering'])
+                || $customColumn['ordering']['sibling'] === null
+            ) {
                 $customColumns->prepend($customColumn);
                 continue;
             }

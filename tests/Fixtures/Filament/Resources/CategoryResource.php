@@ -2,11 +2,10 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources;
 
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Tabs;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -16,6 +15,8 @@ use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource\Pages;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
+use BackedEnum;
+use Filament\Schemas\Schema;
 
 class CategoryResource extends Resource implements UserAttributesConfigContract
 {
@@ -23,7 +24,7 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
 
     protected static ?string $model = Category::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-newspaper';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-newspaper';
 
     protected static ?string $navigationLabel = 'Categories';
 
@@ -39,7 +40,7 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
         return $user;
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $form
             ->schema(
@@ -59,8 +60,8 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
                                         ]),
                                     Tabs\Tab::make('Additional Settings')
                                         ->schema([
-                                                // TODO: Have some User Attributes show here automatically based on user configuration
-                                            ]),
+                                            // TODO: Have some User Attributes show here automatically based on user configuration
+                                        ]),
 
                                     Tabs\Tab::make('Attachments')
                                         ->schema([
