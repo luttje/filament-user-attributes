@@ -36,7 +36,7 @@ jobs:
             testbench: 8.*
             carbon: ^2.63
             larastan: ^2.0
-            pest: ^2.35.0
+            pest: ^2.34.0
             pest-plugin-laravel: ^2.0
             pest-plugin-arch: ^2.0
             pest-plugin-livewire: ^2.1
