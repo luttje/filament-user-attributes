@@ -28,9 +28,8 @@ class TestCase extends Orchestra
         // which is what the parent::setUp() method does besides setting static::$latestResponse to null.
         $this->setUpTheTestEnvironment();
 
-
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn (string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
     }
 
