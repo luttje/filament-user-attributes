@@ -24,10 +24,13 @@ class TestCase extends Orchestra
 {
     protected function setUp(): void
     {
-        parent::setUp();
+        // Before version 9.1.4 of testbench the parent::setUp() method had a call to static::$latestResponse, which caused an error
+        // for prefer-lowest testing for PHP 8.2 and Laravel 11.*. This is fixed by just directly calling the setUpTheTestEnvironment() method,
+        // which is what the parent::setUp() method does besides setting static::$latestResponse to null.
+        $this->setUpTheTestEnvironment();
 
         Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn(string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
     }
 

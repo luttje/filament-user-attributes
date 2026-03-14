@@ -28,35 +28,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # Laravel 10
-          - os: ubuntu-latest
-            php: 8.1
-            laravel: 10.*
-            livewire: ^3.0
-            testbench: 8.*
-            carbon: ^2.63
-            larastan: ^2.0
-            pest: ^2.0
-            pest-plugin-laravel: ^2.0
-            pest-plugin-arch: ^2.0
-            pest-plugin-livewire: ^2.1
-            collision: ^7.0
-            stability: prefer-stable
-
-          - os: ubuntu-latest
-            php: 8.2
-            laravel: 10.*
-            livewire: ^3.0
-            testbench: 8.*
-            carbon: ^2.63
-            larastan: ^2.0
-            pest: ^2.0
-            pest-plugin-laravel: ^2.0
-            pest-plugin-arch: ^2.0
-            pest-plugin-livewire: ^2.1
-            collision: ^7.0
-            stability: prefer-stable
-
           # Laravel 11
           - os: ubuntu-latest
             php: 8.2
