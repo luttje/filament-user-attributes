@@ -52,7 +52,7 @@
     "scripts": {
         "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
         "test": "vendor/bin/pest --configuration=phpunit.xml",
-        "test-ci": "vendor/bin/pest --configuration=phpunit.xml.ci --coverage --ci",
+        "test-ci": "vendor/bin/pest --configuration=phpunit.xml.ci --coverage --ci -v",
         "test-coverage": "@test --coverage",
         "format": "vendor/bin/pint"
     },
