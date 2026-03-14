@@ -35,7 +35,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 ## 🚀 Getting started
 
 1. Make sure your project meets these requirements:
-    - PHP 8.1 or higher
+    - PHP 8.2 or higher
     - [Livewire 3.0.3](https://livewire.laravel.com/) or higher
     - [Filament 3.0](https://filamentphp.com/docs) or higher
     - A database that supports JSON columns, e.g:

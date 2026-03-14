@@ -30,21 +30,6 @@ jobs:
         include:
           # Laravel 10
           - os: ubuntu-latest
-            php: 8.1
-            laravel: 10.*
-            livewire: ^3.0
-            testbench: 8.*
-            carbon: ^2.63
-            larastan: ^2.0
-            pest: ^2.34.0
-            phpunit: ^10.5.10
-            pest-plugin-laravel: ^2.0
-            pest-plugin-arch: ^2.0
-            pest-plugin-livewire: ^2.1
-            collision: ^7.0
-            stability: prefer-stable
-
-          - os: ubuntu-latest
             php: 8.2
             laravel: 10.*
             livewire: ^3.0
@@ -151,7 +136,6 @@ jobs:
             "pestphp/pest-plugin-arch:${{ matrix.pest-plugin-arch }}" \
             "pestphp/pest-plugin-livewire:${{ matrix.pest-plugin-livewire }}" \
             "nunomaduro/collision:${{ matrix.collision }}" \
-            ${{ matrix.phpunit && format('"phpunit/phpunit:{0}"', matrix.phpunit) || '' }} \
             --dev --no-interaction --no-update
 
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
