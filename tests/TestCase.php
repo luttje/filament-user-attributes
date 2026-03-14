@@ -30,7 +30,7 @@ class TestCase extends Orchestra
         $this->setUpTheTestEnvironment();
 
         Factory::guessFactoryNamesUsing(
-            fn(string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
+            fn (string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
         );
     }
 
