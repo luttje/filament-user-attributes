@@ -2,6 +2,8 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Livewire;
 
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -18,11 +20,12 @@ use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
+class ConfiguredManageComponent extends Component implements HasForms, HasTable, HasActions, UserAttributesConfigContract
 {
     use UserAttributesResource;
     use InteractsWithForms;
     use InteractsWithTable;
+    use InteractsWithActions;
 
     public ?array $data = [];
 
