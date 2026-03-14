@@ -24,7 +24,7 @@ return [
     'ordering' => 'Reihenfolge',
     'select_sibling' => 'Nebenattribut auswählen',
     'suffix_page' => ' Seite',
-    'suggestions_help' => 'Durch Kommas getrennte Liste von Vorschlägen für den Benutzer zur Auswahl.',
+    'suggestions_help' => 'Vorschlägen für den Benutzer zur Auswahl.',
 
     /**
      * Short names of relationships.

@@ -24,7 +24,7 @@ return [
     'ordering' => 'Ordering',
     'select_sibling' => 'Select sibling',
     'suffix_page' => ' Page',
-    'suggestions_help' => 'Comma separated list of suggestions for the user to choose from.',
+    'suggestions_help' => 'Suggestions for the user to choose from.',
 
     /**
      * Short names of relationships.

@@ -24,7 +24,7 @@ return [
     'ordering' => 'Volgordelijkheid',
     'select_sibling' => 'Selecteer naastgelegen veld',
     'suffix_page' => ' Pagina',
-    'suggestions_help' => "Door komma's gescheiden lijst van suggesties voor de gebruiker om uit te kiezen.",
+    'suggestions_help' => "Suggesties voor de gebruiker om uit te kiezen.",
 
     /**
      * Short names of relationships.
