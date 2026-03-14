@@ -258,5 +258,28 @@ it('can configure date, time and datetime input format', function (string $forma
 ]);
 
 it('can manage user attributes through the action', function () {
-    // TODO: Write this test.
+    $user = User::factory()->create();
+
+    Config::set('filament-user-attributes.discover_resources', [
+        'Resources',
+    ]);
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__ . '/../Fixtures/Filament'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures\Filament',
+    ));
+
+    $component = Livewire::actingAs($user)
+        ->test(ManageUserAttributeConfigs::class);
+
+    $actionName = ucfirst(__('filament-user-attributes::user-attributes.manage_user_attributes'));
+
+    $component
+        ->callAction($actionName, [
+            'resource_type' => CategoryResource::class,
+        ])
+        ->assertHasNoActionErrors()
+        ->assertRedirect(UserAttributeConfigResource::getUrl('edit', [
+            'record' => urlencode(CategoryResource::class),
+        ]));
 });

@@ -84,8 +84,13 @@ class UserAttributeConfigResource extends Resource
 
     public static function form(Schema $form): Schema
     {
-        /** @var UserAttributeConfig */
-        $model = $form->model;
+        /** @var UserAttributeConfig|null */
+        $model = $form->getRecord();
+
+        if (! $model instanceof UserAttributeConfig) {
+            return $form->components([])->columns(1);
+        }
+
         return $form
             ->components([
                 Forms\Components\Repeater::make('config')
