@@ -25,7 +25,7 @@ class ManageUserAttributeConfigs extends ManageRecords
 
         return [
             Actions\Action::make(ucfirst(__('filament-user-attributes::user-attributes.manage_user_attributes')))
-                ->form([
+                ->schema([
                     Forms\Components\Select::make('resource_type')
                         ->options($resources)
                         ->label(ucfirst(__('filament-user-attributes::user-attributes.attributes.resource_type')))
