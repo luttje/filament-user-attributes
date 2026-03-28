@@ -26,6 +26,7 @@
         "filament/tables": "^4.0",
         "illuminate/contracts": "^11.0 || ^12.0",
         "livewire/livewire": "^3.4",
+        "ryangjchandler/blade-capture-directive": "^1.1",
         "spatie/laravel-package-tools": "^1.15.0"
     },
     "require-dev": {
