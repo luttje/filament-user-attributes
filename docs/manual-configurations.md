@@ -3,7 +3,7 @@
 > [!Warning]
 > The steps described below can also be done automatically by running the [🚀 Getting Started](../README.md#-getting-started) wizard (`php artisan filament-user-attributes:wizard`) command.
 >
-> The information below is only for those who want to manually configure the package.
+> The information below is only for those who want to manually configure their Filament 4 project (or Filament 5, if you still use the Filament 4 folder structure).
 
 ## 📦 Setup models to have custom user attributes
 
