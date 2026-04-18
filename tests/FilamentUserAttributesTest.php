@@ -66,7 +66,6 @@ it('can discover resources from specified app directories', function () {
 it('can discover resources from specified app directories even sub folders', function () {
     Config::set('filament-user-attributes.discover_resources', [
         'Resources',
-        'Resources/SomeSubFolder',
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
@@ -240,13 +239,13 @@ it('can discover models from specified app directories', function () {
         Product::class,
         ProductButGuarded::class,
         User::class,
+        PriceRange::class,
     ]);
 });
 
 it('can discover models from specified app directories even sub folders', function () {
     Config::set('filament-user-attributes.discover_models', [
         'Models',
-        'Models/SomeSubFolder',
     ]);
 
     FilamentUserAttributes::swap(new FilamentUserAttributesImpl(

@@ -20,12 +20,13 @@
     ],
     "require": {
         "php": "^8.2",
-        "filament/filament": "^4.0",
-        "filament/forms": "^4.0",
-        "filament/schemas": "^4.0",
-        "filament/tables": "^4.0",
-        "illuminate/contracts": "^11.0 || ^12.0",
-        "livewire/livewire": "^3.4",
+        "filament/filament": "^4.0|^5.0",
+        "filament/actions": "^4.0|^5.0",
+        "filament/forms": "^4.0|^5.0",
+        "filament/schemas": "^4.0|^5.0",
+        "filament/tables": "^4.0|^5.0",
+        "illuminate/contracts": "^11.28|^12.0|^13.0",
+        "livewire/livewire": "^3.6.4|^4.0",
         "ryangjchandler/blade-capture-directive": "^1.1",
         "spatie/laravel-package-tools": "^1.15.0"
     },
@@ -35,11 +36,11 @@
         "nikic/php-parser": "^5.4",
         "nunomaduro/collision": "^8.1",
         "openspout/openspout": "^4.23 <4.29",
-        "orchestra/testbench": "^9.11 || ^10.0",
-        "pestphp/pest": "^3.0",
-        "pestphp/pest-plugin-arch": "^3.1",
-        "pestphp/pest-plugin-laravel": "^3.1.0",
-        "pestphp/pest-plugin-livewire": "^3.0.0"
+        "orchestra/testbench": "^9.11|^10.0",
+        "pestphp/pest": "^3.0|^4.3.1",
+        "pestphp/pest-plugin-arch": "^3.1|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.1|^4.0",
+        "pestphp/pest-plugin-livewire": "^3.0|^4.1"
     },
     "autoload": {
         "psr-4": {

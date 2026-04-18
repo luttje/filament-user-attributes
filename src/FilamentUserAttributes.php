@@ -279,21 +279,23 @@ class FilamentUserAttributes
 
             $nameTransformer = config('filament-user-attributes.discovery_resource_name_transformer');
 
-            $resourcesForPath = collect(File::files($path))
+            $resourcesForPath = collect(File::allFiles($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = $this->appNamespace . static::normalizeClassName($targetPath) . '\\' . $file->getRelativePathName();
+                    $type = $this->appNamespace . static::normalizeClassName($targetPath) . '\\' . static::normalizeClassName($file->getRelativePathname());
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
+                })
+                ->filter(function ($type) {
+                    // Only include classes that extend Filament's Resource base class,
+                    // since recursive discovery may find non-resource classes (e.g. Pages, Schemas, Tables).
+                    return class_exists($type)
+                        && is_subclass_of($type, \Filament\Resources\Resource::class);
                 });
 
             // Note: this will autoload the models if $configured = true
             if ($configuredOnly) {
                 $resourcesForPath = $resourcesForPath->filter(function ($type) {
-                    if (!class_exists($type)) {
-                        return false;
-                    }
-
                     if (!in_array(\Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract::class, class_implements($type))) {
                         return false;
                     }
@@ -341,9 +343,9 @@ class FilamentUserAttributes
                 continue;
             }
 
-            $modelsForPath = collect(File::files($path))
+            $modelsForPath = collect(File::allFiles($path))
                 ->map(function ($file) use ($targetPath) {
-                    $type = $this->appNamespace . static::normalizeClassName($targetPath) . '\\' . $file->getRelativePathName();
+                    $type = $this->appNamespace . static::normalizeClassName($targetPath) . '\\' . static::normalizeClassName($file->getRelativePathname());
                     $type = substr($type, 0, -strlen('.php'));
 
                     return $type;
@@ -385,10 +387,10 @@ class FilamentUserAttributes
                 continue;
             }
 
-            $file = $path . DIRECTORY_SEPARATOR . class_basename($resource) . '.php';
-
-            if (File::exists($file)) {
-                return $file;
+            foreach (File::allFiles($path) as $file) {
+                if ($file->getFilename() === class_basename($resource) . '.php') {
+                    return $file->getPathname();
+                }
             }
         }
 
@@ -410,10 +412,10 @@ class FilamentUserAttributes
                 continue;
             }
 
-            $file = $path . DIRECTORY_SEPARATOR . class_basename($model) . '.php';
-
-            if (File::exists($file)) {
-                return $file;
+            foreach (File::allFiles($path) as $file) {
+                if ($file->getFilename() === class_basename($model) . '.php') {
+                    return $file->getPathname();
+                }
             }
         }
 
