@@ -2,9 +2,9 @@ name: run-tests
 
 on:
   push:
-    branches: [main, filament-v4]
+    branches: [ main ]
   pull_request:
-    branches: [main, filament-v4]
+    branches: [ main ]
 
 jobs:
   test:
@@ -16,140 +16,137 @@ jobs:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: ci_test
         ports:
-          - 3306:3306
+        - 3306:3306
         # Set health checks to wait until mysql database has started (it takes some seconds to start)
         options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Laravel 11
-          # TODO: For some reason all tests pass, but pest still fails with 'error code 2'. No idea why.
-          # - os: ubuntu-latest
-          #   php: 8.2
-          #   laravel: 11.*
-          #   livewire: ^3.3.5
-          #   testbench: 9.*
-          #   carbon: ^2.63
-          #   larastan: ^2.0
-          #   pest: ^2.0
-          #   pest-plugin-laravel: ^2.0
-          #   pest-plugin-arch: ^2.0
-          #   pest-plugin-livewire: ^2.1
-          #   collision: ^8.0
-          #   stability: prefer-lowest
+        # Laravel 11
+        # TODO: For some reason all tests pass, but pest still fails with 'error code 2'. No idea why.
+        # - os: ubuntu-latest
+        #   php: 8.2
+        #   laravel: 11.*
+        #   livewire: ^3.3.5
+        #   testbench: 9.*
+        #   carbon: ^2.63
+        #   larastan: ^2.0
+        #   pest: ^2.0
+        #   pest-plugin-laravel: ^2.0
+        #   pest-plugin-arch: ^2.0
+        #   pest-plugin-livewire: ^2.1
+        #   collision: ^8.0
+        #   stability: prefer-lowest
 
-          - os: ubuntu-latest
-            php: 8.2
-            laravel: 11.*
-            livewire: ^3.3.5
-            testbench: 9.*
-            carbon: ^2.63
-            larastan: ^2.0
-            pest: ^2.0
-            pest-plugin-laravel: ^2.0
-            pest-plugin-arch: ^2.0
-            pest-plugin-livewire: ^2.1
-            collision: ^8.0
-            stability: prefer-stable
+        - os: ubuntu-latest
+          php: 8.2
+          laravel: 11.*
+          livewire: ^3.3.5
+          testbench: 9.*
+          carbon: ^2.63
+          larastan: ^2.0
+          pest: ^2.0
+          pest-plugin-laravel: ^2.0
+          pest-plugin-arch: ^2.0
+          pest-plugin-livewire: ^2.1
+          collision: ^8.0
+          stability: prefer-stable
 
-          # Laravel 12
-          - os: ubuntu-latest
-            php: 8.2
-            laravel: 12.*
-            livewire: ^3.5.20
-            testbench: 10.*
-            carbon: ^3.0
-            larastan: ^3.1.0
-            pest: ^3.7
-            pest-plugin-laravel: ^3.1.0
-            pest-plugin-arch: ^3.1
-            pest-plugin-livewire: ^3.0.0
-            collision: ^8.0
-            stability: prefer-lowest
+        # Laravel 12
+        - os: ubuntu-latest
+          php: 8.2
+          laravel: 12.*
+          livewire: ^3.5.20
+          testbench: 10.*
+          carbon: ^3.0
+          larastan: ^3.1.0
+          pest: ^3.7
+          pest-plugin-laravel: ^3.1.0
+          pest-plugin-arch: ^3.1
+          pest-plugin-livewire: ^3.0.0
+          collision: ^8.0
+          stability: prefer-lowest
 
-          - os: ubuntu-latest
-            php: 8.2
-            laravel: 12.*
-            livewire: ^3.5.20
-            testbench: 10.*
-            carbon: ^3.0
-            larastan: ^3.1.0
-            pest: ^3.7
-            pest-plugin-laravel: ^3.1.0
-            pest-plugin-arch: ^3.1
-            pest-plugin-livewire: ^3.0.0
-            collision: ^8.0
-            stability: prefer-stable
+        - os: ubuntu-latest
+          php: 8.2
+          laravel: 12.*
+          livewire: ^3.5.20
+          testbench: 10.*
+          carbon: ^3.0
+          larastan: ^3.1.0
+          pest: ^3.7
+          pest-plugin-laravel: ^3.1.0
+          pest-plugin-arch: ^3.1
+          pest-plugin-livewire: ^3.0.0
+          collision: ^8.0
+          stability: prefer-stable
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
-          coverage: xdebug
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
+        extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo
+        coverage: xdebug
 
-      - name: Setup problem matchers
-        run: |
-          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+    - name: Setup problem matchers
+      run: |
+        echo "::add-matcher::${{ runner.tool_cache }}/php.json"
+        echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
 
-      - name: Install dependencies
-        run: |
-          composer require \
-            "php":^${{ matrix.php }} \
-            "livewire/livewire:${{ matrix.livewire }}" \
-            "illuminate/contracts:${{ matrix.laravel }}" \
-            --no-interaction --no-update
+    - name: Install dependencies
+      run: |
+        composer require \
+          "php":^${{ matrix.php }} \
+          "livewire/livewire:${{ matrix.livewire }}" \
+          "illuminate/contracts:${{ matrix.laravel }}" \
+          --no-interaction --no-update
 
-          composer require \
-            "orchestra/testbench:${{ matrix.testbench }}" \
-            "nesbot/carbon:${{ matrix.carbon }}" \
-            "larastan/larastan:${{ matrix.larastan }}" \
-            "pestphp/pest:${{ matrix.pest }}" \
-            "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin-laravel }}" \
-            "pestphp/pest-plugin-arch:${{ matrix.pest-plugin-arch }}" \
-            "pestphp/pest-plugin-livewire:${{ matrix.pest-plugin-livewire }}" \
-            "nunomaduro/collision:${{ matrix.collision }}" \
-            --dev --no-interaction --no-update
+        composer require \
+          "orchestra/testbench:${{ matrix.testbench }}" \
+          "nesbot/carbon:${{ matrix.carbon }}" \
+          "larastan/larastan:${{ matrix.larastan }}" \
+          "pestphp/pest:${{ matrix.pest }}" \
+          "pestphp/pest-plugin-laravel:${{ matrix.pest-plugin-laravel }}" \
+          "pestphp/pest-plugin-arch:${{ matrix.pest-plugin-arch }}" \
+          "pestphp/pest-plugin-livewire:${{ matrix.pest-plugin-livewire }}" \
+          "nunomaduro/collision:${{ matrix.collision }}" \
+          --dev --no-interaction --no-update
 
-          composer update --${{ matrix.stability }} --prefer-dist --no-interaction
+        composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
-      - name: List Installed Dependencies
-        run: composer show -D
+    - name: List Installed Dependencies
+      run: composer show -D
 
-      - name: Execute tests
-        env:
-          DB_CONNECTION: mysql
-          DB_PORT: 3306
-          DB_HOST: 127.0.0.1 # localhost does not work on some systems
-          DB_USERNAME: root
-          DB_PASSWORD: ""
-          DB_DATABASE: ci_test
-        run: composer test-ci
+    - name: Execute tests
+      env:
+        DB_CONNECTION: mysql
+        DB_PORT: 3306
+        DB_HOST: 127.0.0.1 # localhost does not work on some systems
+        DB_USERNAME: root
+        DB_PASSWORD: ""
+        DB_DATABASE: ci_test
+      run: composer test-ci
 
-      - name: Send coverage to Coveralls
-        uses: coverallsapp/github-action@v2
-        with:
-          parallel: true
+    - name: Send coverage to Coveralls
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel: true
 
   finish:
     needs: test
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-      - name: Coveralls Finished
-        uses: coverallsapp/github-action@v2
-        with:
-          parallel-finished: true
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true

@@ -10,7 +10,7 @@
 <div align="center">
 
 [![Tests](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/run-tests.yml)
-[![Coverage Status](https://coveralls.io/repos/github/luttje/filament-user-attributes/badge.svg?branch=filament-v4)](https://coveralls.io/github/luttje/filament-user-attributes?branch=filament-v4)
+[![Coverage Status](https://coveralls.io/repos/github/luttje/filament-user-attributes/badge.svg?branch=main)](https://coveralls.io/github/luttje/filament-user-attributes?branch=main)
 [![Fix PHP Code Styling](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml/badge.svg)](https://github.com/luttje/filament-user-attributes/actions/workflows/fix-php-code-styling.yml)
 
 </div>
