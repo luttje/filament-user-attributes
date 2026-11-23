@@ -85,6 +85,42 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 
     *Or you can create your own resource from scratch. See the [source code](./src/Filament/Resources/) for inspiration.*
 
+6. Decide who may configure user attributes. The resource **denies all access** until you register a [policy](https://laravel.com/docs/authorization#creating-policies) for the `UserAttributeConfig` model:
+
+    ```php
+    // app/Policies/UserAttributeConfigPolicy.php
+    namespace App\Policies;
+
+    use App\Models\User;
+    use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
+
+    class UserAttributeConfigPolicy
+    {
+        public function viewAny(User $user): bool
+        {
+            return $user->is_admin; // Your own rules here
+        }
+
+        public function update(User $user, UserAttributeConfig $config): bool
+        {
+            return $user->is_admin;
+        }
+    }
+    ```
+
+    ```php
+    // app/Providers/AppServiceProvider.php (in the boot method)
+    use Illuminate\Support\Facades\Gate;
+
+    Gate::policy(
+        \Luttje\FilamentUserAttributes\Models\UserAttributeConfig::class,
+        \App\Policies\UserAttributeConfigPolicy::class
+    );
+    ```
+
+    > [!WARNING]
+    > Whoever can access this resource can change the forms and tables of your other resources. If you really want *every* panel user to be able to do that, you can skip the policy by adding `protected static bool $shouldSkipAuthorization = true;` to your resource from step 5.
+
 **🎉 That was all, you and your users can now configure custom attributes!**
 
 > Your users (or tenants) can now configure custom attribute fields:

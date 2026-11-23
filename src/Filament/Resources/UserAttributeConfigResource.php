@@ -9,21 +9,50 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Auth\Access\Response;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Gate;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
+use UnitEnum;
 
 class UserAttributeConfigResource extends Resource
 {
     protected static ?string $model = UserAttributeConfig::class;
 
     protected static ?string $tenantOwnershipRelationshipName = 'owner';
+
+    /**
+     * Redeclared so that toggling it only affects this resource (and resources
+     * extending it), instead of every Filament resource.
+     *
+     * Set this to true in your own resource to let every panel user manage
+     * user attribute configurations without a policy.
+     */
+    protected static bool $shouldSkipAuthorization = false;
+
+    /**
+     * Denies everything unless a policy is registered for the config model.
+     *
+     * Filament allows all actions when a model has no policy. Since this
+     * resource lets users change the forms and tables of other resources,
+     * access must be granted explicitly: either through a policy, or by
+     * setting `$shouldSkipAuthorization` to true.
+     */
+    public static function getAuthorizationResponse(string | UnitEnum $action, ?Model $record = null): Response
+    {
+        if (!static::shouldSkipAuthorization() && blank(Gate::getPolicyFor(static::getModel()))) {
+            return Response::deny('No policy is registered for ' . static::getModel() . '. Register a policy or set $shouldSkipAuthorization to true on your resource.');
+        }
+
+        return parent::getAuthorizationResponse($action, $record);
+    }
 
     /**
      * Limit the query to only the user attributes for the correct config (like a user or tenant).

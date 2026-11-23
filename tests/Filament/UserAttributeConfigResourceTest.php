@@ -3,9 +3,11 @@
 namespace Luttje\FilamentUserAttributes\Tests\Filament;
 
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Policies\UserAttributeConfigPolicy;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
@@ -377,4 +379,49 @@ it('lists no configs when no config owner can be resolved', function (bool $disc
 })->with([
     'resources without an owner' => true,
     'no resources' => false,
+]);
+
+it('denies access when no policy is registered', function () {
+    UserAttributeConfigResource::skipAuthorization(false);
+
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('index'))
+        ->assertForbidden();
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('edit', ['record' => CategoryResource::class]))
+        ->assertForbidden();
+});
+
+it('allows access without a policy when authorization is explicitly skipped', function () {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('index'))
+        ->assertSuccessful();
+});
+
+it('uses the registered policy to decide access', function (string $name, bool $allowed) {
+    UserAttributeConfigResource::skipAuthorization(false);
+    Gate::policy(UserAttributeConfig::class, UserAttributeConfigPolicy::class);
+
+    $user = User::factory()->create(['name' => $name]);
+
+    $index = $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('index'));
+    $edit = $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('edit', ['record' => CategoryResource::class]));
+
+    if ($allowed) {
+        $index->assertSuccessful();
+        $edit->assertSuccessful();
+    } else {
+        $index->assertForbidden();
+        $edit->assertForbidden();
+    }
+})->with([
+    'allowed by the policy' => ['admin', true],
+    'denied by the policy' => ['someone else', false],
 ]);

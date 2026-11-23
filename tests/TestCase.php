@@ -15,6 +15,7 @@ use Filament\Tables\TablesServiceProvider;
 use Filament\Widgets\WidgetsServiceProvider;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Livewire\LivewireServiceProvider;
+use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource;
 use Luttje\FilamentUserAttributes\FilamentUserAttributesServiceProvider;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\TestPanelProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
@@ -28,6 +29,9 @@ class TestCase extends Orchestra
         // for prefer-lowest testing for PHP 8.2 and Laravel 11.*. This is fixed by just directly calling the setUpTheTestEnvironment() method,
         // which is what the parent::setUp() method does besides setting static::$latestResponse to null.
         $this->setUpTheTestEnvironment();
+
+        // Most tests are not about authorization, those that are turn this off again.
+        UserAttributeConfigResource::skipAuthorization();
 
         Factory::guessFactoryNamesUsing(
             fn (string $modelName) => 'Luttje\\FilamentUserAttributes\\Database\\Factories\\' . class_basename($modelName) . 'Factory',
