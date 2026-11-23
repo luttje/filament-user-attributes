@@ -67,6 +67,8 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     - Setup a model that can configure the user attributes for each user (e.g. a user or tenant model)
     - Setup resources that the configuration model can configure custom attributes for
 
+    By default the current tenant or logged in user owns the configuration (whichever you set up to configure user attributes). See [choosing who configures the attributes](./docs/manual-configurations.md#-choosing-who-configures-the-attributes) to change that.
+
     Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
 5. Add the plugin to your panel:
