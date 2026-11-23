@@ -319,3 +319,62 @@ it('only resolves manually registered resources when discovery is disabled', fun
 
     expect(UserAttributeConfig::pluck('resource_type')->all())->toBe([ProductResource::class]);
 });
+
+function discoverFixtureResources()
+{
+    Config::set('filament-user-attributes.discover_resources', [
+        'Resources',
+    ]);
+
+    FilamentUserAttributes::swap(new FilamentUserAttributesImpl(
+        realpath(__DIR__ . '/../Fixtures/Filament'),
+        'Luttje\FilamentUserAttributes\Tests\Fixtures\Filament',
+    ));
+}
+
+it('only lists the configs of the current owner', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    $ownConfig = $user->createUserAttributeConfig(CategoryResource::class, 'own', 'Own');
+    $otherUser->createUserAttributeConfig(CategoryResource::class, 'other', 'Other');
+
+    discoverFixtureResources();
+
+    $this->actingAs($user);
+
+    expect(UserAttributeConfigResource::getEloquentQuery()->pluck('id')->all())
+        ->toBe([$ownConfig->id]);
+});
+
+it('cannot edit the config of another owner by its id', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    $otherConfig = $otherUser->createUserAttributeConfig(CategoryResource::class, 'other', 'Other');
+
+    discoverFixtureResources();
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('edit', ['record' => $otherConfig->id]))
+        ->assertNotFound();
+});
+
+it('lists no configs when no config owner can be resolved', function (bool $discover) {
+    $user = User::factory()->create();
+    $user->createUserAttributeConfig(CategoryResource::class, 'own', 'Own');
+
+    if ($discover) {
+        // Resources are found, but nobody is logged in so they resolve no owner
+        discoverFixtureResources();
+    } else {
+        // No configurable resources are found at all
+        $this->actingAs($user);
+    }
+
+    expect(UserAttributeConfig::count())->toBe(1);
+    expect(UserAttributeConfigResource::getEloquentQuery()->count())->toBe(0);
+})->with([
+    'resources without an owner' => true,
+    'no resources' => false,
+]);

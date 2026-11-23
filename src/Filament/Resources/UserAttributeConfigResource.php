@@ -32,22 +32,36 @@ class UserAttributeConfigResource extends Resource
     {
         $resources = FilamentUserAttributes::getConfigurableResources();
         $query = parent::getEloquentQuery();
+        $owners = [];
 
-        /** @var \Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract $resource */
         foreach ($resources as $resource => $_) {
+            if (!is_subclass_of($resource, UserAttributesConfigContract::class)) {
+                continue;
+            }
+
             $config = $resource::getUserAttributesConfig();
 
             if (!$config) {
                 continue;
             }
 
-            $query->where('owner_type', get_class($config))
-                ->where('owner_id', $config->getKey());
-
-            break;
+            $owners[get_class($config) . '|' . $config->getKey()] = $config;
         }
 
-        return $query;
+        // Fail closed: without a known owner nothing may be shown, otherwise
+        // the configs of every owner (e.g. all tenants) would be exposed.
+        if (empty($owners)) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->where(function (Builder $query) use ($owners) {
+            foreach ($owners as $owner) {
+                $query->orWhere(function (Builder $query) use ($owner) {
+                    $query->where('owner_type', get_class($owner))
+                        ->where('owner_id', $owner->getKey());
+                });
+            }
+        });
     }
 
     /**
