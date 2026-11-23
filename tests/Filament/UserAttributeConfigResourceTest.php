@@ -432,6 +432,8 @@ it('denies access when no policy is registered', function () {
     $this->actingAs($user)
         ->get(UserAttributeConfigResource::getUrl('edit', ['record' => CategoryResource::class]))
         ->assertForbidden();
+
+    expect(UserAttributeConfig::count())->toBe(0);
 });
 
 it('allows access without a policy when authorization is explicitly skipped', function () {
@@ -456,9 +458,11 @@ it('uses the registered policy to decide access', function (string $name, bool $
     if ($allowed) {
         $index->assertSuccessful();
         $edit->assertSuccessful();
+        expect($user->userAttributesConfigs()->where('resource_type', CategoryResource::class)->exists())->toBeTrue();
     } else {
         $index->assertForbidden();
         $edit->assertForbidden();
+        expect(UserAttributeConfig::count())->toBe(0);
     }
 })->with([
     'allowed by the policy' => ['admin', true],

@@ -152,12 +152,12 @@ class UserAttributeConfigResource extends Resource
                 ->where('resource_type', $resource)
                 ->first();
 
+            // Not saved here: this runs before access is authorized. The edit
+            // page saves it once the user is allowed to edit it.
             if (!$userAttributeConfigs) {
-                $modelType = FilamentUserAttributes::getModelFromResource($resource);
-
-                $userAttributeConfigs = $owner->userAttributesConfigs()->create([
+                $userAttributeConfigs = $owner->userAttributesConfigs()->make([
                     'resource_type' => $resource,
-                    'model_type' => $modelType,
+                    'model_type' => FilamentUserAttributes::getModelFromResource($resource),
                     'config' => [],
                 ]);
             }

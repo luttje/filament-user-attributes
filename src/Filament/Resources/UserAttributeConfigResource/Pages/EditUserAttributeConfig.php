@@ -13,4 +13,16 @@ class EditUserAttributeConfig extends EditRecord
     {
         return static::$injectedResource;
     }
+
+    public function mount(int | string $record): void
+    {
+        parent::mount($record);
+
+        // The record may be new (see UserAttributeConfigResource::resolveRecordRouteBinding).
+        // Only save it now that access has been authorized, so that it exists
+        // for the requests that follow.
+        if (!$this->getRecord()->exists) {
+            $this->getRecord()->save();
+        }
+    }
 }
