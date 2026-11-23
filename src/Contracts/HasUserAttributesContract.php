@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 /**
  * This interface is implemented by the HasUserAttributes trait.
  *
- * @property \Luttje\FilamentUserAttributes\UserAttributeValues $user_attributes
+ * @property-read \Luttje\FilamentUserAttributes\UserAttributeValues $user_attributes
+ * @property-write array|object $user_attributes Values to merge into the user attributes
  *
  * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
  */

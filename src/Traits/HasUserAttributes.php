@@ -13,7 +13,8 @@ use Luttje\FilamentUserAttributes\UserAttributeValues;
 
 /**
  * @see Model
- * @property UserAttributeValues $user_attributes
+ * @property-read UserAttributeValues $user_attributes
+ * @property-write array|object $user_attributes Values to merge into the user attributes
  */
 trait HasUserAttributes
 {
