@@ -117,21 +117,15 @@ When no owner is found, no configurations are shown or saved.
 
 Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
-1. Create a resource and inherit from the `UserAttributeConfigResource` class:
+1. Add the plugin to your panel, and register a policy as described in the [🚀 Getting Started](../README.md#-getting-started) steps:
 
     ```php
-    // app/Filament/Resources/UserAttributeConfigResource.php
-    namespace App\Filament\Resources;
+    use Luttje\FilamentUserAttributes\FilamentUserAttributesPlugin;
 
-    use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource as BaseUserAttributeConfigResource;
-
-    class UserAttributeConfigResource extends BaseUserAttributeConfigResource
-    {
-        protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
-    }
+    $panel->plugin(FilamentUserAttributesPlugin::make());
     ```
 
-    *Or you can create your own resource from scratch. See the [source code](../src/Filament/Resources/) for inspiration.*
+    *To customize the resource further, extend `UserAttributeConfigResource` and pass it to the plugin: `->resource(MyUserAttributeConfigResource::class)`. See the [source code](../src/Filament/Resources/) for inspiration.*
 
 ## 🎈 Filament Livewire Components
 

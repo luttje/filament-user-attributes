@@ -2,6 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes\Filament\Resources;
 
+use BackedEnum;
 use Closure;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -10,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +21,7 @@ use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
+use Luttje\FilamentUserAttributes\FilamentUserAttributesPlugin;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use UnitEnum;
 
@@ -27,6 +30,23 @@ class UserAttributeConfigResource extends Resource
     protected static ?string $model = UserAttributeConfig::class;
 
     protected static ?string $tenantOwnershipRelationshipName = 'owner';
+
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-adjustments-horizontal';
+
+    public static function getNavigationGroup(): string | UnitEnum | null
+    {
+        return FilamentUserAttributesPlugin::get()?->getNavigationGroup() ?? parent::getNavigationGroup();
+    }
+
+    public static function getNavigationIcon(): string | BackedEnum | Htmlable | null
+    {
+        return FilamentUserAttributesPlugin::get()?->getNavigationIcon() ?? parent::getNavigationIcon();
+    }
+
+    public static function getNavigationSort(): ?int
+    {
+        return FilamentUserAttributesPlugin::get()?->getNavigationSort() ?? parent::getNavigationSort();
+    }
 
     /**
      * Redeclared so that toggling it only affects this resource (and resources
@@ -190,7 +210,6 @@ class UserAttributeConfigResource extends Resource
                     }),
             ])
             ->recordActions([
-                EditAction::make(),
                 EditAction::make(),
             ]);
     }

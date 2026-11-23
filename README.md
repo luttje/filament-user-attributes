@@ -69,21 +69,24 @@ Let your users specify custom attributes for models in Filament, similar to Cust
 
     Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
-5. Create a resource and inherit from the `UserAttributeConfigResource` class:
+5. Add the plugin to your panel:
 
     ```php
-    // app/Filament/Resources/UserAttributeConfigResource.php
-    namespace App\Filament\Resources;
+    // app/Providers/Filament/AdminPanelProvider.php
+    use Luttje\FilamentUserAttributes\FilamentUserAttributesPlugin;
 
-    use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource as BaseUserAttributeConfigResource;
-
-    class UserAttributeConfigResource extends BaseUserAttributeConfigResource
+    public function panel(Panel $panel): Panel
     {
-        protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-rectangle-stack';
+        return $panel
+            // ...
+            ->plugin(
+                FilamentUserAttributesPlugin::make()
+                    ->navigationGroup('Settings') // Optional
+            );
     }
     ```
 
-    *Or you can create your own resource from scratch. See the [source code](./src/Filament/Resources/) for inspiration.*
+    *To customize the resource further, extend `UserAttributeConfigResource` and pass it to the plugin: `->resource(MyUserAttributeConfigResource::class)`. See the [source code](./src/Filament/Resources/) for inspiration.*
 
 6. Decide who may configure user attributes. The resource **denies all access** until you register a [policy](https://laravel.com/docs/authorization#creating-policies) for the `UserAttributeConfig` model:
 
@@ -119,7 +122,7 @@ Let your users specify custom attributes for models in Filament, similar to Cust
     ```
 
     > [!WARNING]
-    > Whoever can access this resource can change the forms and tables of your other resources. If you really want *every* panel user to be able to do that, you can skip the policy by adding `protected static bool $shouldSkipAuthorization = true;` to your resource from step 5.
+    > Whoever can access this resource can change the forms and tables of your other resources. If you really want *every* panel user to be able to do that, you can skip the policy by calling `UserAttributeConfigResource::skipAuthorization();` in your `AppServiceProvider`'s boot method (or by adding `protected static bool $shouldSkipAuthorization = true;` to your own resource).
 
 **🎉 That was all, you and your users can now configure custom attributes!**
 

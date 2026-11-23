@@ -32,7 +32,7 @@ class ManageUserAttributeConfigs extends ManageRecords
                         ->required(),
                 ])
                 ->action(function (array $data) {
-                    $this->redirect(UserAttributeConfigResource::getUrl('edit', [
+                    $this->redirect(static::getResource()::getUrl('edit', [
                         'record' => urlencode($data['resource_type']),
                     ]));
                 }),

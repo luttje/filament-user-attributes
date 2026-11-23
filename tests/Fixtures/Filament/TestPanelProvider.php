@@ -14,6 +14,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Luttje\FilamentUserAttributes\FilamentUserAttributesPlugin;
 
 class TestPanelProvider extends PanelProvider
 {
@@ -34,7 +35,7 @@ class TestPanelProvider extends PanelProvider
             // ->emailVerification()
             ->profile()
             ->default()
-            ->discoverResources(in: static::localPath('../../../src/Filament/Resources'), for: 'Luttje\\FilamentUserAttributes\\Filament\\Resources')
+            ->plugin(FilamentUserAttributesPlugin::make()->navigationGroup('Settings'))
             ->discoverResources(in: static::localPath('Resources'), for: 'Luttje\\FilamentUserAttributes\\Tests\\Fixtures\\Filament\\Resources')
             ->discoverPages(in: static::localPath('Pages'), for: 'Luttje\\FilamentUserAttributes\\Tests\\Fixtures\\Filament\\Pages')
             ->discoverWidgets(in: static::localPath('Widgets'), for: 'Luttje\\FilamentUserAttributes\\Tests\\Fixtures\\Filament\\Widgets')
