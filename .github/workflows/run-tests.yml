@@ -84,6 +84,36 @@ jobs:
           collision: ^8.0
           stability: prefer-stable
 
+        # Laravel 13
+        - os: ubuntu-latest
+          php: 8.3
+          laravel: 13.*
+          livewire: ^4.0
+          testbench: 11.*
+          carbon: ^3.0
+          larastan: ^3.1.0
+          pest: ^4.3.1
+          pest-plugin-laravel: ^4.0
+          pest-plugin-arch: ^4.0
+          pest-plugin-livewire: ^4.1
+          collision: ^8.0
+          stability: prefer-lowest
+
+        # Pest 5 requires PHP 8.4
+        - os: ubuntu-latest
+          php: 8.4
+          laravel: 13.*
+          livewire: ^4.0
+          testbench: 11.*
+          carbon: ^3.0
+          larastan: ^3.1.0
+          pest: ^5.0
+          pest-plugin-laravel: ^5.0
+          pest-plugin-arch: ^5.0
+          pest-plugin-livewire: ^5.0
+          collision: ^8.0
+          stability: prefer-stable
+
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     steps:
