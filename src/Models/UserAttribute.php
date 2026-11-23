@@ -24,9 +24,4 @@ class UserAttribute extends Model
     {
         return $this->morphTo();
     }
-
-    public static function make(array $values): object
-    {
-        return (object) $values;
-    }
 }

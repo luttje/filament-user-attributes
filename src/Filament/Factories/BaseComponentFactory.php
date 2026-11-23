@@ -136,7 +136,7 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 query: function (Builder $query, string $direction) use ($userAttributeName): Builder {
                     $jsonPath = '$."' . str_replace('"', '\"', $userAttributeName) . '"';
                     $model = $query->getModel();
-                    $modelClass = get_class($model);
+                    $modelClass = $model->getMorphClass();
                     $modelTable = $model->getTable();
                     $modelKey = $model->getKeyName();
                     $nullsFirst = $direction === 'desc';

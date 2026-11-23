@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 /**
  * This interface is implemented by the HasUserAttributes trait.
  *
- * @property object $user_attributes
+ * @property \Luttje\FilamentUserAttributes\UserAttributeValues $user_attributes
  *
  * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
  */
@@ -32,7 +32,7 @@ interface HasUserAttributesContract
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes
      */
-    public function setUserAttributeValues(object $values);
+    public function setUserAttributeValues(array|object $values);
 
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\HasUserAttributes

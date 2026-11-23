@@ -16,13 +16,32 @@ Besides using the package as described in the [README](../README.md) you can als
     $product->save();
     ```
 
-* Getting the attribute is just as easy:
+* Or set multiple at once by assigning an array. The values are merged with the existing user attributes:
+
+    ```php
+    $product->user_attributes = ['color' => 'red', 'size' => 'large'];
+    $product->save();
+
+    // Mass assignment works too
+    Product::create(['name' => 'Shirt', 'user_attributes' => ['color' => 'red']]);
+    ```
+
+* Getting the attribute is just as easy. Use dot notation for nested values:
 
     ```php
     $product = Product::find(1);
     echo $product->user_attributes->color; // 'red'
-    echo $product->user_attributes->customizations['material']; // 'synthetic'
+    echo $product->user_attributes['color']; // 'red'
+    echo $product->getUserAttributeValue('customizations.material'); // 'synthetic'
+
+    foreach ($product->user_attributes as $key => $value) {
+        // ...
+    }
+
+    $product->user_attributes->toArray(); // ['color' => 'red', ...]
     ```
+
+    Values you've set but not yet saved are returned as well.
 
 * To display a single user attribute as a column use the `UserAttributeColumn` class:
 
@@ -52,6 +71,21 @@ Besides using the package as described in the [README](../README.md) you can als
     ```
 
 > You'll find all the attributes in the `user_attributes` table of your database. However you don't have to worry about it's existence. The `HasUserAttributes` trait handles all the database interactions for you.
+
+## 🔍 Querying by user attribute
+
+The `HasUserAttributes` trait adds query scopes, which you can use on their own or chain onto any query:
+
+```php
+Product::whereUserAttribute('color', 'red')->get();
+Product::where('active', true)->whereUserAttribute('stock', '>', 10)->get();
+Product::whereUserAttribute('customizations.material', 'synthetic')->get();
+Product::whereUserAttributeContains('tags', 'sale')->get();
+Product::whereUserAttributeLength('tags', '>', 2)->get();
+
+Product::userAttributeSum('price'); // Sum across all products
+Product::allUserAttributes('color'); // Collection of each product's color
+```
 
 ## 🔎 Querying by config value
 

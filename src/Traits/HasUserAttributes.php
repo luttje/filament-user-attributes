@@ -2,15 +2,18 @@
 
 namespace Luttje\FilamentUserAttributes\Traits;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Luttje\FilamentUserAttributes\Models\UserAttribute;
+use Luttje\FilamentUserAttributes\UserAttributeValues;
 
 /**
  * @see Model
- * @property object $user_attributes
+ * @property UserAttributeValues $user_attributes
  */
 trait HasUserAttributes
 {
@@ -25,9 +28,9 @@ trait HasUserAttributes
     protected $shouldDestroyUserAttributes = false;
 
     /**
-     * Stores an instance of the anonymous class that is created when the user_attributes
+     * Gives property and array access to the user attributes.
      */
-    private $__userAttributesInstance;
+    private ?UserAttributeValues $userAttributeValuesInstance = null;
 
     /**
      * Setup the model to make user_attributes fillable (so they reach the 'saving' hook).
@@ -55,35 +58,14 @@ trait HasUserAttributes
      * Boots the trait and adds a saved hook to save the user attributes
      * when the model is saved.
      *
-     * Additionally removes user_attributes so it doesn't get saved to
-     * the database.
-     *
      * @return void
      */
     protected static function bootHasUserAttributes()
     {
-        static::saving(function ($model) {
-            if (!isset($model->attributes['user_attributes'])) {
-                return;
-            }
-
-            $userAttributes = $model->attributes['user_attributes'];
-
-            // In some cases (like when Filament is saving a model), the user_attributes
-            // may not have been added to dirtyUserAttributes yet. In this case, we
-            // need to add them now.
-            foreach ($userAttributes as $key => $value) {
-                if (!array_key_exists($key, $model->dirtyUserAttributes)) {
-                    $model->dirtyUserAttributes[$key] = $value;
-                }
-            }
-
-            unset($model->attributes['user_attributes']);
-        });
-
         static::saved(function ($model) {
             if ($model->shouldDestroyUserAttributes) {
                 $model->userAttribute()->delete();
+                $model->setRelation('userAttribute', null);
                 $model->shouldDestroyUserAttributes = false;
 
                 return;
@@ -101,8 +83,7 @@ trait HasUserAttributes
     /**
      * Overrides the default isGuardableColumn method to ensure that
      * user_attributes is considered a guardable column, ensuring it
-     * is passed along to the `saving` eloquent hook. (This is necessary
-     * otherwise Model::fill will not pass the user_attributes)
+     * is passed along by Model::fill (which Filament uses to save).
      */
     protected function isGuardableColumn($key)
     {
@@ -114,23 +95,37 @@ trait HasUserAttributes
     }
 
     /**
-     * Saves all user attributes.
-     *
-     * @param  array  $attributes
+     * Intercepts mass assignment (e.g. `Model::create(['user_attributes' => [...]])`
+     * or Filament saving a form) so user attributes never reach the model's own table.
+     */
+    public function setAttribute($key, $value)
+    {
+        if ($key === 'user_attributes') {
+            if ($value !== null) {
+                $this->setUserAttributeValues($value);
+            }
+
+            return $this;
+        }
+
+        return parent::setAttribute($key, $value);
+    }
+
+    /**
+     * Saves all user attributes, merging them with those already stored.
      */
     public function saveAllUserAttributes(array $attributes)
     {
-        // If the model already has user attributes, merge them, otherwise create a new record
-        if ($this->userAttribute()->exists()) {
-            $newValues = array_merge($this->userAttribute->values->toArray(), $attributes);
-            $this->userAttribute->values = $newValues;
-            $this->userAttribute->save();
-        } else {
-            $this->userAttribute()->create(['values' => $attributes]);
+        $userAttribute = $this->userAttribute;
 
-            // Ensure that the user attributes are dirty for the next time the model is used.
-            //$this->unsetRelation('userAttribute'); ?/ This was here because I accidentally fetched the relationship, just before creating it. Causing it to be set as null (and then not updated after save)
+        if ($userAttribute) {
+            $userAttribute->values = array_merge($userAttribute->values?->toArray() ?? [], $attributes);
+            $userAttribute->save();
+
+            return;
         }
+
+        $this->setRelation('userAttribute', $this->userAttribute()->create(['values' => $attributes]));
     }
 
     /**
@@ -149,50 +144,69 @@ trait HasUserAttributes
         return $this->morphOne(UserAttribute::class, 'model');
     }
 
+    /**
+     * Whether the user attribute has a (non-null) value, including values
+     * that have been set but not yet saved.
+     */
     public function hasUserAttribute(string $key): bool
     {
-        return $this->userAttribute()->where('values->' . $key, '!=', null)->exists();
+        return $this->getUserAttributeValue($key) !== null;
     }
 
     public function setUserAttributeValue(string $key, $value)
     {
         if ($this->shouldDestroyUserAttributes) {
-            throw new \Exception('Cannot set user attribute on a model that has been marked for deletion.');
+            throw new \LogicException('Cannot set user attribute on a model that has been marked for deletion.');
         }
 
         $this->dirtyUserAttributes[$key] = $value;
     }
 
-    public function setUserAttributeValues(object $values)
+    /**
+     * Sets multiple user attributes at once. They are merged with the
+     * existing user attributes when the model is saved.
+     */
+    public function setUserAttributeValues(array|object $values)
     {
         if ($this->shouldDestroyUserAttributes) {
-            throw new \Exception('Cannot set user attributes on a model that has been marked for deletion.');
+            throw new \LogicException('Cannot set user attributes on a model that has been marked for deletion.');
         }
 
-        $this->dirtyUserAttributes = array_merge($this->dirtyUserAttributes, (array) $values);
+        $values = $values instanceof Arrayable ? $values->toArray() : (array) $values;
+
+        $this->dirtyUserAttributes = array_merge($this->dirtyUserAttributes, $values);
     }
 
+    /**
+     * Removes all user attributes when the model is saved.
+     */
     public function destroyUserAttributes()
     {
+        $this->dirtyUserAttributes = [];
         $this->shouldDestroyUserAttributes = true;
     }
 
+    /**
+     * Gets a user attribute by its key, or a nested value using dot notation.
+     * Values that have been set but not yet saved are included.
+     */
     public function getUserAttributeValue(string $keyOrPath)
     {
-        $userAttribute = $this->userAttribute;
-        $array = $userAttribute?->values;
-
-        if (!$array) {
-            return null;
-        }
-
-        return Arr::get($array, $keyOrPath);
+        return Arr::get($this->getUserAttributeValues()->getArrayCopy(), $keyOrPath);
     }
 
+    /**
+     * Gets all user attributes, including those set but not yet saved.
+     */
     public function getUserAttributeValues(): ArrayObject
     {
-        $userAttribute = $this->userAttribute;
-        return $userAttribute?->values ?? new ArrayObject([]);
+        if ($this->shouldDestroyUserAttributes) {
+            return new ArrayObject([]);
+        }
+
+        $stored = $this->userAttribute?->values?->getArrayCopy() ?? [];
+
+        return new ArrayObject(array_merge($stored, $this->dirtyUserAttributes));
     }
 
     /**
@@ -201,10 +215,13 @@ trait HasUserAttributes
     public static function getUserAttributeQuery(): Builder
     {
         return UserAttribute::query()
-            ->where('model_type', static::class);
+            ->where('model_type', (new static())->getMorphClass());
     }
 
-    public static function allUserAttributes(string $key)
+    /**
+     * Gets the value of the given user attribute for all models of this type.
+     */
+    public static function allUserAttributes(string $key): Collection
     {
         return static::getUserAttributeQuery()
             ->get()
@@ -214,39 +231,53 @@ trait HasUserAttributes
     /**
      * Aggregates
      */
-    public static function userAttributeSum(string $path): int
+    public static function userAttributeSum(string $path): int|float
     {
-        return UserAttribute::query()
-            ->where('model_type', static::class)
-            ->sum('values->' . $path);
+        $sum = (float) static::getUserAttributeQuery()
+            ->sum(static::userAttributeJsonPath($path));
+
+        return floor($sum) === $sum ? (int) $sum : $sum;
     }
 
     /**
-     * Where filters
+     * Converts a dot notation path (as used by getUserAttributeValue) to a JSON
+     * column path. Paths already using `->` are supported as well.
      */
-    public static function whereUserAttribute(string $key, $value)
+    protected static function userAttributeJsonPath(string $path): string
     {
-        return static::whereHas('userAttribute', function ($query) use ($key, $value) {
-            $query->where('values->' . $key, $value);
-        });
+        return 'values->' . str_replace('.', '->', $path);
     }
 
-    public static function whereUserAttributeContains(string $key, $value)
+    /**
+     * Query scopes. These can be called statically (`Product::whereUserAttribute(...)`)
+     * or chained onto an existing query (`Product::where(...)->whereUserAttribute(...)`).
+     */
+    public function scopeWhereUserAttribute(Builder $query, string $key, mixed $operator = null, mixed $value = null): void
     {
-        return static::whereHas('userAttribute', function ($query) use ($key, $value) {
-            $query->whereJsonContains('values->' . $key, $value);
-        });
-    }
-
-    public static function whereUserAttributeLength(string $key, $operator, $value = null)
-    {
-        if (func_num_args() == 2) {
-            $value = $operator;
-            $operator = '=';
+        if (func_num_args() === 3) {
+            [$operator, $value] = ['=', $operator];
         }
 
-        return static::whereHas('userAttribute', function ($query) use ($key, $operator, $value) {
-            $query->whereJsonLength('values->' . $key, $operator, $value);
+        $query->whereHas('userAttribute', function (Builder $query) use ($key, $operator, $value) {
+            $query->where(static::userAttributeJsonPath($key), $operator, $value);
+        });
+    }
+
+    public function scopeWhereUserAttributeContains(Builder $query, string $key, mixed $value): void
+    {
+        $query->whereHas('userAttribute', function (Builder $query) use ($key, $value) {
+            $query->whereJsonContains(static::userAttributeJsonPath($key), $value);
+        });
+    }
+
+    public function scopeWhereUserAttributeLength(Builder $query, string $key, mixed $operator, mixed $value = null): void
+    {
+        if (func_num_args() === 3) {
+            [$operator, $value] = ['=', $operator];
+        }
+
+        $query->whereHas('userAttribute', function (Builder $query) use ($key, $operator, $value) {
+            $query->whereJsonLength(static::userAttributeJsonPath($key), $operator, $value);
         });
     }
 
@@ -255,58 +286,24 @@ trait HasUserAttributes
      */
 
     /**
-     * We want users of this trait to be able to access the user_attributes property as if it
-     * were a real property on the model. This makes it easy to get and set user attributes.
+     * Lets `$model->user_attributes` be used to get and set user attributes,
+     * as properties or as array keys:
      *
-     * Creates an anonymous class when user_attributes is called for the first time and stores it
-     * in the $__userAttributesInstance property. The anonymous class stores a reference back to
-     * the owner object and uses the __get and __set magic methods to intercept property accesses.
-     *
-     * @return object
+     *     $model->user_attributes->color = 'red';
+     *     $model->user_attributes['color']; // 'red'
      */
     public function __get($key)
     {
         if ($key === 'user_attributes') {
-            if (!$this->__userAttributesInstance) {
-                $this->__userAttributesInstance = new class ($this) {
-                    private $owner;
-
-                    public function __construct($owner)
-                    {
-                        $this->owner = $owner;
-                    }
-
-                    public function __get($key)
-                    {
-                        return $this->owner->getUserAttributeValue($key);
-                    }
-
-                    public function __set($key, $value)
-                    {
-                        $this->owner->setUserAttributeValue($key, $value);
-                    }
-
-                    public function __unset($key)
-                    {
-                        $this->owner->setUserAttributeValue($key, null);
-                    }
-
-                    public function __isset($key)
-                    {
-                        return $this->owner->hasUserAttribute($key);
-                    }
-                };
-            }
-
-            return $this->__userAttributesInstance;
+            return $this->userAttributeValuesInstance ??= new UserAttributeValues($this);
         }
 
         return parent::__get($key);
     }
 
     /**
-     * When the user attempts to directly set the user_attributes property, we intercept it
-     * and call setUserAttributeValues instead.
+     * Setting `$model->user_attributes = [...]` merges the given values into
+     * the user attributes.
      *
      * @param  mixed  $key
      * @param  mixed  $value
@@ -314,10 +311,8 @@ trait HasUserAttributes
     public function __set($key, $value)
     {
         if ($key === 'user_attributes') {
-            if (!is_object($value)) {
-                // We throw, because if a developer would set `$model->user_attributes = ['key' => 'value']`, it would
-                // mess with the IDE's ability to recognize `user_attributes` as an object (thanks to the PHPdoc and __get)
-                throw new \Exception('The user_attributes property must be an object. Be sure to wrap arrays with UserAttribute::make($yourArray) or cast them to an object.');
+            if (!is_array($value) && !is_object($value)) {
+                throw new \InvalidArgumentException('The user_attributes property can only be set to an array or object. To remove all user attributes, use unset($model->user_attributes).');
             }
 
             $this->setUserAttributeValues($value);

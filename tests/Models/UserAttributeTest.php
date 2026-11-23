@@ -2,7 +2,6 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Models;
 
-use Luttje\FilamentUserAttributes\Models\UserAttribute;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\ProductButGuarded;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
@@ -11,7 +10,7 @@ it('can add a custom attribute to a new model', function () {
     $model = Product::factory()->make([
         'name' => 'Test Product',
     ]);
-    $attributes = UserAttribute::make(['color' => 'red']);
+    $attributes = (['color' => 'red']);
 
     $model->user_attributes = $attributes;
 
@@ -21,7 +20,7 @@ it('can add a custom attribute to a new model', function () {
     $model->save();
 
     expect($model->userAttribute()->count())->toBe(1);
-    expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
+    expect($model->getUserAttributeValues())->toMatchArray($attributes);
     expect($model->userAttribute->model->id)->toBe($model->id);
     expect($model->name)->toBe('Test Product');
 });
@@ -58,32 +57,32 @@ it('can add arrays to a new model', function () {
 
 it('can add a custom attribute to an existing model', function () {
     $model = User::factory()->create();
-    $attributes = UserAttribute::make(['key' => 'value']);
+    $attributes = (['key' => 'value']);
 
     $model->user_attributes = $attributes;
     $model->save();
 
     expect($model->userAttribute()->count())->toBe(1);
-    expect($model->getUserAttributeValues())->toMatchArray((array) $attributes);
+    expect($model->getUserAttributeValues())->toMatchArray($attributes);
     expect($model->userAttribute->model->id)->toBe($model->id);
 });
 
 it('can update a custom attribute on an existing model', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
-    $newValues = UserAttribute::make(['key' => 'new value']);
+    $model->user_attributes = (['key' => 'value']);
+    $newValues = (['key' => 'new value']);
 
     $model->user_attributes = $newValues;
     $model->save();
 
     expect($model->userAttribute()->count())->toBe(1);
-    expect($model->getUserAttributeValues())->toMatchArray((array) $newValues);
+    expect($model->getUserAttributeValues())->toMatchArray($newValues);
     expect($model->userAttribute->model->id)->toBe($model->id);
 });
 
 it('can remove a custom attribute from an existing model', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
 
     unset($model->user_attributes);
     $model->save();
@@ -93,7 +92,7 @@ it('can remove a custom attribute from an existing model', function () {
 
 it('throws exception when setting a custom attribute if the attributes were destroyed', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     unset($model->user_attributes);
@@ -103,12 +102,12 @@ it('throws exception when setting a custom attribute if the attributes were dest
 
 it('throws exception when setting attributes if the attributes were destroyed', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     unset($model->user_attributes);
 
-    $model->user_attributes = UserAttribute::make(['key' => 'value2']);
+    $model->user_attributes = (['key' => 'value2']);
 })->throws(\Exception::class);
 
 it('throws if trying to set a non-object as attributes', function (mixed $data) {
@@ -118,7 +117,6 @@ it('throws if trying to set a non-object as attributes', function (mixed $data) 
     'string' => 'string',
     'int' => 1,
     'float' => 1.1,
-    'array' => [['key' => 'value']],
     'null' => null,
     'bool' => true,
     'callable' => fn () => null,
@@ -126,7 +124,7 @@ it('throws if trying to set a non-object as attributes', function (mixed $data) 
 
 it('can perform json queries on custom attributes', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make([
+    $model->user_attributes = ([
         'key' => 'value',
         'array' => ['value1', 'value2'],
         'costs' => [
@@ -138,7 +136,7 @@ it('can perform json queries on custom attributes', function () {
     $model->save();
 
     $model2 = User::factory()->create();
-    $model2->user_attributes = UserAttribute::make([
+    $model2->user_attributes = ([
         'key' => 'value2',
         'array' => ['value4'],
         'costs' => [
@@ -159,7 +157,7 @@ it('can perform json queries on custom attributes', function () {
 
 it('can update a single attribute on an existing model', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     expect($model->userAttribute()->count())->toBe(1);
@@ -175,7 +173,7 @@ it('can update a single attribute on an existing model', function () {
 
 it('can get a single attribute from an existing model', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     expect($model->user_attributes->key)->toBe('value');
@@ -191,7 +189,7 @@ it('will get null when no user attributes are set on an existing model', functio
 
 it('can check if an existing model has a single attribute', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     expect($model->hasUserAttribute('key'))->toBeTrue();
@@ -200,11 +198,11 @@ it('can check if an existing model has a single attribute', function () {
 
 it('can get a single attribute from multiple models', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     $model2 = User::factory()->create();
-    $model2->user_attributes = UserAttribute::make(['key' => 'value2']);
+    $model2->user_attributes = (['key' => 'value2']);
     $model2->save();
 
     expect(User::allUserAttributes('key')->toArray())->toMatchArray(['value', 'value2']);
@@ -212,7 +210,7 @@ it('can get a single attribute from multiple models', function () {
 
 it('does not break regular unset', function () {
     $model = User::factory()->create();
-    $model->user_attributes = UserAttribute::make(['key' => 'value']);
+    $model->user_attributes = (['key' => 'value']);
     $model->save();
 
     unset($model->name);
@@ -222,7 +220,7 @@ it('does not break regular unset', function () {
 
 it('can create a model with user attributes through mass assignment', function () {
     $model = User::factory()->create([
-        'user_attributes' => UserAttribute::make(['key' => 'value']),
+        'user_attributes' => (['key' => 'value']),
     ]);
 
     expect($model->userAttribute()->count())->toBe(1);
@@ -251,4 +249,90 @@ it('can add a custom attribute when mass assignable filter is guarded', function
     expect($model->userAttribute->model->id)->toBe($model->id);
     expect($model->user_attributes->key)->toBe('value');
     expect($model->name)->toBe('Test Product');
+});
+
+it('can read user attributes that are set but not yet saved', function () {
+    $model = User::factory()->create();
+    $model->user_attributes = ['key' => 'value'];
+    $model->save();
+
+    $model->user_attributes->key = 'new value';
+    $model->user_attributes->other = 'other value';
+
+    expect($model->user_attributes->key)->toBe('new value');
+    expect($model->user_attributes->other)->toBe('other value');
+    expect($model->hasUserAttribute('other'))->toBeTrue();
+    expect($model->getUserAttributeValues())->toMatchArray(['key' => 'new value', 'other' => 'other value']);
+});
+
+it('can use the user attributes like an array', function () {
+    $model = User::factory()->create();
+    $model->user_attributes['color'] = 'red';
+    $model->user_attributes['size'] = 'large';
+    $model->save();
+
+    $model = User::find($model->id);
+
+    expect($model->user_attributes['color'])->toBe('red');
+    expect(isset($model->user_attributes['size']))->toBeTrue();
+    expect(isset($model->user_attributes['missing']))->toBeFalse();
+    expect(count($model->user_attributes))->toBe(2);
+    expect(iterator_to_array($model->user_attributes))->toEqual(['color' => 'red', 'size' => 'large']);
+    expect($model->user_attributes->toArray())->toEqual(['color' => 'red', 'size' => 'large']);
+});
+
+it('keeps the user attributes in sync after first saving them', function () {
+    $model = User::factory()->create();
+
+    // Loads the (still missing) relation
+    expect($model->user_attributes->key)->toBeNull();
+
+    $model->user_attributes->key = 'value';
+    $model->save();
+
+    expect($model->user_attributes->key)->toBe('value');
+});
+
+it('does not query the database to check if a user attribute is set', function () {
+    $model = User::factory()->create();
+    $model->user_attributes = ['key' => 'value'];
+    $model->save();
+
+    $model = User::with('userAttribute')->find($model->id);
+
+    \Illuminate\Support\Facades\DB::enableQueryLog();
+    \Illuminate\Support\Facades\DB::flushQueryLog();
+
+    expect($model->hasUserAttribute('key'))->toBeTrue();
+    expect(isset($model->user_attributes->key))->toBeTrue();
+    expect(isset($model->user_attributes->missing))->toBeFalse();
+
+    expect(\Illuminate\Support\Facades\DB::getQueryLog())->toBeEmpty();
+});
+
+it('can chain user attribute query scopes', function () {
+    $model = User::factory()->create(['name' => 'Alice']);
+    $model->user_attributes = ['key' => 'value', 'amount' => 10, 'nested' => ['deep' => 'yes']];
+    $model->save();
+
+    $model2 = User::factory()->create(['name' => 'Bob']);
+    $model2->user_attributes = ['key' => 'value', 'amount' => 5];
+    $model2->save();
+
+    expect(User::where('name', 'Alice')->whereUserAttribute('key', 'value')->count())->toBe(1);
+    expect(User::whereUserAttribute('amount', '>', 6)->pluck('name')->all())->toBe(['Alice']);
+    expect(User::whereUserAttribute('nested.deep', 'yes')->count())->toBe(1);
+    expect(User::query()->whereUserAttribute('key', 'value')->whereUserAttribute('amount', 5)->pluck('name')->all())->toBe(['Bob']);
+});
+
+it('sums decimal user attributes without losing precision', function () {
+    $model = User::factory()->create();
+    $model->user_attributes = ['price' => 1.25];
+    $model->save();
+
+    $model2 = User::factory()->create();
+    $model2->user_attributes = ['price' => 2.5];
+    $model2->save();
+
+    expect(User::userAttributeSum('price'))->toBe(3.75);
 });
