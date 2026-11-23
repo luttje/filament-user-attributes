@@ -102,40 +102,33 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
 
         $userAttributeName = $userAttribute['name'];
 
-        if (isset($customizations['is_searchable']) && $customizations['is_searchable'] === true) {
-            $column->searchable(query: function (Builder $query, string $search) use ($userAttributeName): Builder {
-                $jsonPath = '$."' . str_replace('"', '\"', $userAttributeName) . '"';
+        // The JSON column syntax (`values->name`) lets Laravel write the right SQL for each database
+        $jsonColumn = 'values->' . $userAttributeName;
 
-                $query->whereHas('userAttribute', function (Builder $query) use ($jsonPath, $search) {
-                    $query->where(function (Builder $subQuery) use ($jsonPath, $search) {
-                        $subQuery->whereRaw(
-                            "JSON_UNQUOTE(JSON_EXTRACT(`values`, ?)) LIKE ?",
-                            [$jsonPath, '%' . $search . '%']
-                        );
+        if (isset($customizations['is_searchable']) && $customizations['is_searchable'] === true) {
+            $column->searchable(query: function (Builder $query, string $search) use ($jsonColumn): Builder {
+                return $query->whereHas('userAttribute', function (Builder $query) use ($jsonColumn, $search) {
+                    $query->where(function (Builder $subQuery) use ($jsonColumn, $search) {
+                        $subQuery->where($jsonColumn, 'like', '%' . $search . '%');
 
                         // If search contains comma, also search with dot, because the database only stores JSON numbers with dots
-                        if (strpos($search, ',') !== false) {
-                            $searchWithDot = str_replace(',', '.', $search);
-                            $subQuery->orWhereRaw(
-                                "JSON_UNQUOTE(JSON_EXTRACT(`values`, ?)) LIKE ?",
-                                [$jsonPath, '%' . $searchWithDot . '%']
-                            );
+                        if (str_contains($search, ',')) {
+                            $subQuery->orWhere($jsonColumn, 'like', '%' . str_replace(',', '.', $search) . '%');
                         }
                     });
                 });
-                return $query;
             });
         }
 
         if (isset($customizations['is_sortable']) && $customizations['is_sortable'] === true) {
             $column->sortable(
-                query: function (Builder $query, string $direction) use ($userAttributeName): Builder {
-                    $jsonPath = '$."' . str_replace('"', '\"', $userAttributeName) . '"';
+                query: function (Builder $query, string $direction) use ($jsonColumn): Builder {
                     $model = $query->getModel();
                     $modelClass = $model->getMorphClass();
                     $modelTable = $model->getTable();
                     $modelKey = $model->getKeyName();
-                    $nullsFirst = $direction === 'desc';
+                    $value = $query->getQuery()->getGrammar()->wrap('user_attributes.' . $jsonColumn);
+                    $isAscending = $direction !== 'desc';
 
                     return $query
                         ->select($modelTable . '.*') // Ensure we're selecting all columns from main table (or we get a `Missing required parameter` error)
@@ -143,17 +136,12 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                             $join->on('user_attributes.model_id', '=', $modelTable . '.' . $modelKey)
                                 ->where('user_attributes.model_type', '=', $modelClass);
                         })
-                        ->orderByRaw("
-                            CASE
-                                WHEN user_attributes.id IS NULL THEN ?
-                                ELSE ?
-                            END,
-                            COALESCE(JSON_UNQUOTE(JSON_EXTRACT(user_attributes.values, ?)), '') {$direction}
-                        ", [
-                            $nullsFirst ? 0 : 1,  // NULL records priority
-                            $nullsFirst ? 1 : 0,  // Non-NULL records priority
-                            $jsonPath
-                        ]);
+                        // Records without a value come last when sorting ascending, and first when descending (on every database)
+                        ->orderByRaw("CASE WHEN {$value} IS NULL THEN ? ELSE ? END", [
+                            $isAscending ? 1 : 0,
+                            $isAscending ? 0 : 1,
+                        ])
+                        ->orderBy('user_attributes.' . $jsonColumn, $isAscending ? 'asc' : 'desc');
                 }
             );
         }

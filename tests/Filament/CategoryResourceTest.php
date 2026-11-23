@@ -6,6 +6,8 @@ use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
 use Illuminate\Support\Str;
+use Livewire\Livewire;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource\Pages\ListCategories;
 
 function createUserWithAttributeConfigs($attributesConfig)
 {
@@ -336,4 +338,30 @@ it('can render a resource with user attributes while lazy loading is prevented',
     } finally {
         \Illuminate\Database\Eloquent\Model::preventLazyLoading(false);
     }
+});
+
+it('can search and sort by a user attribute', function () {
+    $user = User::factory()->create();
+    $user->createUserAttributeConfig(CategoryResource::class, 'color', 'Color', customizations: [
+        'is_searchable' => true,
+        'is_sortable' => true,
+    ]);
+
+    $categories = createCategories(['Banana', 'Cherry', 'Apple', 'Unknown']);
+    addAttributesToCategories($categories, [['color' => 'yellow'], ['color' => 'red'], ['color' => 'green'], []]);
+    [$banana, $cherry, $apple, $unknown] = $categories->all();
+
+    $this->actingAs($user);
+
+    Livewire::test(ListCategories::class)
+        ->searchTable('re')
+        ->assertCanSeeTableRecords([$cherry, $apple])
+        ->assertCanNotSeeTableRecords([$banana, $unknown]);
+
+    // Records without a value come last when sorting ascending, and first when descending
+    Livewire::test(ListCategories::class)
+        ->sortTable('color')
+        ->assertCanSeeTableRecords([$apple, $cherry, $banana, $unknown], inOrder: true)
+        ->sortTable('color', 'desc')
+        ->assertCanSeeTableRecords([$unknown, $banana, $cherry, $apple], inOrder: true);
 });

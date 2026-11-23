@@ -55,7 +55,7 @@
     },
     "scripts": {
         "post-autoload-dump": "@php ./vendor/bin/testbench package:discover --ansi",
-        "test": "vendor/bin/pest --configuration=phpunit.xml",
+        "test": "vendor/bin/pest",
         "test-ci": "vendor/bin/pest --configuration=phpunit.xml.ci --coverage --ci",
         "test-coverage": "@test --coverage",
         "format": "vendor/bin/pint"

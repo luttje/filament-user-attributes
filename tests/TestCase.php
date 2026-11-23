@@ -61,9 +61,18 @@ class TestCase extends Orchestra
 
     public function getEnvironmentSetUp($app)
     {
+        // An in-memory SQLite database by default, so the tests need no database server and
+        // every test starts empty. Set DB_DRIVER (e.g. to mysql) to test against another database.
+        $driver = env('DB_DRIVER', env('DB_CONNECTION', 'sqlite'));
+
         config()->set('database.default', 'testing');
-        config()->set('database.connections.testing', [
-            'driver' => env('DB_DRIVER', 'mysql'),
+        config()->set('database.connections.testing', $driver === 'sqlite' ? [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+            'foreign_key_constraints' => true,
+        ] : [
+            'driver' => $driver,
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '3306'),
             'database' => env('DB_DATABASE', 'test_filament_user_attributes'),

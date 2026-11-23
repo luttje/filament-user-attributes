@@ -78,17 +78,15 @@ You can now test and modify this package. Changes will immediately be reflected 
 
 ## 🧪 Testing
 
-1. Copy `phpunit.xml.example` to `phpunit.xml`
-
-2. Start and create a database that supports JSON columns.
-
-3. Add the credentials to the `phpunit.xml` file.
-
-4. Run the tests
+Run the tests:
 
 ```bash
 composer test
 ```
+
+The tests use an in-memory SQLite database, so you don't need a database server and every test starts with an empty database.
+
+To run them against MySQL instead (like most CI jobs do), copy `phpunit.xml.example` to `phpunit.xml` and set your database credentials in it. `composer test` uses `phpunit.xml` when it exists.
 
 ### Code coverage
 
