@@ -46,32 +46,12 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 return data_get($record ?? [], $userAttribute['inherit_attribute']);
             }
 
-            if ($record !== null) {
-                $related = data_get($record, $userAttribute['inherit_relation']);
-
-                // Only a single related model can be inherited from (not one of many)
-                if (!$related instanceof Model || EloquentHelper::isHiddenAttribute($related, $userAttribute['inherit_attribute'])) {
-                    return $default;
-                }
-
-                return data_get($related, $userAttribute['inherit_attribute']);
-            }
-
-            // Without a record, the related model can only be found through its
-            // field in the form (e.g. a select for 'customer_id').
+            // A related model chosen in the form (e.g. a select for 'customer_id')
+            // is used first, so that changing it updates the inherited value.
             $inheritRelationInfo = EloquentHelper::getRelationInfo($this->modelType, $userAttribute['inherit_relation']);
-
-            // The relation may no longer exist (or be discoverable), in that case we keep the default
-            if (
-                $inheritRelationInfo === null
-                || EloquentHelper::isHiddenAttribute($inheritRelationInfo->relatedType, $userAttribute['inherit_attribute'])
-            ) {
-                return $default;
-            }
-
             $relatedKey = null;
 
-            foreach ($inheritRelationInfo->getFormFieldNames() as $fieldName) {
+            foreach ($inheritRelationInfo?->getFormFieldNames() ?? [] as $fieldName) {
                 try {
                     $relatedKey = $get($fieldName);
                 } catch (\Error) {
@@ -83,16 +63,23 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 }
             }
 
-            if (!$relatedKey) {
+            if ($relatedKey) {
+                // The key comes from the client, so it's looked up with the scopes and authorization of the related resource
+                $related = FilamentUserAttributes::findRecordToInheritFrom($inheritRelationInfo->relatedType, $relatedKey);
+            } elseif ($record?->exists) {
+                // Otherwise a saved record has the related model (even without a field in the form).
+                // Filament 4 passes a new model instance as the record on create pages, hence the check if it exists.
+                $related = data_get($record, $userAttribute['inherit_relation']);
+            } else {
                 return $default;
             }
 
-            // The key comes from the client, so it's looked up with the scopes and authorization of the related resource
-            $related = FilamentUserAttributes::findRecordToInheritFrom($inheritRelationInfo->relatedType, $relatedKey);
+            // Only a single related model can be inherited from (not one of many)
+            if (!$related instanceof Model || EloquentHelper::isHiddenAttribute($related, $userAttribute['inherit_attribute'])) {
+                return $default;
+            }
 
-            return $related !== null
-                ? data_get($related, $userAttribute['inherit_attribute'])
-                : $default;
+            return data_get($related, $userAttribute['inherit_attribute']);
         };
     }
 
@@ -187,7 +174,7 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
 
             // Default won't work when user_attributes does not yet contain the value, therefor we also set it here
             $field->formatStateUsing(function (Component $component, ?Model $record, $state) use ($userAttribute, $default) {
-                if ($record === null) {
+                if (!$record?->exists) {
                     return $state;
                 }
 

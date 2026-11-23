@@ -59,6 +59,20 @@ it('inherits from the related record chosen in the form of a new record', functi
     'a foreign key not named after the relation' => 'mainCategory',
 ]);
 
+it('inherits from the related record chosen in the form of a saved record', function () {
+    $user = User::factory()->create();
+    inheritCategoryName($user, 'category');
+
+    $shoes = Category::factory()->create(['name' => 'Shoes']);
+    $shirts = Category::factory()->create(['name' => 'Shirts']);
+    $product = Product::factory()->create(['category_id' => $shoes->id]);
+
+    Livewire::actingAs($user)
+        ->test(ProductForm::class, ['record' => $product])
+        ->set('data.category_id', $shirts->id)
+        ->assertSet('data.user_attributes.category_name', 'Shirts');
+});
+
 it('updates every attribute that inherits through the same field', function () {
     $user = User::factory()->create();
     inheritCategoryName($user, 'category', 'first_name');

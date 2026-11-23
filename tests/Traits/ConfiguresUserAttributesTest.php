@@ -91,5 +91,8 @@ it('explains how to register an unsupported user attribute type', function () {
 it('explains which model is missing user attributes in a column', function () {
     $column = UserAttributeColumn::make('color');
 
-    $column->evaluate($column->getStateUsingCallback(), ['record' => new TagNotSetup()]);
+    // Read the callback from the property, since older Filament versions have no getter for it
+    $getStateUsing = (fn () => $this->getStateUsing)->call($column);
+
+    $column->evaluate($getStateUsing, ['record' => new TagNotSetup()]);
 })->throws(\LogicException::class, TagNotSetup::class . ' has no user attributes');
