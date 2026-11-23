@@ -17,7 +17,7 @@
 
 # Filament User Attributes
 
-Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress. For Laravel 11-13 and Filament 4-5.
+Let your users specify custom attributes for models in Filament, similar to Custom Fields in WordPress. For Laravel 12-13 and Filament 4-5.
 
 > **Demonstration:** showing the creation of a custom user attribute for the 'Locations' resource of this app:
 >
