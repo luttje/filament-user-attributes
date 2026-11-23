@@ -49,41 +49,50 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
             if ($record !== null) {
                 $related = data_get($record, $userAttribute['inherit_relation']);
 
-                if ($related instanceof Model && EloquentHelper::isHiddenAttribute($related, $userAttribute['inherit_attribute'])) {
+                // Only a single related model can be inherited from (not one of many)
+                if (!$related instanceof Model || EloquentHelper::isHiddenAttribute($related, $userAttribute['inherit_attribute'])) {
                     return $default;
                 }
 
-                $default = data_get($related, $userAttribute['inherit_attribute']);
-            } else {
-                // TODO: Should we support situations where a relation exists, but no form field is shown for it.
-                // TODO: We currently only support relations that have a form field e.g: relation customer needs customer(_id) field
-                try {
-                    $relatedField = $get($userAttribute['inherit_relation']);
+                return data_get($related, $userAttribute['inherit_attribute']);
+            }
 
-                    if (!$relatedField) {
-                        $relatedField = $get($userAttribute['inherit_relation'] . '_id');
-                    }
+            // Without a record, the related model can only be found through its
+            // field in the form (e.g. a select for 'customer_id').
+            $inheritRelationInfo = EloquentHelper::getRelationInfo($this->modelType, $userAttribute['inherit_relation']);
+
+            // The relation may no longer exist (or be discoverable), in that case we keep the default
+            if (
+                $inheritRelationInfo === null
+                || EloquentHelper::isHiddenAttribute($inheritRelationInfo->relatedType, $userAttribute['inherit_attribute'])
+            ) {
+                return $default;
+            }
+
+            $relatedKey = null;
+
+            foreach ($inheritRelationInfo->getFormFieldNames() as $fieldName) {
+                try {
+                    $relatedKey = $get($fieldName);
                 } catch (\Error) {
-                    $relatedField = null;
+                    $relatedKey = null;
                 }
 
-                if ($relatedField !== null) {
-                    $record = $this->modelType;
-                    $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
-
-                    // The relation may no longer exist (or be discoverable), in that case we keep the default
-                    if (
-                        $inheritRelationInfo !== null
-                        && !EloquentHelper::isHiddenAttribute($inheritRelationInfo->relatedType, $userAttribute['inherit_attribute'])
-                    ) {
-                        // The key comes from the client, so it's looked up with the scopes and authorization of the related resource
-                        $related = FilamentUserAttributes::findRecordToInheritFrom($inheritRelationInfo->relatedType, $relatedField);
-                        $default = data_get($related, $userAttribute['inherit_attribute']);
-                    }
+                if ($relatedKey) {
+                    break;
                 }
             }
 
-            return $default;
+            if (!$relatedKey) {
+                return $default;
+            }
+
+            // The key comes from the client, so it's looked up with the scopes and authorization of the related resource
+            $related = FilamentUserAttributes::findRecordToInheritFrom($inheritRelationInfo->relatedType, $relatedKey);
+
+            return $related !== null
+                ? data_get($related, $userAttribute['inherit_attribute'])
+                : $default;
         };
     }
 

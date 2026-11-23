@@ -190,8 +190,9 @@ Let your users specify custom attributes for models in Filament, similar to Cust
   - [x] Users can specify if attributes inherit their value from another attribute, even from a related model, for:
     - [x] Resources
     - [x] Livewire components (if they implement the static `::getModel()` method)
-    - [x] Related fields that have a {relation}_id field in the form
+    - [x] Related fields that have a field in the form, e.g. `customer_id` (or whatever the foreign key of the `BelongsTo` relation is)
     - [x] Relations that declare their return type, e.g. `public function customer(): BelongsTo` (relation methods without a return type are not discovered)
+    - [x] Relations with a single related record (`BelongsTo`, `HasOne`, …). Relations with many (`HasMany`, `BelongsToMany`, …) aren't offered, because it's unclear which of them to inherit from
     - [ ] Related attributes that have no field in this form
     - [ ] Fields nested inside layout components (Section, Tabs, Fieldset) whose children are defined via a `Closure` — these cannot be resolved outside a Livewire context and will not appear in the inherit attribute dropdown
   - [x] Allow users to specify if an attribute should have a limit, wrap text or format as currency

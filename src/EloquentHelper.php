@@ -3,6 +3,7 @@
 namespace Luttje\FilamentUserAttributes;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class EloquentHelper
@@ -55,6 +56,10 @@ class EloquentHelper
                 $relation->relationTypeShort = lcfirst($type->getShortName()); // belongsTo
                 $relation->relationType = $type->getName(); // Illuminate\Database\Eloquent\Relations\BelongsTo
                 $relation->relatedType = $relatedClass;
+
+                if ($methodReturn instanceof BelongsTo) {
+                    $relation->foreignKeyName = $methodReturn->getForeignKeyName();
+                }
 
                 $relations[] = $relation;
             }

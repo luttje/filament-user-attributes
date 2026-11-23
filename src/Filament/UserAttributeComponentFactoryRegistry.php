@@ -89,6 +89,12 @@ class UserAttributeComponentFactoryRegistry
             }
 
             $relationAmount = static::$relatedAmountMap[$relation->relationTypeShort];
+
+            // Which of many related models should be inherited from is ambiguous, so only single relations are offered
+            if ($relationAmount !== 1) {
+                continue;
+            }
+
             $languageKey = 'filament-user-attributes::user-attributes.inherit_relation_option_label';
 
             if ($relation->name === '__self') {

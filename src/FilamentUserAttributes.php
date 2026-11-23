@@ -630,17 +630,7 @@ class FilamentUserAttributes
         $customFields = collect(FilamentUserAttributes::getUserAttributeFields($resource));
         $customFieldCount = $customFields->count();
 
-        $inheritingFieldsMap = $customFields->filter(function ($customField) {
-            return $customField['inheritance']['enabled'] === true;
-        })->mapWithKeys(function ($customField) {
-            $key = $customField['inheritance']['relation'];
-
-            if ($key === '__self') {
-                $key = $customField['inheritance']['attribute'];
-            }
-
-            return [$key => $customField];
-        });
+        $inheritingFieldsMap = $this->mapInheritingFieldsByFormField($customFields, $resource);
 
         for ($i = 0; $i < $customFieldCount; $i++) {
             $customField = $customFields->pop();
@@ -669,6 +659,40 @@ class FilamentUserAttributes
     }
 
     /**
+     * Maps the names of form fields to the custom fields that inherit their
+     * value through them. When such a form field changes, the inheriting
+     * fields need to update. Several custom fields can inherit through the
+     * same form field.
+     *
+     * @return Collection<string, array[]>
+     */
+    protected function mapInheritingFieldsByFormField(Collection $customFields, string $resource): Collection
+    {
+        $map = collect();
+
+        foreach ($customFields as $customField) {
+            if (($customField['inheritance']['enabled'] ?? false) !== true) {
+                continue;
+            }
+
+            $relation = $customField['inheritance']['relation'];
+
+            if ($relation === '__self') {
+                $fieldNames = [$customField['inheritance']['attribute']];
+            } else {
+                $relationInfo = EloquentHelper::getRelationInfo($this->getModelFromResource($resource), $relation);
+                $fieldNames = $relationInfo?->getFormFieldNames() ?? [$relation, $relation . '_id'];
+            }
+
+            foreach ($fieldNames as $fieldName) {
+                $map->put($fieldName, [...$map->get($fieldName, []), $customField]);
+            }
+        }
+
+        return $map;
+    }
+
+    /**
      * Adds a state change signal to all fields that inherit from another model.
      * This ensures the inherited field updates, when the related field value
      * changes.
@@ -691,29 +715,34 @@ class FilamentUserAttributes
                 $this->addStateChangeSignalToInheritedFields($childComponents, $inheritingFieldsMap);
             }
 
-            $statePath = $field->getStatePath(false);
-            $statePath = preg_replace('/_id$/', '', $statePath);
-            $inheritingField = $inheritingFieldsMap->get($statePath);
+            $inheritingFields = $inheritingFieldsMap->get($field->getStatePath(false));
 
-            if (!$inheritingField) {
+            if (!$inheritingFields) {
                 continue;
             }
 
             // Ensure that the related field is live, so that state changes are reactive.
-            if (!$field->isLive()) {
+            try {
+                $isLive = $field->isLive();
+            } catch (\Error) {
+                // Without `->live()` on the field, Filament asks the form it belongs to, which isn't set yet.
+                $isLive = false;
+            }
+
+            if (!$isLive) {
                 $field->live();
             }
 
-            $field->afterStateUpdated(static function (Component $component) use ($inheritingField): void {
+            $field->afterStateUpdated(static function (Component $component) use ($inheritingFields): void {
+                $inheritingFieldIds = array_map(fn ($inheritingField) => $inheritingField['field']->getId(), $inheritingFields);
                 $components = $component->getContainer()
                     ->getFlatComponents(true);
 
-                foreach ($components as $component) {
-                    if ($component->getId() !== $inheritingField['field']->getId()) {
-                        continue;
+                foreach ($components as $candidate) {
+                    // The default of an inheriting field is the inherited value
+                    if ($candidate instanceof Field && in_array($candidate->getId(), $inheritingFieldIds, true)) {
+                        $candidate->state($candidate->getDefaultState());
                     }
-
-                    $component->fill();
                 }
             });
         }

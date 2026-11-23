@@ -4,6 +4,7 @@ namespace Luttje\FilamentUserAttributes\Tests\Fixtures\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Database\Factories\CategoryFactory;
 use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
@@ -20,6 +21,11 @@ class Category extends Model implements HasUserAttributesContract
      */
     protected $fillable = [
     ];
+
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
 
     /**
      * Create a new factory instance for the model.
