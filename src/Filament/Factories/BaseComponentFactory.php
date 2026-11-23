@@ -59,8 +59,12 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                 if ($relatedField !== null) {
                     $record = $this->modelType;
                     $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
-                    $related = ($inheritRelationInfo->relatedType)::find($relatedField);
-                    $default = data_get($related, $userAttribute['inherit_attribute']);
+
+                    // The relation may no longer exist (or be discoverable), in that case we keep the default
+                    if ($inheritRelationInfo !== null) {
+                        $related = ($inheritRelationInfo->relatedType)::find($relatedField);
+                        $default = data_get($related, $userAttribute['inherit_attribute']);
+                    }
                 }
             }
 
