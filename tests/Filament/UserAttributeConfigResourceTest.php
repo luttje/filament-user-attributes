@@ -11,6 +11,8 @@ use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\SomeSubFolder\ProductResource;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\TagNotSetupResource;
 use Filament\Forms\Components\Repeater;
 use Luttje\FilamentUserAttributes\FilamentUserAttributes as FilamentUserAttributesImpl;
 
@@ -282,4 +284,38 @@ it('can manage user attributes through the action', function () {
         ->assertRedirect(UserAttributeConfigResource::getUrl('edit', [
             'record' => urlencode(CategoryResource::class),
         ]));
+});
+
+it('does not resolve classes that are not configurable resources from the url', function (string $class) {
+    $user = User::factory()->create();
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('edit', ['record' => $class]))
+        ->assertNotFound();
+
+    expect(UserAttributeConfig::count())->toBe(0);
+})->with([
+    'a model' => User::class,
+    'a resource without the contract' => TagNotSetupResource::class,
+    'a non-existent class' => 'App\DoesNotExist',
+]);
+
+it('only resolves manually registered resources when discovery is disabled', function () {
+    $user = User::factory()->create();
+
+    Config::set('filament-user-attributes.discover_resources', false);
+
+    FilamentUserAttributes::registerResources([
+        ProductResource::class => 'Product Page',
+    ]);
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('edit', ['record' => CategoryResource::class]))
+        ->assertNotFound();
+
+    $this->actingAs($user)
+        ->get(UserAttributeConfigResource::getUrl('edit', ['record' => ProductResource::class]))
+        ->assertSuccessful();
+
+    expect(UserAttributeConfig::pluck('resource_type')->all())->toBe([ProductResource::class]);
 });

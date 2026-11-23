@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
@@ -49,9 +50,30 @@ class UserAttributeConfigResource extends Resource
         return $query;
     }
 
+    /**
+     * Whether the given class may be configured through this resource.
+     *
+     * The class name comes from the URL, so it must never be trusted: only
+     * classes that opted in by implementing the UserAttributesConfigContract
+     * are accepted. When resources are registered manually (discovery is
+     * disabled) that list is authoritative.
+     */
+    protected static function isConfigurableResource(string $class): bool
+    {
+        if (!class_exists($class) || !is_subclass_of($class, UserAttributesConfigContract::class)) {
+            return false;
+        }
+
+        if (FilamentUserAttributes::getResourceDiscoverPaths() === false) {
+            return array_key_exists($class, FilamentUserAttributes::getConfigurableResources());
+        }
+
+        return true;
+    }
+
     public static function resolveRecordRouteBinding(int | string $key, ?Closure $modifyQuery = null): ?Model
     {
-        if (class_exists($key)) {
+        if (is_string($key) && static::isConfigurableResource($key)) {
             $resource = $key;
             $config = $resource::getUserAttributesConfig();
 
@@ -79,7 +101,7 @@ class UserAttributeConfigResource extends Resource
             return $userAttributeConfigs;
         }
 
-        return parent::resolveRecordRouteBinding($key);
+        return parent::resolveRecordRouteBinding($key, $modifyQuery);
     }
 
     public static function form(Schema $form): Schema
