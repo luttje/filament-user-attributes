@@ -19,7 +19,6 @@ use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
-use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
 
 /**
  * Class FilamentUserAttributes
