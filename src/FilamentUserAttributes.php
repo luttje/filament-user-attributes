@@ -10,6 +10,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Tables\Columns\Column;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
@@ -756,6 +757,38 @@ class FilamentUserAttributes
         }
 
         return $model;
+    }
+
+    /**
+     * Finds the related record that a user attribute may inherit its value from.
+     *
+     * The key comes from the form state, which the client controls. Therefore
+     * the record is looked up through the query of the resource that manages
+     * the related model (so tenancy and other scopes apply) and the user must
+     * be allowed to view it.
+     */
+    public function findRecordToInheritFrom(string $relatedType, mixed $key): ?Model
+    {
+        if (!is_scalar($key) || $key === '' || is_bool($key)) {
+            return null;
+        }
+
+        $resource = $this->getResourcesByModel()->get($relatedType);
+
+        if ($resource !== null && is_subclass_of($resource, \Filament\Resources\Resource::class)) {
+            $related = $resource::getEloquentQuery()->find($key);
+
+            if (!$related instanceof Model || !$resource::canView($related)) {
+                return null;
+            }
+
+            return $related;
+        }
+
+        // Livewire components have no resource query, so only the global scopes of the model apply.
+        $related = $relatedType::query()->find($key);
+
+        return $related instanceof Model ? $related : null;
     }
 
     /**

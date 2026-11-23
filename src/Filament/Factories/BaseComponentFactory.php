@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
 use Luttje\FilamentUserAttributes\EloquentHelper;
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryInterface;
 
 abstract class BaseComponentFactory implements UserAttributeComponentFactoryInterface
@@ -28,6 +29,10 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
     {
         return function (?Model $record, Get $get) use ($userAttribute, $default) {
             if ($userAttribute['inherit_relation'] === '__self') {
+                if (EloquentHelper::isHiddenAttribute($this->modelType, $userAttribute['inherit_attribute'])) {
+                    return $default;
+                }
+
                 try {
                     $relatedField = $get($userAttribute['inherit_attribute']);
                 } catch (\Error) {
@@ -42,7 +47,13 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
             }
 
             if ($record !== null) {
-                $default = data_get($record, $userAttribute['inherit_relation'] . '.' . $userAttribute['inherit_attribute']);
+                $related = data_get($record, $userAttribute['inherit_relation']);
+
+                if ($related instanceof Model && EloquentHelper::isHiddenAttribute($related, $userAttribute['inherit_attribute'])) {
+                    return $default;
+                }
+
+                $default = data_get($related, $userAttribute['inherit_attribute']);
             } else {
                 // TODO: Should we support situations where a relation exists, but no form field is shown for it.
                 // TODO: We currently only support relations that have a form field e.g: relation customer needs customer(_id) field
@@ -61,8 +72,12 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                     $inheritRelationInfo = EloquentHelper::getRelationInfo($record, $userAttribute['inherit_relation']);
 
                     // The relation may no longer exist (or be discoverable), in that case we keep the default
-                    if ($inheritRelationInfo !== null) {
-                        $related = ($inheritRelationInfo->relatedType)::find($relatedField);
+                    if (
+                        $inheritRelationInfo !== null
+                        && !EloquentHelper::isHiddenAttribute($inheritRelationInfo->relatedType, $userAttribute['inherit_attribute'])
+                    ) {
+                        // The key comes from the client, so it's looked up with the scopes and authorization of the related resource
+                        $related = FilamentUserAttributes::findRecordToInheritFrom($inheritRelationInfo->relatedType, $relatedField);
                         $default = data_get($related, $userAttribute['inherit_attribute']);
                     }
                 }

@@ -209,7 +209,13 @@ class UserAttributeComponentFactoryRegistry
 
                                 $attributes = $resource::getAllFieldComponents();
                                 $attributes = array_combine(array_column($attributes, 'statePath'), array_column($attributes, 'label'));
-                                return $attributes;
+
+                                // Attributes the model hides (like a password) may not be inherited from
+                                return array_filter(
+                                    $attributes,
+                                    fn ($statePath) => !EloquentHelper::isHiddenAttribute($inheritRelatedModelType, (string) $statePath),
+                                    ARRAY_FILTER_USE_KEY
+                                );
                             })
                             ->label(ucfirst(__('filament-user-attributes::user-attributes.inherit_attribute')))
                             ->required(fn (Get $get) => $get('inherit'))

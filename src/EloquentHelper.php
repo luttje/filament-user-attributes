@@ -83,6 +83,28 @@ class EloquentHelper
     }
 
     /**
+     * Whether the model hides the attribute (through `$hidden` or `$visible`).
+     *
+     * Hidden attributes, like a password, should never be exposed to users,
+     * so they can't be used as the source for an inherited user attribute.
+     */
+    public static function isHiddenAttribute(Model|string $model, string $attributePath): bool
+    {
+        if (is_string($model)) {
+            $model = new $model();
+        }
+
+        $attribute = explode('.', $attributePath)[0];
+        $visible = $model->getVisible();
+
+        if (in_array($attribute, $model->getHidden(), true)) {
+            return true;
+        }
+
+        return !empty($visible) && !in_array($attribute, $visible, true);
+    }
+
+    /**
      * Gets the relation type for the given relation name.
      */
     public static function getRelationInfo(Model|string $model, string $relationName): ?EloquentHelperRelationshipInfo

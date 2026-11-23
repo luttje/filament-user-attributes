@@ -98,3 +98,18 @@ it('can get the info for a single relation', function () {
     expect(EloquentHelper::getRelationInfo(RelationDiscoveryModel::class, 'doesNotExist'))
         ->toBeNull();
 });
+
+class VisibleOnlyModel extends Model
+{
+    protected $visible = ['name'];
+}
+
+it('knows which attributes a model hides', function () {
+    expect(EloquentHelper::isHiddenAttribute(User::class, 'password'))->toBeTrue();
+    expect(EloquentHelper::isHiddenAttribute(new User(), 'remember_token'))->toBeTrue();
+    expect(EloquentHelper::isHiddenAttribute(User::class, 'password.nested'))->toBeTrue();
+    expect(EloquentHelper::isHiddenAttribute(User::class, 'name'))->toBeFalse();
+
+    expect(EloquentHelper::isHiddenAttribute(VisibleOnlyModel::class, 'name'))->toBeFalse();
+    expect(EloquentHelper::isHiddenAttribute(VisibleOnlyModel::class, 'secret'))->toBeTrue();
+});
