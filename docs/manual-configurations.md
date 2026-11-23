@@ -39,36 +39,24 @@ You can let your users configure which custom attributes should be added to your
 
 Now it's time to setup a resource that should display the user attributes and allow editting them:
 
-1. Have the resource use the `UserAttributesResource` trait.
+1. Add the `UserAttributesResourceContract` interface and `UserAttributesResource` trait to the resource.
 
 2. In your resource wrap the array for your fields (in the `form` method) in `self::withUserAttributeFields()`.
 
 3. Similarly wrap the array for your columns (in the `table` method) in `self::withUserAttributeColumns()`.
 
-4. Have the resource implement the `UserAttributesConfigContract` method `getUserAttributesConfig()` to return the model instance that decides which custom user attributes are available. This is the model with the `ConfiguresUserAttributes` trait (like the user or tenant).
-
 **Your resource should now look something like this:**
 
 ```php
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
-use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class ProductResource extends Resource implements UserAttributesConfigContract
+class ProductResource extends Resource implements UserAttributesResourceContract
 {
     // This will add the user attributes to the form and table, based on the configuration for the Product model, specified by the User.
     use UserAttributesResource;
 
     protected static ?string $model = Product::class;
-
-    // This is the model that will be asked for the user attributes configuration. For example a user or tenant model.
-    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
-    {
-        /** @var \App\Models\User */
-        $user = Auth::user();
-
-        return $user;
-    }
 
     public static function form(Schema $form): Schema
     {
@@ -102,6 +90,31 @@ class ProductResource extends Resource implements UserAttributesConfigContract
 }
 ```
 
+### 👤 Choosing who configures the attributes
+
+The model with the `ConfiguresUserAttributes` trait owns the configurations. By default this is the current Filament tenant, or otherwise the logged in user (whichever implements `ConfiguresUserAttributesContract`).
+
+To find the owner differently for all resources, tell us how in your `AppServiceProvider`'s `boot` method:
+
+```php
+use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
+
+FilamentUserAttributes::resolveOwnerUsing(function (string $resource) {
+    return auth()->user()?->team;
+});
+```
+
+Or implement `getUserAttributesOwner()` on a single resource:
+
+```php
+public static function getUserAttributesOwner(): ?ConfiguresUserAttributesContract
+{
+    return auth()->user()?->team;
+}
+```
+
+When no owner is found, no configurations are shown or saved.
+
 Finally you need to show the user attributes configuration form somewhere. That way users can actually configure their custom attributes for the resource.
 
 1. Create a resource and inherit from the `UserAttributeConfigResource` class:
@@ -122,14 +135,13 @@ Finally you need to show the user attributes configuration form somewhere. That 
 
 ## 🎈 Filament Livewire Components
 
-Filament Livewire components work roughly the same, but you additionally need to implement a static `getModel` method that returns the model class that should be used for the component. We also implement the `UserAttributesConfigContract` method `getUserAttributesConfig` so the configuration is retrieved from the model that specifies configurations.
+Filament Livewire components work roughly the same, but you additionally need to implement a static `getModel` method that returns the model class that should be used for the component.
 
 ```php
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
-use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class ProductManageComponent extends Component implements HasForms, HasTable, UserAttributesConfigContract
+class ProductManageComponent extends Component implements HasForms, HasTable, UserAttributesResourceContract
 {
     use UserAttributesResource;
     use InteractsWithForms;
@@ -145,14 +157,6 @@ class ProductManageComponent extends Component implements HasForms, HasTable, Us
     public static function getModel(): string
     {
         return Product::class;
-    }
-
-    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
-    {
-        /** @var \App\Models\User */
-        $user = Auth::user();
-
-        return $user;
     }
 
     public function table(Table $table): Table

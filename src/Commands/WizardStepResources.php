@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Luttje\FilamentUserAttributes\CodeGeneration\CodeEditor;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
@@ -84,6 +84,9 @@ class WizardStepResources extends Command
         foreach ($resources as $resource) {
             $this->setupResource($resource);
         }
+
+        $this->line("\nThe user attributes for these resources are configured by the current tenant or user (whichever implements ConfiguresUserAttributesContract).");
+        $this->line('To change that, call FilamentUserAttributes::resolveOwnerUsing() in a service provider, or implement getUserAttributesOwner() on a resource.');
     }
 
     protected function setupResource(string $resource)
@@ -96,23 +99,13 @@ class WizardStepResources extends Command
         $tableDelegation = self::detectDelegation($originalCode, 'table');
 
         $editor = CodeEditor::make();
-        $editor->editFileWithBackup($file, function ($code) use ($editor, $resource, $formDelegation, $tableDelegation) {
+        $editor->editFileWithBackup($file, function ($code) use ($editor, $formDelegation, $tableDelegation) {
             $code = $editor->addTrait($code, UserAttributesResource::class);
-            $code = $editor->addInterface($code, UserAttributesConfigContract::class);
-            $code = $editor->addMethod($code, 'getUserAttributesConfig', function () use ($resource) {
-                $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesConfig', [
-                    'flags' => \PhpParser\Node\Stmt\Class_::MODIFIER_PUBLIC | \PhpParser\Node\Stmt\Class_::MODIFIER_STATIC,
-                    'returnType' => new \PhpParser\Node\NullableType(
-                        new \PhpParser\Node\Name\FullyQualified(ConfiguresUserAttributesContract::class)
-                    ),
-                ]);
-                $method->stmts = $this->guessTemplate($resource, $this->getModelsImplementingConfiguresUserAttributesContract());
-                return $method;
-            });
+            $code = $editor->addInterface($code, UserAttributesResourceContract::class);
 
             // Only apply inline wrapping if the method doesn't delegate to another class
             if ($formDelegation === null) {
-                $code = self::applyWrapperMethod($editor, $code, 'form', 'schema', 'withUserAttributeFields');
+                $code = self::applyWrapperMethod($editor, $code, 'form', ['components', 'schema'], 'withUserAttributeFields');
             }
             if ($tableDelegation === null) {
                 $code = self::applyWrapperMethod($editor, $code, 'table', 'columns', 'withUserAttributeColumns');
@@ -255,11 +248,24 @@ class WizardStepResources extends Command
                 /** @var \PhpParser\Node\Stmt\ClassMethod */
                 $method = $method;
                 $firstParameter = $method->params[0];
-                $schema = $editor->findCall(
-                    $method->stmts,
-                    $firstParameter->var->name,
-                    $methodNameToWrapInside
-                );
+                $schema = null;
+
+                // Filament 4+ uses `components`, but `schema` is still supported
+                foreach ((array) $methodNameToWrapInside as $methodName) {
+                    $schema = $editor->findCall(
+                        $method->stmts,
+                        $firstParameter->var->name,
+                        $methodName
+                    );
+
+                    if ($schema !== null) {
+                        break;
+                    }
+                }
+
+                if ($schema === null || empty($schema->args)) {
+                    return $method;
+                }
 
                 if (
                     $schema->args[0]->value instanceof \PhpParser\Node\Expr\StaticCall
@@ -285,140 +291,5 @@ class WizardStepResources extends Command
                 return $method;
             }
         );
-    }
-
-    protected function guessTemplate(string $resource, Collection $models)
-    {
-        $this->warn("\nWe will prepare the getUserAttributesConfig method for you, but you'll have to finish it for $resource.");
-
-        $model = $models->first();
-
-        if (!$model) {
-            return $this->guessTemplateNoModels($resource);
-        }
-
-        if (is_subclass_of($model, \Illuminate\Foundation\Auth\User::class)) {
-            return $this->guessTemplateAuthUser();
-        }
-
-        if (strstr($model, 'Tenant') !== false) {
-            return $this->guessTemplateTenant();
-        }
-
-        return $this->guessTemplateNoKnownModels($resource, $models);
-    }
-
-    protected function guessTemplateAuthUser()
-    {
-        $this->line("\nGuessing that your configuration model may be a user model...");
-
-        return [
-            new \PhpParser\Node\Stmt\Expression(
-                new \PhpParser\Node\Expr\Assign(
-                    new \PhpParser\Node\Expr\Variable('user'),
-                    new \PhpParser\Node\Expr\StaticCall(
-                        new \PhpParser\Node\Name\FullyQualified(\Illuminate\Support\Facades\Auth::class),
-                        'user'
-                    ),
-                ),
-                [
-                    'comments' => [
-                        new \PhpParser\Comment\Doc(
-                            <<<PHPDOC
-/** @var \App\Models\User */
-PHPDOC
-                        ),
-                    ],
-                ]
-            ),
-            new \PhpParser\Node\Stmt\Return_(
-                new \PhpParser\Node\Expr\Variable('user')
-            ),
-        ];
-    }
-
-    protected function guessTemplateTenant()
-    {
-        $this->line("\nGuessing that your configuration model may be a multi-tenancy model...");
-
-        return [
-            new \PhpParser\Node\Stmt\Expression(
-                new \PhpParser\Node\Expr\Assign(
-                    new \PhpParser\Node\Expr\Variable('tenant'),
-                    new \PhpParser\Node\Expr\StaticCall(
-                        new \PhpParser\Node\Name\FullyQualified(\Filament\Facades\Filament::class),
-                        'getTenant'
-                    ),
-                ),
-                [
-                    'comments' => [
-                        new \PhpParser\Comment\Doc(
-                            <<<PHPDOC
-// TODO: Double-check that this is the correct configuration model for your app.
-PHPDOC
-                        ),
-                    ],
-                ]
-            ),
-            new \PhpParser\Node\Stmt\Return_(
-                new \PhpParser\Node\Expr\Variable('tenant')
-            ),
-        ];
-    }
-
-    protected function guessTemplateNoModels(string $resource)
-    {
-        $this->warn("\nWe didn't find any models that implement the correct interface, so you'll have to do this yourself.");
-
-        return [
-            new \PhpParser\Node\Stmt\Throw_(
-                new \PhpParser\Node\Expr\New_(
-                    new \PhpParser\Node\Name\FullyQualified(\Exception::class),
-                    [
-                        new \PhpParser\Node\Arg(
-                            new \PhpParser\Node\Scalar\String_('You have to implement the getUserAttributesConfig method in ' . $resource . '.')
-                        ),
-                    ]
-                ),
-                [
-                    'comments' => [
-                        new \PhpParser\Comment\Doc(
-                            <<<PHPDOC
-// TODO: You should finish this method and return the model that configures the user attributes.
-// TODO: We didn't find any models that implement the correct interface, so you'll have to do this yourself.
-PHPDOC
-                        ),
-                    ],
-                ]
-            ),
-        ];
-    }
-
-    protected function guessTemplateNoKnownModels(string $resource, Collection $models)
-    {
-        $this->warn("\nWe didn't recognize any of the models that implement the correct interface, so you'll have to finish this implementation yourself.");
-
-        return [
-            new \PhpParser\Node\Stmt\Throw_(
-                new \PhpParser\Node\Expr\New_(
-                    new \PhpParser\Node\Name\FullyQualified(\Exception::class),
-                    [
-                        new \PhpParser\Node\Arg(
-                            new \PhpParser\Node\Scalar\String_('You have to implement the getUserAttributesConfig method in ' . $resource . '.')
-                        ),
-                    ]
-                ),
-                [
-                    'comments' => [
-                        new \PhpParser\Comment\Doc(
-                            '// TODO: You should finish this method and return the model that configures the user attributes.' .
-                            $models->map(fn ($model) => '\\' . $model . '::class')
-                                ->values()
-                                ->reduce(fn ($carry, $model) => $carry . ($carry ? "\n" : '') . "\t\t// $model", "\t\t// These are the models that implement the correct interface:")
-                        ),
-                    ],
-                ]
-            ),
-        ];
     }
 }

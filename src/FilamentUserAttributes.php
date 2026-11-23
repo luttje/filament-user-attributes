@@ -3,6 +3,7 @@
 namespace Luttje\FilamentUserAttributes;
 
 use Closure;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Field;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Fieldset;
@@ -15,7 +16,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 use Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes;
@@ -44,6 +45,11 @@ class FilamentUserAttributes
      * @var array|null Cached list of discovered resources.
      */
     protected ?array $cachedDiscoveredResources = null;
+
+    /**
+     * Resolves the owner of the user attribute configurations, see `resolveOwnerUsing`.
+     */
+    protected ?Closure $ownerResolver = null;
 
     /**
      * @var string Path to the application directory.
@@ -159,7 +165,7 @@ class FilamentUserAttributes
      */
     public function getUserAttributeColumns(string $resource): array
     {
-        $config = $this->getUserAttributeConfig($resource);
+        $config = $this->getResourceOwner($resource);
 
         if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
             throw new \Exception("The resource '$resource' does not correctly use the ConfiguresUserAttributes trait");
@@ -173,7 +179,7 @@ class FilamentUserAttributes
      */
     public function getUserAttributeFields(string $resource): array
     {
-        $config = $this->getUserAttributeConfig($resource);
+        $config = $this->getResourceOwner($resource);
 
         if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
             throw new \Exception("The resource '$resource' does not use the ConfiguresUserAttributes trait");
@@ -183,23 +189,74 @@ class FilamentUserAttributes
     }
 
     /**
-     * Returns the user attribute configuration model.
+     * Set how the owner of the user attribute configurations (e.g. the user
+     * or tenant) is resolved for all resources. The closure receives the
+     * resource class and must return a model that implements
+     * ConfiguresUserAttributesContract, or null.
+     *
+     * Resources can still override this by implementing
+     * `getUserAttributesOwner()` themselves.
+     *
+     * Call this in your AppServiceProvider's boot function.
      */
-    public function getUserAttributeConfig(string $resource): ConfiguresUserAttributesContract
+    public function resolveOwnerUsing(?Closure $resolver): void
     {
-        if (!in_array(UserAttributesConfigContract::class, class_implements($resource))) {
-            throw new \Exception("The resource '$resource' does not implement the UserAttributesConfigContract interface.");
+        $this->ownerResolver = $resolver;
+    }
+
+    /**
+     * Resolves the owner of the user attribute configurations for the given
+     * resource.
+     *
+     * Unless a resolver is set with `resolveOwnerUsing`, this is the current
+     * Filament tenant, or otherwise the authenticated user. Either is only
+     * used if it implements ConfiguresUserAttributesContract.
+     */
+    public function resolveOwner(string $resource): ?ConfiguresUserAttributesContract
+    {
+        if ($this->ownerResolver !== null) {
+            $owner = ($this->ownerResolver)($resource);
+
+            if ($owner !== null && !$owner instanceof ConfiguresUserAttributesContract) {
+                throw new \UnexpectedValueException('The owner resolver must return null or an instance of ' . ConfiguresUserAttributesContract::class . ', got ' . get_debug_type($owner) . '.');
+            }
+
+            return $owner;
         }
 
-        /** @var ?UserAttributesConfigContract */
-        $resource = $resource;
-        $config = $resource::getUserAttributesConfig();
+        $tenant = Filament::getTenant();
 
-        if ($config === null) {
-            throw new \Exception("The resource '" . strval($resource) . "' did not return a configuration model from the getUserAttributesConfig function (or it was null).");
+        if ($tenant instanceof ConfiguresUserAttributesContract) {
+            return $tenant;
         }
 
-        return $config;
+        $user = auth()->user();
+
+        if ($user instanceof ConfiguresUserAttributesContract) {
+            return $user;
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the owner of the user attribute configurations (e.g. the user
+     * or tenant) for the given resource.
+     */
+    public function getResourceOwner(string $resource): ConfiguresUserAttributesContract
+    {
+        if (!in_array(UserAttributesResourceContract::class, class_implements($resource))) {
+            throw new \LogicException("The resource '$resource' does not implement the UserAttributesResourceContract interface.");
+        }
+
+        /** @var class-string<UserAttributesResourceContract> $resource */
+        $owner = $resource::getUserAttributesOwner();
+
+        if ($owner === null) {
+            throw new \LogicException("No owner of user attribute configurations was found for '$resource'. Implement ConfiguresUserAttributesContract on your user or tenant model, or tell us how to find the owner with FilamentUserAttributes::resolveOwnerUsing().");
+        }
+
+        return $owner;
     }
 
     public static function normalizePath(string $path): string
@@ -297,7 +354,7 @@ class FilamentUserAttributes
             // Note: this will autoload the models if $configured = true
             if ($configuredOnly) {
                 $resourcesForPath = $resourcesForPath->filter(function ($type) {
-                    if (!in_array(\Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract::class, class_implements($type))) {
+                    if (!in_array(\Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract::class, class_implements($type))) {
                         return false;
                     }
 

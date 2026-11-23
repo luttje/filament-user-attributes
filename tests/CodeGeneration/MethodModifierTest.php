@@ -15,8 +15,8 @@ it('can add a method to a class', function () {
 
     $editor = CodeEditor::make();
     $edit = $editor->editFileWithBackup($file, function ($code) use ($editor) {
-        return $editor->addMethod($code, 'getUserAttributesConfig', function () {
-            $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesConfig', [
+        return $editor->addMethod($code, 'getUserAttributesOwner', function () {
+            $method = new \PhpParser\Node\Stmt\ClassMethod('getUserAttributesOwner', [
                 'flags' => \PhpParser\Node\Stmt\Class_::MODIFIER_PUBLIC | \PhpParser\Node\Stmt\Class_::MODIFIER_STATIC,
                 'returnType' => new \PhpParser\Node\NullableType(
                     new \PhpParser\Node\Name\FullyQualified(ConfiguresUserAttributesContract::class)
@@ -33,5 +33,5 @@ it('can add a method to a class', function () {
         });
     });
 
-    expect($edit->getCode())->toContain('public static function getUserAttributesConfig(): ?\Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract');
+    expect($edit->getCode())->toContain('public static function getUserAttributesOwner(): ?\Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract');
 });

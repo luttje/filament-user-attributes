@@ -12,15 +12,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Component;
-use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 
-class ConfiguredManageComponent extends Component implements HasForms, HasTable, HasActions, UserAttributesConfigContract
+class ConfiguredManageComponent extends Component implements HasForms, HasTable, HasActions, UserAttributesResourceContract
 {
     use UserAttributesResource;
     use InteractsWithForms;
@@ -37,14 +35,6 @@ class ConfiguredManageComponent extends Component implements HasForms, HasTable,
     public static function getModel(): string
     {
         return Product::class;
-    }
-
-    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
-    {
-        /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
-        $user = Auth::user();
-
-        return $user;
     }
 
     public function table(Table $table): Table

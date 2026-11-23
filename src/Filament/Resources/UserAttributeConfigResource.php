@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\ArrayObject;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Gate;
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\EditUserAttributeConfig;
 use Luttje\FilamentUserAttributes\Filament\Resources\UserAttributeConfigResource\Pages\ManageUserAttributeConfigs;
@@ -75,13 +75,13 @@ class UserAttributeConfigResource extends Resource
                 continue;
             }
 
-            $config = $resource::getUserAttributesConfig();
+            $owner = $resource::getUserAttributesOwner();
 
-            if (!$config) {
+            if (!$owner) {
                 continue;
             }
 
-            $owners[get_class($config) . '|' . $config->getKey()] = $config;
+            $owners[get_class($owner) . '|' . $owner->getKey()] = $owner;
         }
 
         // Fail closed: without a known owner nothing may be shown, otherwise
@@ -104,13 +104,13 @@ class UserAttributeConfigResource extends Resource
      * Whether the given class may be configured through this resource.
      *
      * The class name comes from the URL, so it must never be trusted: only
-     * classes that opted in by implementing the UserAttributesConfigContract
+     * classes that opted in by implementing the UserAttributesResourceContract
      * are accepted. When resources are registered manually (discovery is
      * disabled) that list is authoritative.
      */
     protected static function isConfigurableResource(string $class): bool
     {
-        if (!class_exists($class) || !is_subclass_of($class, UserAttributesConfigContract::class)) {
+        if (!class_exists($class) || !is_subclass_of($class, UserAttributesResourceContract::class)) {
             return false;
         }
 
@@ -125,13 +125,9 @@ class UserAttributeConfigResource extends Resource
     {
         if (is_string($key) && static::isConfigurableResource($key)) {
             $resource = $key;
-            $config = $resource::getUserAttributesConfig();
+            $owner = FilamentUserAttributes::getResourceOwner($resource);
 
-            if (!$config) {
-                throw new \Exception("No valid user attributes config found for resource {$resource}. Did you forget to implement the `UserAttributesConfigContract` method `getUserAttributesConfig()`?");
-            }
-
-            $userAttributeConfigs = $config
+            $userAttributeConfigs = $owner
                 ->userAttributesConfigs()
                 ->where('resource_type', $resource)
                 ->first();
@@ -142,8 +138,8 @@ class UserAttributeConfigResource extends Resource
                 $userAttributeConfigs = UserAttributeConfig::create([
                     'resource_type' => $resource,
                     'model_type' => $modelType,
-                    'owner_type' => get_class($config),
-                    'owner_id' => $config->id,
+                    'owner_type' => get_class($owner),
+                    'owner_id' => $owner->getKey(),
                     'config' => [],
                 ]);
             }

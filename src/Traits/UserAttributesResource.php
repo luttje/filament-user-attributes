@@ -9,6 +9,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 
 trait UserAttributesResource
@@ -18,6 +19,22 @@ trait UserAttributesResource
      * attributes when getting them for ordering)
      */
     private static bool $blockInjectUserAttributes = false;
+
+    /**
+     * Returns the model that owns the user attribute configurations for this
+     * resource. By default this is the current tenant or user, see
+     * FilamentUserAttributes::resolveOwnerUsing() to change that for all
+     * resources. Override this method to change it for this resource only.
+     */
+    public static function getUserAttributesOwner(): ?ConfiguresUserAttributesContract
+    {
+        // Upgrading would otherwise silently ignore the old method and use another owner.
+        if (method_exists(static::class, 'getUserAttributesConfig')) {
+            throw new \LogicException(static::class . '::getUserAttributesConfig() has been renamed to getUserAttributesOwner(). Rename it, or remove it to use the owner from FilamentUserAttributes::resolveOwnerUsing().');
+        }
+
+        return FilamentUserAttributes::resolveOwner(static::class);
+    }
 
     /**
      * Inserts the user attributes into the given fields schema.

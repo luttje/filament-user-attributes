@@ -9,16 +9,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
-use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource\Pages;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 use BackedEnum;
 use Filament\Schemas\Schema;
 
-class CategoryResource extends Resource implements UserAttributesConfigContract
+class CategoryResource extends Resource implements UserAttributesResourceContract
 {
     use UserAttributesResource;
 
@@ -31,14 +29,6 @@ class CategoryResource extends Resource implements UserAttributesConfigContract
     protected static ?string $modelLabel = 'Category';
 
     protected static ?string $pluralModelLabel = 'Categories';
-
-    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
-    {
-        /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
-        $user = Auth::user();
-
-        return $user;
-    }
 
     public static function form(Schema $form): Schema
     {

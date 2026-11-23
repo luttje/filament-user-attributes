@@ -9,12 +9,12 @@ use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Product;
 use Luttje\FilamentUserAttributes\Contracts\ConfiguresUserAttributesContract;
-use Luttje\FilamentUserAttributes\Contracts\UserAttributesConfigContract;
+use Luttje\FilamentUserAttributes\Contracts\UserAttributesResourceContract;
 use Luttje\FilamentUserAttributes\Traits\UserAttributesResource;
 use BackedEnum;
 use Filament\Schemas\Schema;
 
-class ProductResource extends Resource implements UserAttributesConfigContract
+class ProductResource extends Resource implements UserAttributesResourceContract
 {
     use UserAttributesResource;
 
@@ -30,7 +30,7 @@ class ProductResource extends Resource implements UserAttributesConfigContract
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public static function getUserAttributesConfig(): ?ConfiguresUserAttributesContract
+    public static function getUserAttributesOwner(): ?ConfiguresUserAttributesContract
     {
         /** @var \Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User */
         $user = Auth::user();
