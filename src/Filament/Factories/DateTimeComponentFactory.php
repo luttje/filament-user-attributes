@@ -19,9 +19,8 @@ class DateTimeComponentFactory extends BaseComponentFactory
 
         $dateFormat = match ($customizations['format'] ?? 'date') {
             'datetime' => 'd-m-Y H:i:s',
-            'date' => 'd-m-Y',
             'time' => 'H:i:s',
-            default => throw new \Exception('Invalid date format'),
+            default => 'd-m-Y',
         };
 
         $column = UserAttributeColumn::make($userAttribute['name'])
@@ -46,7 +45,7 @@ class DateTimeComponentFactory extends BaseComponentFactory
                 $field = DatePicker::make($userAttribute['name']);
         }
 
-        if (!$customizations['allow_before_now']) {
+        if (empty($customizations['allow_before_now'])) {
             $field->minDate(now());
         }
 

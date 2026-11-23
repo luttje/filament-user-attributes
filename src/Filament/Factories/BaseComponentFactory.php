@@ -182,8 +182,8 @@ abstract class BaseComponentFactory implements UserAttributeComponentFactoryInte
                     return $state;
                 }
 
-                if (!in_array(HasUserAttributesContract::class, class_implements($record))) {
-                    throw new \Exception('Record must implement HasUserAttributesContract');
+                if (!$record instanceof HasUserAttributesContract) {
+                    throw new \LogicException('The model ' . get_class($record) . ' must implement ' . HasUserAttributesContract::class . ' to inherit user attribute values.');
                 }
 
                 /** @var HasUserAttributesContract $record */

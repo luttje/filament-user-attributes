@@ -98,7 +98,7 @@ it('throws exception when setting a custom attribute if the attributes were dest
     unset($model->user_attributes);
 
     $model->user_attributes->key = 'new value';
-})->throws(\Exception::class);
+})->throws(\LogicException::class);
 
 it('throws exception when setting attributes if the attributes were destroyed', function () {
     $model = User::factory()->create();
@@ -108,12 +108,12 @@ it('throws exception when setting attributes if the attributes were destroyed', 
     unset($model->user_attributes);
 
     $model->user_attributes = (['key' => 'value2']);
-})->throws(\Exception::class);
+})->throws(\LogicException::class);
 
 it('throws if trying to set a non-object as attributes', function (mixed $data) {
     $model = User::factory()->create();
     $model->user_attributes = $data;
-})->throws(\Exception::class)->with([
+})->throws(\InvalidArgumentException::class)->with([
     'string' => 'string',
     'int' => 1,
     'float' => 1.1,

@@ -6,6 +6,7 @@ use Filament\Tables\Columns\Column;
 use Filament\Tables\Columns\TextColumn;
 use Illuminate\Database\Eloquent\Model;
 use Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract;
+use Luttje\FilamentUserAttributes\Traits\HasUserAttributes;
 
 class UserAttributeColumn extends TextColumn
 {
@@ -19,17 +20,15 @@ class UserAttributeColumn extends TextColumn
     public static function setUpColumnState(Column $column): Column
     {
         $column->getStateUsing(function (?Model $record) use ($column) {
-            /** @var HasUserAttributesContract */
-            $record = $record;
-
-            $userAttributes = $record->user_attributes;
-
-            if ($userAttributes == null) {
-                $class = get_class($record);
-                throw new \Exception("User attributes not available for instance of $class. Did you forget to implement Luttje\FilamentUserAttributes\Contracts\HasUserAttributesContract with the Luttje\FilamentUserAttributes\Traits\HasUserAttributes trait on this model?");
+            if ($record === null) {
+                return null;
             }
 
-            return $record->user_attributes->{$column->name};
+            if (!$record instanceof HasUserAttributesContract) {
+                throw new \LogicException('The model ' . get_class($record) . ' has no user attributes. Implement ' . HasUserAttributesContract::class . ' and use the ' . HasUserAttributes::class . ' trait on it.');
+            }
+
+            return $record->getUserAttributeValue($column->getName());
         });
 
         return $column;

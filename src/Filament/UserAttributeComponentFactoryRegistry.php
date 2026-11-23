@@ -39,7 +39,7 @@ class UserAttributeComponentFactoryRegistry
     public static function getFactory(string $type, string $modelType): UserAttributeComponentFactoryInterface
     {
         if (!isset(static::$factories[$type])) {
-            throw new \Exception("Factory for type {$type} not registered.");
+            throw new \InvalidArgumentException("The user attribute type '{$type}' is not supported. Register a factory for it with " . static::class . '::register().');
         }
 
         return new static::$factories[$type]($modelType);

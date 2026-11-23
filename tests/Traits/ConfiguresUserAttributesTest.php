@@ -2,8 +2,10 @@
 
 namespace Luttje\FilamentUserAttributes\Tests\Traits;
 
+use Luttje\FilamentUserAttributes\Filament\Tables\UserAttributeColumn;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Filament\Resources\CategoryResource;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\Category;
+use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\TagNotSetup;
 use Luttje\FilamentUserAttributes\Tests\Fixtures\Models\User;
 
 it('can create a user attribute config', function () {
@@ -70,3 +72,24 @@ it('stores the morph alias of the owner', function () {
         \Illuminate\Database\Eloquent\Relations\Relation::morphMap([], false);
     }
 });
+
+it('builds date fields and columns without every customization set', function () {
+    $user = User::factory()->create();
+    $user->createUserAttributeConfig(CategoryResource::class, 'released_at', 'Released at', 'datetime', ['format' => 'unknown']);
+
+    expect($user->getUserAttributeFields(CategoryResource::class))->toHaveCount(1)
+        ->and($user->getUserAttributeColumns(CategoryResource::class))->toHaveCount(1);
+});
+
+it('explains how to register an unsupported user attribute type', function () {
+    $user = User::factory()->create();
+    $user->createUserAttributeConfig(CategoryResource::class, 'custom', 'Custom', 'does-not-exist');
+
+    $user->getUserAttributeFields(CategoryResource::class);
+})->throws(\InvalidArgumentException::class, "type 'does-not-exist' is not supported");
+
+it('explains which model is missing user attributes in a column', function () {
+    $column = UserAttributeColumn::make('color');
+
+    $column->evaluate($column->getStateUsingCallback(), ['record' => new TagNotSetup()]);
+})->throws(\LogicException::class, TagNotSetup::class . ' has no user attributes');

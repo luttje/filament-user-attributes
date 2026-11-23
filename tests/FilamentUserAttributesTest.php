@@ -44,7 +44,7 @@ it('throws when trying to register a resource while discovering is enabled', fun
         'App\\Filament\\Resources\\UserResource',
         'App\\Filament\\Resources\\PostResource',
     ]);
-})->throws(\Exception::class);
+})->throws(\LogicException::class, 'discover_resources');
 
 it('can discover resources from specified app directories', function () {
     Config::set('filament-user-attributes.discover_resources', [

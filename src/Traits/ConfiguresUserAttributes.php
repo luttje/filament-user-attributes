@@ -54,10 +54,6 @@ trait ConfiguresUserAttributes
             $model = FilamentUserAttributes::getModelFromResource($resource);
             $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $model);
 
-            if (!isset($factory)) {
-                throw new \Exception("The user attribute type '{$type}' is not yet supported.");
-            }
-
             $field = $factory->makeField($userAttribute);
 
             $fields[] = [
@@ -103,10 +99,6 @@ trait ConfiguresUserAttributes
             $type = $userAttribute['type'];
             $model = FilamentUserAttributes::getModelFromResource($resource);
             $factory = UserAttributeComponentFactoryRegistry::getFactory($type, $model);
-
-            if (!isset($factory)) {
-                throw new \Exception("The user attribute type '{$type}' is not yet supported.");
-            }
 
             $columns[] = [
                 'column' => $factory->makeColumn($userAttribute),

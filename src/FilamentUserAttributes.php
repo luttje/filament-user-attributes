@@ -101,7 +101,7 @@ class FilamentUserAttributes
     public function registerResources(array | Closure $resources): void
     {
         if (config('filament-user-attributes.discover_resources') !== false) {
-            throw new \Exception("You cannot register resources when the 'filament-user-attributes.discover_resources' config option is enabled. Set it to false.");
+            throw new \LogicException("You cannot register resources while resource discovery is enabled. Set the 'filament-user-attributes.discover_resources' config option to false.");
         }
 
         if (is_array($resources)) {
@@ -165,13 +165,7 @@ class FilamentUserAttributes
      */
     public function getUserAttributeColumns(string $resource): array
     {
-        $config = $this->getResourceOwner($resource);
-
-        if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
-            throw new \Exception("The resource '$resource' does not correctly use the ConfiguresUserAttributes trait");
-        }
-
-        return $config->getUserAttributeColumns($resource);
+        return $this->getResourceOwner($resource)->getUserAttributeColumns($resource);
     }
 
     /**
@@ -179,13 +173,7 @@ class FilamentUserAttributes
      */
     public function getUserAttributeFields(string $resource): array
     {
-        $config = $this->getResourceOwner($resource);
-
-        if (!in_array(ConfiguresUserAttributes::class, class_uses_recursive($config))) {
-            throw new \Exception("The resource '$resource' does not use the ConfiguresUserAttributes trait");
-        }
-
-        return $config->getUserAttributeFields($resource);
+        return $this->getResourceOwner($resource)->getUserAttributeFields($resource);
     }
 
     /**
@@ -452,7 +440,7 @@ class FilamentUserAttributes
             }
         }
 
-        throw new \Exception("Could not find the file for resource '$resource'. Did you forget to add it's directory to the 'filament-user-attributes.discover_resources' config option?");
+        throw new \RuntimeException("Could not find the file for resource '$resource'. Did you forget to add its directory to the 'filament-user-attributes.discover_resources' config option?");
     }
 
     /**
@@ -477,7 +465,7 @@ class FilamentUserAttributes
             }
         }
 
-        throw new \Exception("Could not find the file for model '$model'. Did you forget to add it's directory to the 'filament-user-attributes.discover_models' config option?");
+        throw new \RuntimeException("Could not find the file for model '$model'. Did you forget to add its directory to the 'filament-user-attributes.discover_models' config option?");
     }
 
     /**
@@ -627,7 +615,7 @@ class FilamentUserAttributes
                 } elseif ($position === 'after') {
                     $newColumns[] = $columnToAdd;
                 } else {
-                    throw new \Exception("Invalid position '$position' given.");
+                    throw new \InvalidArgumentException("Invalid position '$position' given. Use 'before' or 'after'.");
                 }
             }
         }
@@ -804,13 +792,13 @@ class FilamentUserAttributes
     public function getModelFromResource(string $resource): string
     {
         if (!method_exists($resource, 'getModel')) {
-            throw new \Exception("The resource '$resource' does not implement the getModel method. If you are using a Livewire component, you need to implement the static getModel method yourself.");
+            throw new \LogicException("The resource '$resource' has no static getModel() method. Livewire components must implement it themselves and return the model class.");
         }
 
         $model = $resource::getModel();
 
         if ($model === null) {
-            throw new \Exception("The resource '$resource' did not return a model from the static getModel function (or it was null).");
+            throw new \LogicException("The static getModel() method of '$resource' returned null. It must return the model class.");
         }
 
         return $model;
