@@ -5,7 +5,7 @@ namespace Luttje\FilamentUserAttributes\Traits;
 use Filament\Forms\Components\Field;
 use Filament\Tables\Columns\Column;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Luttje\FilamentUserAttributes\Facades\FilamentUserAttributes;
 use Luttje\FilamentUserAttributes\Filament\UserAttributeComponentFactoryRegistry;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
@@ -15,10 +15,9 @@ trait ConfiguresUserAttributes
     /**
      * Returns the user attributes configuration models.
      */
-    public function userAttributesConfigs(): HasMany
+    public function userAttributesConfigs(): MorphMany
     {
-        return $this->hasMany(UserAttributeConfig::class, 'owner_id')
-            ->where('owner_type', static::class);
+        return $this->morphMany(UserAttributeConfig::class, 'owner');
     }
 
     private function getUserAttributesConfigInstance(string $resource): ?UserAttributeConfig
@@ -122,15 +121,28 @@ trait ConfiguresUserAttributes
     }
 
     /**
-     * Creates a user attribute configuration for the specified resource.
-     * Uses the specified label, type and extra options.
+     * Adds a user attribute to the configuration of the specified resource.
+     *
+     * The customizations depend on the type (e.g. `placeholder` for text).
+     * The options configure the attribute itself, e.g:
+     *
+     *     [
+     *         'required' => true,
+     *         'order_position_form' => 'after', // 'before', 'after' or 'hidden'
+     *         'order_sibling_form' => 'Name',   // Label of the field to order next to
+     *         'order_position_table' => 'hidden',
+     *         'inherit' => true,
+     *         'inherit_relation' => 'customer', // Or '__self'
+     *         'inherit_attribute' => 'name',
+     *     ]
      */
     public function createUserAttributeConfig(
         string $resource,
         string $name,
         string $label,
         string $type = 'text',
-        array $customizations = []
+        array $customizations = [],
+        array $options = []
     ): UserAttributeConfig {
         $config = $this->userAttributesConfigs()
             ->where('resource_type', $resource)
@@ -138,21 +150,25 @@ trait ConfiguresUserAttributes
 
         if (!$config) {
             $config = new UserAttributeConfig();
-            $config->owner_type = get_class($this);
             $config->resource_type = $resource;
             $config->model_type = FilamentUserAttributes::getModelFromResource($resource);
         }
 
-        $config->config = array_merge($config->config ?? [], [
+        $config->config = [
+            ...($config->config?->getArrayCopy() ?? []),
             [
+                ...$options,
                 'name' => $name,
                 'type' => $type,
                 'label' => $label,
                 'customizations' => $customizations,
-            ]
-        ]);
+            ],
+        ];
 
         $this->userAttributesConfigs()->save($config);
+
+        // So the new attribute shows up when getting the fields and columns
+        $this->unsetRelation('userAttributesConfigs');
 
         return $config;
     }

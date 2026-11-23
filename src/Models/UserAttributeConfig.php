@@ -2,6 +2,7 @@
 
 namespace Luttje\FilamentUserAttributes\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\AsArrayObject;
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,21 +38,20 @@ class UserAttributeConfig extends Model
     }
 
     /**
-     * Gets all user attribute configs with a certain key/value pair in
-     * the config field.
+     * Limits to user attribute configs with a certain key/value pair in
+     * the config field. Can be chained, e.g. onto `$owner->userAttributesConfigs()`.
      */
-    public static function queryByConfig(string $key, mixed $value)
+    public function scopeQueryByConfig(Builder $query, string $key, mixed $value): void
     {
-        return static::query()
-            ->whereJsonContains('config', [$key => $value]);
+        $query->whereJsonContains('config', [$key => $value]);
     }
 
     /**
-     * Gets all user attribute configs with a certain key in the config field.
+     * Limits to user attribute configs with a certain key in the config field.
+     * Can be chained, e.g. onto `$owner->userAttributesConfigs()`.
      */
-    public static function queryByConfigKey(string $key)
+    public function scopeQueryByConfigKey(Builder $query, string $key): void
     {
-        return static::query()
-            ->whereJsonContainsKey('config->[*]->' . $key);
+        $query->whereJsonContainsKey('config->[*]->' . $key);
     }
 }

@@ -101,7 +101,7 @@ class UserAttributeConfigResource extends Resource
                 continue;
             }
 
-            $owners[get_class($owner) . '|' . $owner->getKey()] = $owner;
+            $owners[$owner->getMorphClass() . '|' . $owner->getKey()] = $owner;
         }
 
         // Fail closed: without a known owner nothing may be shown, otherwise
@@ -113,7 +113,7 @@ class UserAttributeConfigResource extends Resource
         return $query->where(function (Builder $query) use ($owners) {
             foreach ($owners as $owner) {
                 $query->orWhere(function (Builder $query) use ($owner) {
-                    $query->where('owner_type', get_class($owner))
+                    $query->where('owner_type', $owner->getMorphClass())
                         ->where('owner_id', $owner->getKey());
                 });
             }
@@ -155,11 +155,9 @@ class UserAttributeConfigResource extends Resource
             if (!$userAttributeConfigs) {
                 $modelType = FilamentUserAttributes::getModelFromResource($resource);
 
-                $userAttributeConfigs = UserAttributeConfig::create([
+                $userAttributeConfigs = $owner->userAttributesConfigs()->create([
                     'resource_type' => $resource,
                     'model_type' => $modelType,
-                    'owner_type' => get_class($owner),
-                    'owner_id' => $owner->getKey(),
                     'config' => [],
                 ]);
             }

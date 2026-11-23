@@ -2,20 +2,30 @@
 
 namespace Luttje\FilamentUserAttributes\Contracts;
 
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Luttje\FilamentUserAttributes\Models\UserAttributeConfig;
 
+/**
+ * This interface is implemented by the ConfiguresUserAttributes trait.
+ *
+ * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
+ */
 interface ConfiguresUserAttributesContract
 {
     /**
-     * @see https://laravel.com/api/10.x/Illuminate/Database/Eloquent/Model.html#method_getKey
+     * @see \Illuminate\Database\Eloquent\Model::getKey()
      */
     public function getKey();
 
     /**
+     * @see \Illuminate\Database\Eloquent\Model::getMorphClass()
+     */
+    public function getMorphClass();
+
+    /**
      * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
      */
-    public function userAttributesConfigs(): HasMany;
+    public function userAttributesConfigs(): MorphMany;
 
     /**
      * @see \Luttje\FilamentUserAttributes\Traits\ConfiguresUserAttributes
@@ -35,6 +45,7 @@ interface ConfiguresUserAttributesContract
         string $name,
         string $label,
         string $type = 'text',
-        array $customizations = []
+        array $customizations = [],
+        array $options = []
     ): UserAttributeConfig;
 }

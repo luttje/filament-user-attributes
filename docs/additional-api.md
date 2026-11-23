@@ -99,15 +99,32 @@ $configs = UserAttributeConfig::queryByConfig('should_import', true)
 // You'll get all the user attributes, so you still have to filter out those of other tenants.
 ```
 
-And this snippet checks if there's a config with a `config` key using `queryByConfigKey`, it also limits to the current tenant:
+And this snippet checks if there's a config with a `config` key using `queryByConfigKey`, it also limits to the current tenant by starting from its configs:
 
 ```php
-$tenant = user()->tenant ?? Filament::getTenant();
-$configs = UserAttributeConfig::queryByConfigKey('import')
-    ->where('owner_id', $tenant->id)
-    ->where('owner_type', get_class($tenant))
+$configs = Filament::getTenant()
+    ->userAttributesConfigs()
+    ->queryByConfigKey('import')
     ->with('userAttributes.model')
     ->get();
+```
+
+## 🌱 Adding user attributes from code
+
+The model with the `ConfiguresUserAttributes` trait (e.g. your tenant) can add user attributes to a resource, for example when seeding defaults for new tenants:
+
+```php
+$tenant->createUserAttributeConfig(
+    ProductResource::class,
+    name: 'color',
+    label: 'Color',
+    type: 'select',
+    customizations: ['options' => [
+        ['id' => 'red', 'label' => 'Red'],
+        ['id' => 'blue', 'label' => 'Blue'],
+    ]],
+    options: ['required' => true, 'order_position_form' => 'after', 'order_sibling_form' => 'Name'],
+);
 ```
 
 ## 📝 Add custom user attribute configuration fields
