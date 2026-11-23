@@ -46,9 +46,10 @@ return [
 
     /**
      * Whether to eager load the user attributes relationship on models that
-     * use the HasUserAttributes trait.
+     * use the HasUserAttributes trait. This prevents a query for each record
+     * in tables (and lazy loading violations when lazy loading is prevented).
      */
-    'eager_load_user_attributes' => false,
+    'eager_load_user_attributes' => true,
 
     /**
      * Whether to use IconColumn (true) or UserAttributeColumn (false) for

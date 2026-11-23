@@ -39,7 +39,7 @@ trait HasUserAttributes
      */
     protected function initializeHasUserAttributes()
     {
-        if (config('filament-user-attributes.eager_load_user_attributes', false)) {
+        if (config('filament-user-attributes.eager_load_user_attributes', true)) {
             $this->with[] = 'userAttribute';
         }
 

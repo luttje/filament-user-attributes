@@ -317,3 +317,23 @@ it('can render a resource with configured checkbox input user attribute which is
 //         ])
 //         ->assertDontSee('data.user_attributes.time');
 // });
+
+it('can render a resource with user attributes while lazy loading is prevented', function () {
+    $user = User::factory()->create();
+    $user->createUserAttributeConfig(CategoryResource::class, 'color', 'Color');
+
+    $categories = createCategories(['Test Category', 'Another cat']);
+    addAttributesToCategories($categories, [['color' => 'X_red_X'], ['color' => 'X_blue_X']]);
+
+    \Illuminate\Database\Eloquent\Model::preventLazyLoading();
+
+    try {
+        $this->withoutExceptionHandling()
+            ->actingAs($user)
+            ->get(CategoryResource::getUrl('index'))
+            ->assertSuccessful()
+            ->assertSeeInOrder(['X_red_X', 'X_blue_X']);
+    } finally {
+        \Illuminate\Database\Eloquent\Model::preventLazyLoading(false);
+    }
+});
