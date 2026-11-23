@@ -367,19 +367,58 @@ it('lists no configs when no config owner can be resolved', function (bool $disc
     $user->createUserAttributeConfig(CategoryResource::class, 'own', 'Own');
 
     if ($discover) {
-        // Resources are found, but nobody is logged in so they resolve no owner
         discoverFixtureResources();
-    } else {
-        // No configurable resources are found at all
-        $this->actingAs($user);
     }
 
+    // Nobody is logged in, so the resources resolve no owner
     expect(UserAttributeConfig::count())->toBe(1);
     expect(UserAttributeConfigResource::getEloquentQuery()->count())->toBe(0);
 })->with([
-    'resources without an owner' => true,
-    'no resources' => false,
+    'with discovered resources' => true,
+    'without discovered resources' => false,
 ]);
+
+it('lists no configs of resources that are not configurable', function () {
+    $user = User::factory()->create();
+
+    UserAttributeConfig::create([
+        'resource_type' => TagNotSetupResource::class,
+        'model_type' => User::class,
+        'owner_type' => User::class,
+        'owner_id' => $user->id,
+        'config' => [],
+    ]);
+
+    $this->actingAs($user);
+
+    expect(UserAttributeConfigResource::getEloquentQuery()->count())->toBe(0);
+});
+
+it('lists and saves configs of resources that are not discovered', function () {
+    $user = User::factory()->create();
+    $otherUser = User::factory()->create();
+
+    // No resources are discovered in this test, yet the config can be managed
+    expect(FilamentUserAttributes::getConfigurableResources())->toBe([]);
+
+    $otherUser->createUserAttributeConfig(CategoryResource::class, 'other', 'Other');
+
+    $config = createUserAttributeConfig($this, $user, CategoryResource::class, [
+        function ($id, $component) {
+            $component->fillForm([
+                "config.$id.name" => 'custom_attribute_1',
+                "config.$id.label" => 'Label',
+                "config.$id.type" => 'text',
+            ]);
+        },
+    ]);
+
+    $ownConfig = $user->userAttributesConfigs()->first();
+
+    expect($ownConfig->config[0]['name'])->toBe('custom_attribute_1');
+    expect(UserAttributeConfigResource::getEloquentQuery()->pluck('id')->all())
+        ->toBe([$ownConfig->id]);
+});
 
 it('denies access when no policy is registered', function () {
     UserAttributeConfigResource::skipAuthorization(false);

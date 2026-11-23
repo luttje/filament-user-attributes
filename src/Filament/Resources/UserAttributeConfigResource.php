@@ -59,12 +59,19 @@ class UserAttributeConfigResource extends Resource
      */
     public static function getEloquentQuery(): Builder
     {
-        $resources = FilamentUserAttributes::getConfigurableResources();
         $query = parent::getEloquentQuery();
         $owners = [];
 
-        foreach ($resources as $resource => $_) {
-            if (!is_subclass_of($resource, UserAttributesConfigContract::class)) {
+        // Besides the known resources, also consider resources that already
+        // have a configuration. Those may not be discoverable (e.g. Livewire
+        // components), but their configs must still be listed and editable.
+        $resources = array_unique([
+            ...array_keys(FilamentUserAttributes::getConfigurableResources()),
+            ...UserAttributeConfig::query()->distinct()->pluck('resource_type')->all(),
+        ]);
+
+        foreach ($resources as $resource) {
+            if (!is_string($resource) || !static::isConfigurableResource($resource)) {
                 continue;
             }
 
