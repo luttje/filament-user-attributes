@@ -23,6 +23,8 @@
 
     If you need your own resource, keep extending `UserAttributeConfigResource`, but pass it to the plugin with `->resource(YourResource::class)` and stop the panel from discovering it as well.
 
+- The first time someone opens the configuration of a resource, your `UserAttributeConfigPolicy::update()` now receives a configuration that isn't saved yet. It's only saved once your policy allows access. Its `owner` is already set, so checking ownership still works. If your policy relies on the configuration's `id` or `exists`, check the owner instead.
+
 ### Models
 
 - `UserAttribute::make()` was removed. Assign an array instead: `$model->user_attributes = ['color' => 'red']`.
